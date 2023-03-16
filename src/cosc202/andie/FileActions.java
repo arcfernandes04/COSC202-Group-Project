@@ -2,6 +2,8 @@ package cosc202.andie;
 
 import java.util.*;
 import java.awt.event.*;
+import java.io.*;
+import javax.imageio.*;
 import javax.swing.*;
 
 /**
@@ -37,6 +39,7 @@ public class FileActions {
         actions.add(new FileOpenAction("Open", null, "Open a file", Integer.valueOf(KeyEvent.VK_O)));
         actions.add(new FileSaveAction("Save", null, "Save the file", Integer.valueOf(KeyEvent.VK_S)));
         actions.add(new FileSaveAsAction("Save As", null, "Save a copy", Integer.valueOf(KeyEvent.VK_A)));
+        actions.add(new FileExportAction("Export", null, "Export the image", Integer.valueOf(KeyEvent.VK_E)));
         actions.add(new FileExitAction("Exit", null, "Exit the program", Integer.valueOf(0)));
     }
 
@@ -205,6 +208,22 @@ public class FileActions {
             }
         }
 
+    }
+
+    public class FileExportAction extends ImageAction
+    {
+        FileExportAction(String name, ImageIcon icon, String desc, Integer mnemonic)
+        {
+            super(name, icon, desc, mnemonic);
+        }
+        
+        
+    }
+
+    static boolean ImageIO.write(RenderedImage ri, String form, File out) throws IOException
+    {
+        
+        return true;
     }
 
     /**
