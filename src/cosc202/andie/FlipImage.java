@@ -52,23 +52,14 @@ public class FlipImage implements ImageOperation, java.io.Serializable {
 
                     //first pixel
                     int argb = input.getRGB(x, y);
-                    int a = (argb & 0xFF000000) >> 24;
-                    int r = (argb & 0x00FF0000) >> 16;
-                    int g = (argb & 0x0000FF00) >> 8;
-                    int b = (argb & 0x000000FF);
 
                     // opposite pixel
                     int yOpposite = input.getHeight() - (y + 1);
                     int argbOpposite = input.getRGB(x, yOpposite);
-                    int aOpposite = (argbOpposite & 0xFF000000) >> 24;
-                    int rOpposite = (argbOpposite & 0x00FF0000) >> 16;
-                    int gOpposite = (argbOpposite & 0x0000FF00) >> 8;
-                    int bOpposite = (argbOpposite & 0x000000FF);
 
-                    argb = (aOpposite << 24) | (rOpposite << 16) | (gOpposite << 8) | bOpposite;
-                    argbOpposite = (a << 24) | (r << 16) | (g << 8) | b;
-                    input.setRGB(x, y, argb);
-                    input.setRGB(x, yOpposite, argbOpposite);
+                    //swap pixels
+                    input.setRGB(x, y, argbOpposite);
+                    input.setRGB(x, yOpposite, argb);
                 }
             }
         }
@@ -78,23 +69,14 @@ public class FlipImage implements ImageOperation, java.io.Serializable {
 
                     // first pixel
                     int argb = input.getRGB(x, y);
-                    int a = (argb & 0xFF000000) >> 24;
-                    int r = (argb & 0x00FF0000) >> 16;
-                    int g = (argb & 0x0000FF00) >> 8;
-                    int b = (argb & 0x000000FF);
 
                     // opposite pixel
                     int xOpposite = input.getWidth() - (x + 1);
                     int argbOpposite = input.getRGB(xOpposite, y);
-                    int aOpposite = (argbOpposite & 0xFF000000) >> 24;
-                    int rOpposite = (argbOpposite & 0x00FF0000) >> 16;
-                    int gOpposite = (argbOpposite & 0x0000FF00) >> 8;
-                    int bOpposite = (argbOpposite & 0x000000FF);
 
-                    argb = (aOpposite << 24) | (rOpposite << 16) | (gOpposite << 8) | bOpposite;
-                    argbOpposite = (a << 24) | (r << 16) | (g << 8) | b;
-                    input.setRGB(x, y, argb);
-                    input.setRGB(xOpposite, y, argbOpposite);
+                    //swap pixels
+                    input.setRGB(x, y, argbOpposite);
+                    input.setRGB(xOpposite, y, argb);
                 }
             }
         }
