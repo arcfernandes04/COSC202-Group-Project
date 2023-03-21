@@ -92,9 +92,13 @@ public class ColourActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            target.getImage().apply(new ConvertToGrey());
-            target.repaint();
-            target.getParent().revalidate();
+            try{
+                target.getImage().apply(new ConvertToGrey());
+                target.repaint();
+                target.getParent().revalidate();
+            }catch(Exception ex){
+                new UserMessage(ex);
+            }
         }
 
     }

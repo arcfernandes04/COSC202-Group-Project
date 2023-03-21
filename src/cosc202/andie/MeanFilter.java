@@ -3,6 +3,8 @@ package cosc202.andie;
 import java.awt.image.*;
 import java.util.*;
 
+import cosc202.andie.exceptions.*;
+
 /**
  * <p>
  * ImageOperation to apply a Mean (simple blur) filter.
@@ -67,23 +69,35 @@ public class MeanFilter implements ImageOperation, java.io.Serializable {
      * 
      * <p>
      * As with many filters, the Mean filter is implemented via convolution.
-     * The size of the convolution kernel is specified by the {@link radius}.  
+     * The size of the convolution kernel is specified by the {@link radius}.
      * Larger radii lead to stronger blurring.
      * </p>
      * 
      * @param input The image to apply the Mean filter to.
      * @return The resulting (blurred)) image.
+     * @throws NullFileException Occurs if there is no file currently open
+     * @throws InvalidImageFormatException If the current image is in an 
+     * unrecognised format. Probably due to erroneous manipulation.
+     * @throws Exception Raised if an unexpected {@code Exception} occurs.
+     * 
      */
-    public BufferedImage apply(BufferedImage input) {
-        int size = (2*radius+1) * (2*radius+1);
-        float [] array = new float[size];
-        Arrays.fill(array, 1.0f/size);
+    public BufferedImage apply(BufferedImage input) throws NullFileException, InvalidImageFormatException, Exception {
+        BufferedImage output = null;
+        try{
+            int size = (2*radius+1) * (2*radius+1);
+            float [] array = new float[size];
+            Arrays.fill(array, 1.0f/size);
 
-        Kernel kernel = new Kernel(2*radius+1, 2*radius+1, array);
-        ConvolveOp convOp = new ConvolveOp(kernel);
-        BufferedImage output = new BufferedImage(input.getColorModel(), input.copyData(null), input.isAlphaPremultiplied(), null);
-        convOp.filter(input, output);
+            Kernel kernel = new Kernel(2*radius+1, 2*radius+1, array);
+            ConvolveOp convOp = new ConvolveOp(kernel);
+            output = new BufferedImage(input.getColorModel(), input.copyData(null), input.isAlphaPremultiplied(), null);
+            convOp.filter(input, output);
 
+        }catch(NullPointerException ex){
+            throw new NullFileException(ex);
+        }catch(java.awt.image.RasterFormatException ex){
+            throw new InvalidImageFormatException(ex);
+        }
         return output;
     }
 

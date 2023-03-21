@@ -2,6 +2,9 @@ package cosc202.andie;
 
 import java.awt.*;
 import javax.swing.*;
+
+import cosc202.andie.exceptions.FatalRuntimeException;
+
 import javax.imageio.*;
 
 /**
@@ -49,10 +52,13 @@ public class Andie {
     private static void createAndShowGUI() throws Exception {
         // Set up the main GUI frame
         JFrame frame = new JFrame("ANDIE");
-
         Image image = ImageIO.read(Andie.class.getClassLoader().getResource("icon.png"));
         frame.setIconImage(image);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Set the title and parent frame for UserMessages
+        UserMessage.setTitle("ANDIE");
+        UserMessage.setParent(frame);
 
         // The main content area is an ImagePanel
         ImagePanel imagePanel = new ImagePanel();
@@ -107,8 +113,9 @@ public class Andie {
             public void run() {
                 try {
                     createAndShowGUI();
-                } catch (Exception ex) {
+                } catch (Throwable ex) {
                     ex.printStackTrace();
+                    new UserMessage(new FatalRuntimeException(ex));
                     System.exit(1);
                 }
             }
