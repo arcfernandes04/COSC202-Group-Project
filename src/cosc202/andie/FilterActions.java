@@ -108,10 +108,14 @@ public class FilterActions {
                 radius = radiusModel.getNumber().intValue();
             }
 
-            // Create and apply the filter
-            target.getImage().apply(new MeanFilter(radius));
-            target.repaint();
-            target.getParent().revalidate();
+            try{
+                // Create and apply the filter
+                target.getImage().apply(new MeanFilter(radius));
+                target.repaint();
+                target.getParent().revalidate();
+            }catch(Exception ex){
+                new UserMessage(ex);
+            }
         }
 
     }
