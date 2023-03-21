@@ -36,6 +36,7 @@ public class FilterActions {
         actions = new ArrayList<Action>();
         actions.add(new MeanFilterAction("Mean filter", null, "Apply a mean filter", Integer.valueOf(KeyEvent.VK_M)));
         actions.add(new SharpenFilterAction("Sharpen filter", null, "Apply a sharpen filter", Integer.valueOf(KeyEvent.VK_S)));
+        actions.add(new GaussianBlurFilterAction("Gaussian blur filter", null, "Apply a Gaussian blur filter", Integer.valueOf(KeyEvent.VK_G)));
     }
 
     /**
@@ -116,14 +117,45 @@ public class FilterActions {
     }
 
     public class SharpenFilterAction extends ImageAction {
+        
         SharpenFilterAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
             super(name, icon, desc, mnemonic);
         }
-
+        
         public void actionPerformed(ActionEvent e) {
             target.getImage().apply(new SharpenFilter());
             target.repaint();
             target.getParent().revalidate();
         }
+    }
+
+
+    public class GaussianBlurFilterAction extends ImageAction {
+
+        GaussianBlurFilterAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+            super(name, icon, desc, mnemonic);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            // Determine the radius - ask the user.
+            int radius = 1;
+
+            // Pop-up dialog box to ask for the radius value.
+            SpinnerNumberModel radiusModel = new SpinnerNumberModel(1, 1, 10, 1);
+            JSpinner radiusSpinner = new JSpinner(radiusModel);
+            int option = JOptionPane.showOptionDialog(null, radiusSpinner, "Enter filter radius", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+
+            // Check the return value from the dialog box.
+            if (option == JOptionPane.CANCEL_OPTION) {
+                return;
+            } else if (option == JOptionPane.OK_OPTION) {
+                radius = radiusModel.getNumber().intValue();
+            }
+
+            target.getImage().apply(new GaussianBlurFilter(radius));
+            target.repaint();
+            target.getParent().revalidate();
+        }
+
     }
 }
