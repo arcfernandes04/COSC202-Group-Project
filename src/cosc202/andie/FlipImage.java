@@ -4,6 +4,8 @@ import java.awt.image.*;
 
 import org.w3c.dom.stylesheets.StyleSheetList;
 
+import cosc202.andie.exceptions.NullFileException;
+
 /**
  * <p>
  * ImageOperation to flip an image.
@@ -45,43 +47,47 @@ public class FlipImage implements ImageOperation, java.io.Serializable {
      * @param input The image to be flipped
      * @return The resulting flipped image.
      */
-    public BufferedImage apply(BufferedImage input) {
-        if (direction.toLowerCase().equals("vertical")) {
-            for (int y = 0; y < input.getHeight()/2; ++y) {
-                for (int x = 0; x < input.getWidth(); ++x) {
+    public BufferedImage apply(BufferedImage input) throws NullFileException, Exception {
+        try{
+            if (direction.toLowerCase().equals("vertical")) {
+                for (int y = 0; y < input.getHeight()/2; ++y) {
+                    for (int x = 0; x < input.getWidth(); ++x) {
 
-                    //first pixel
-                    int argb = input.getRGB(x, y);
+                        //first pixel
+                        int argb = input.getRGB(x, y);
 
-                    // opposite pixel
-                    int yOpposite = input.getHeight() - (y + 1);
-                    int argbOpposite = input.getRGB(x, yOpposite);
+                        // opposite pixel
+                        int yOpposite = input.getHeight() - (y + 1);
+                        int argbOpposite = input.getRGB(x, yOpposite);
 
-                    //swap pixels
-                    input.setRGB(x, y, argbOpposite);
-                    input.setRGB(x, yOpposite, argb);
+                        //swap pixels
+                        input.setRGB(x, y, argbOpposite);
+                        input.setRGB(x, yOpposite, argb);
+                    }
                 }
             }
-        }
-        else if (direction.toLowerCase().equals("horizontal")) {
-            for (int y = 0; y < input.getHeight(); ++y) {
-                for (int x = 0; x < input.getWidth()/2; ++x) {
+            else if (direction.toLowerCase().equals("horizontal")) {
+                for (int y = 0; y < input.getHeight(); ++y) {
+                    for (int x = 0; x < input.getWidth()/2; ++x) {
 
-                    // first pixel
-                    int argb = input.getRGB(x, y);
+                        // first pixel
+                        int argb = input.getRGB(x, y);
 
-                    // opposite pixel
-                    int xOpposite = input.getWidth() - (x + 1);
-                    int argbOpposite = input.getRGB(xOpposite, y);
+                        // opposite pixel
+                        int xOpposite = input.getWidth() - (x + 1);
+                        int argbOpposite = input.getRGB(xOpposite, y);
 
-                    //swap pixels
-                    input.setRGB(x, y, argbOpposite);
-                    input.setRGB(xOpposite, y, argb);
+                        //swap pixels
+                        input.setRGB(x, y, argbOpposite);
+                        input.setRGB(xOpposite, y, argb);
+                    }
                 }
             }
-        }
-        else {
-            throw new IllegalArgumentException("Direction provided in EditActions.java is invalid");
+            else {
+                throw new IllegalArgumentException("Direction provided in EditActions.java is invalid");
+            }
+        }catch(NullPointerException ex){
+            throw new NullFileException(ex);
         }
         
         return input;

@@ -36,11 +36,6 @@ public class EditActions {
         actions = new ArrayList<Action>();
         actions.add(new UndoAction("Undo", null, "Undo", Integer.valueOf(KeyEvent.VK_Z)));
         actions.add(new RedoAction("Redo", null, "Redo", Integer.valueOf(KeyEvent.VK_Y)));
-        actions.add(new FlipImageAction("Flip Horizontally", null, "Flip Image Horizontally", Integer.valueOf(KeyEvent.VK_H), "horizontal"));
-        actions.add(new FlipImageAction("Flip Vertically", null, "Flip Image Vertically", Integer.valueOf(KeyEvent.VK_H), "vertical"));
-        actions.add(new RotateImageAction("Rotate 180 Degrees", null, "Rotate Image 180 Degrees", Integer.valueOf(KeyEvent.VK_H), "180"));
-        actions.add(new RotateImageAction("Rotate 90 Degrees Right", null, "Rotate Image 90 Degrees Right", Integer.valueOf(KeyEvent.VK_H), "90 Right"));
-        actions.add(new RotateImageAction("Rotate 90 Degrees Left", null, "Rotate Image 90 Degrees Left", Integer.valueOf(KeyEvent.VK_H), "90 Left"));
     }
 
     /**
@@ -150,91 +145,6 @@ public class EditActions {
             }catch(Exception ex){
                 new UserMessage(ex);
             }
-        }
-    }
-
-     /**
-     * <p>
-     * Action to flip an image.
-     * </p>
-     * 
-     * @see FlipImage
-     */
-    public class FlipImageAction extends ImageAction {
-        
-        private String direction;
-        /**
-         * <p>
-         * Create a new flip-image action.
-         * </p>
-         * 
-         * @param name The name of the action (ignored if null).
-         * @param icon An icon to use to represent the action (ignored if null).
-         * @param desc A brief description of the action  (ignored if null).
-         * @param mnemonic A mnemonic key to use as a shortcut  (ignored if null).
-         * @param direction The line the flip will occur on.
-         */
-        FlipImageAction(String name, ImageIcon icon, String desc, Integer mnemonic, String direction) {
-            super(name, icon, desc, mnemonic);
-            this.direction = direction;
-        }
-
-        /**
-         * <p>
-         * Callback for when the flip-image action is triggered.
-         * </p>
-         * 
-         * <p>
-         * This method is called whenever the FlipImageAction is triggered.
-         * It Flips the image over a line deciphered from the direction data-field.
-         * </p>
-         * 
-         * @param e The event triggering this callback.
-         */
-        public void actionPerformed(ActionEvent e) {
-            target.getImage().apply(new FlipImage(this.direction));
-            target.repaint();
-            target.getParent().revalidate();
-        }
-    }
-
-    public class RotateImageAction extends ImageAction {
-
-        private String rotation;
-
-        /**
-         * <p>
-         * Create a new rotate-image action.
-         * </p>
-         * 
-         * @param name The name of the action (ignored if null).
-         * @param icon An icon to use to represent the action (ignored if null).
-         * @param desc A brief description of the action  (ignored if null).
-         * @param mnemonic A mnemonic key to use as a shortcut  (ignored if null).
-         * @param rotation The direction and degree of rotation.
-         */
-        RotateImageAction(String name, ImageIcon icon, String desc, Integer mnemonic, String rotation) {
-            super(name, icon, desc, mnemonic);
-            this.rotation = rotation;
-        }
-
-        /**
-         * <p>
-         * Callback for when the rotate-image action is triggered.
-         * </p>
-         * 
-         * <p>
-         * This method is called whenever the RotateImageAction is triggered.
-         * It Rotates the image based on the degree and direction given by the
-         * rotation datafield.
-         * </p>
-         * 
-         * @param e The event triggering this callback.
-         */
-        public void actionPerformed(ActionEvent e) {
-            target.getImage().apply(new RotateImage(rotation));
-            target.repaint();
-            target.getParent().revalidate();
         }
     }
 

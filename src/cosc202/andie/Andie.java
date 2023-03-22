@@ -50,6 +50,16 @@ public class Andie {
      * @throws Exception if something goes wrong.
      */
     private static void createAndShowGUI() throws Exception {
+
+        // We need to catch exceptions that are thrown in other threads
+        // Easiest way to do this is by setting the default UncaughtExceptionHandler
+        // https://stackoverflow.com/questions/12008662/swing-uncaughtexceptionhandler
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            public void uncaughtException(Thread t, Throwable e) {
+                new UserMessage((Exception) e);
+            }
+        });
+
         // Set up the main GUI frame
         JFrame frame = new JFrame("ANDIE");
         Image image = ImageIO.read(Andie.class.getClassLoader().getResource("icon.png"));
@@ -80,6 +90,10 @@ public class Andie {
         // View actions control how the image is displayed, but do not alter its actual content
         ViewActions viewActions = new ViewActions();
         menuBar.add(viewActions.createMenu());
+
+        // Transform actions allow for rotation and scaling
+        TransformActions transformActions = new TransformActions();
+        menuBar.add(transformActions.createMenu());
 
         // Filters apply a per-pixel operation to the image, generally based on a local window
         FilterActions filterActions = new FilterActions();

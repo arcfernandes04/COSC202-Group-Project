@@ -127,9 +127,13 @@ public class FilterActions {
         }
         
         public void actionPerformed(ActionEvent e) {
-            target.getImage().apply(new SharpenFilter());
-            target.repaint();
-            target.getParent().revalidate();
+            try{
+                target.getImage().apply(new SharpenFilter());
+                target.repaint();
+                target.getParent().revalidate();
+            }catch(Exception ex){
+                new UserMessage(ex);
+            }
         }
     }
 
@@ -156,9 +160,13 @@ public class FilterActions {
                 radius = radiusModel.getNumber().intValue();
             }
 
-            target.getImage().apply(new GaussianBlurFilter(radius));
-            target.repaint();
-            target.getParent().revalidate();
+            try{
+                target.getImage().apply(new GaussianBlurFilter(radius));
+                target.repaint();
+                target.getParent().revalidate();
+            }catch(Exception ex){
+                new UserMessage(ex);
+            }
         }
 
     }

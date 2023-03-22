@@ -2,6 +2,8 @@ package cosc202.andie;
 
 import java.awt.image.*;
 
+import cosc202.andie.exceptions.NullFileException;
+
 /**
  * <p>
  * ImageOperation to adjust the brightness/contrast levels of an image.
@@ -68,23 +70,27 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
      * @param input The image to be adjusted
      * @return The resulting adjusted image.
      */
-    public BufferedImage apply(BufferedImage input) {
-        for (int y = 0; y < input.getHeight(); ++y) {
-            for (int x = 0; x < input.getWidth(); ++x) {
-                int argb = input.getRGB(x, y);
-                int a = (argb & 0xFF000000) >> 24;
-                int r = (argb & 0x00FF0000) >> 16;
-                int g = (argb & 0x0000FF00) >> 8;
-                int b = (argb & 0x000000FF);
+    public BufferedImage apply(BufferedImage input) throws NullFileException, Exception {
+        try{
+                for (int y = 0; y < input.getHeight(); ++y) {
+                for (int x = 0; x < input.getWidth(); ++x) {
+                    int argb = input.getRGB(x, y);
+                    int a = (argb & 0xFF000000) >> 24;
+                    int r = (argb & 0x00FF0000) >> 16;
+                    int g = (argb & 0x0000FF00) >> 8;
+                    int b = (argb & 0x000000FF);
 
 
-                r = (calculateAdjustment(r));
-                g = (calculateAdjustment(g));
-                b = (calculateAdjustment(b));
+                    r = (calculateAdjustment(r));
+                    g = (calculateAdjustment(g));
+                    b = (calculateAdjustment(b));
 
-                argb = (a << 24) | (r << 16) | (g << 8) | b;
-                input.setRGB(x, y, argb);
+                    argb = (a << 24) | (r << 16) | (g << 8) | b;
+                    input.setRGB(x, y, argb);
+                }
             }
+        }catch(NullPointerException ex){
+            throw new NullFileException();
         }
 
         return input;
