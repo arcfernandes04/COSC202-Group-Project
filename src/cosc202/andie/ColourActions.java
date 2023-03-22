@@ -163,10 +163,14 @@ public class ColourActions {
                 contrast = contrastModel.getNumber().intValue();
             }
 
-            // Create and apply filter
-            target.getImage().apply(new BrightnessContrastAdjustment(brightness, contrast));
-            target.repaint();
-            target.getParent().revalidate();
+            try{
+                // Create and apply filter
+                target.getImage().apply(new BrightnessContrastAdjustment(brightness, contrast));
+                target.repaint();
+                target.getParent().revalidate();
+            }catch(Exception ex){
+                new UserMessage(ex);
+            }
 
         }
     }
