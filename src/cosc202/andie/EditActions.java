@@ -38,6 +38,9 @@ public class EditActions {
         actions.add(new RedoAction("Redo", null, "Redo", Integer.valueOf(KeyEvent.VK_Y)));
         actions.add(new FlipImageAction("Flip Horizontally", null, "Flip Image Horizontally", Integer.valueOf(KeyEvent.VK_H), "horizontal"));
         actions.add(new FlipImageAction("Flip Vertically", null, "Flip Image Vertically", Integer.valueOf(KeyEvent.VK_H), "vertical"));
+        actions.add(new RotateImageAction("Rotate 180 Degrees", null, "Rotate Image 180 Degrees", Integer.valueOf(KeyEvent.VK_H), "180"));
+        actions.add(new RotateImageAction("Rotate 90 Degrees Right", null, "Rotate Image 90 Degrees Right", Integer.valueOf(KeyEvent.VK_H), "90 Right"));
+        actions.add(new RotateImageAction("Rotate 90 Degrees Left", null, "Rotate Image 90 Degrees Left", Integer.valueOf(KeyEvent.VK_H), "90 Left"));
     }
 
     /**
@@ -190,6 +193,46 @@ public class EditActions {
          */
         public void actionPerformed(ActionEvent e) {
             target.getImage().apply(new FlipImage(this.direction));
+            target.repaint();
+            target.getParent().revalidate();
+        }
+    }
+
+    public class RotateImageAction extends ImageAction {
+
+        private String rotation;
+
+        /**
+         * <p>
+         * Create a new rotate-image action.
+         * </p>
+         * 
+         * @param name The name of the action (ignored if null).
+         * @param icon An icon to use to represent the action (ignored if null).
+         * @param desc A brief description of the action  (ignored if null).
+         * @param mnemonic A mnemonic key to use as a shortcut  (ignored if null).
+         * @param rotation The direction and degree of rotation.
+         */
+        RotateImageAction(String name, ImageIcon icon, String desc, Integer mnemonic, String rotation) {
+            super(name, icon, desc, mnemonic);
+            this.rotation = rotation;
+        }
+
+        /**
+         * <p>
+         * Callback for when the rotate-image action is triggered.
+         * </p>
+         * 
+         * <p>
+         * This method is called whenever the RotateImageAction is triggered.
+         * It Rotates the image based on the degree and direction given by the
+         * rotation datafield.
+         * </p>
+         * 
+         * @param e The event triggering this callback.
+         */
+        public void actionPerformed(ActionEvent e) {
+            target.getImage().apply(new RotateImage(rotation));
             target.repaint();
             target.getParent().revalidate();
         }
