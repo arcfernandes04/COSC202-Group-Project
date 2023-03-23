@@ -96,16 +96,16 @@ public class FileActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = new JFileChooser();
-            int result = fileChooser.showOpenDialog(target);
-
-            if (result == JFileChooser.APPROVE_OPTION) {
-                try {
+            try {
+                JFileChooser fileChooser = new JFileChooser();
+                int result = fileChooser.showOpenDialog(target);  // Issue with this being in another thread - cannot catch exception!
+                if (result == JFileChooser.APPROVE_OPTION) {
                     String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                     target.getImage().open(imageFilepath);
-                } catch (Exception ex) {
-                    System.exit(1);
                 }
+            }catch (Exception ex) {
+                //System.exit(1);
+                new UserMessage(ex);
             }
 
             target.repaint();
@@ -153,7 +153,8 @@ public class FileActions {
             try {
                 target.getImage().save();           
             } catch (Exception ex) {
-                System.exit(1);
+                //System.exit(1);
+                new UserMessage(ex);
             }
         }
 
@@ -203,7 +204,8 @@ public class FileActions {
                     String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                     target.getImage().saveAs(imageFilepath);
                 } catch (Exception ex) {
-                    System.exit(1);
+                    //System.exit(1);
+                    new UserMessage(ex);
                 }
             }
         }
