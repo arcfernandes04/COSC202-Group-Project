@@ -240,6 +240,16 @@ class EditableImage {
         save();
     }
 
+    public void export(String filename) throws Exception {
+        // Write image file based on file extension
+        String extension = imageFilename.substring(1+imageFilename.lastIndexOf(".")).toLowerCase();
+        this.imageFilename = filename + "." + extension;
+        ImageIO.write(current, extension, new File(imageFilename));
+        // Write operations file
+
+
+    }
+
     /**
      * <p>
      * Apply an {@link ImageOperation} to this image.
