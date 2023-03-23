@@ -217,13 +217,22 @@ public class FileActions {
             super(name, icon, desc, mnemonic);
         }
         
-        
-    }
 
-    static boolean ImageIO.write(RenderedImage ri, String form, File out) throws IOException
-    {
-        
-        return true;
+
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showSaveDialog(target);
+                
+            if(result == JFileChooser.APPROVE_OPTION)
+            {
+                try {
+                String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
+                target.getImage().export(imageFilepath);           
+            } catch (Exception ex) {
+                System.exit(1);
+            }
+            }
+        }
     }
 
     /**
