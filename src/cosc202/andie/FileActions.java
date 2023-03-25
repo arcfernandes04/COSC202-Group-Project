@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.io.*;
 import javax.imageio.*;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * <p>
@@ -97,8 +98,9 @@ public class FileActions {
          */
         public void actionPerformed(ActionEvent e) {
             try {
-                JFileChooser fileChooser = new JFileChooser();
-                int result = fileChooser.showOpenDialog(target);  // Issue with this being in another thread - cannot catch exception!
+                JFileChooser fileChooser = new AndieFileChooser();
+                int result = fileChooser.showOpenDialog(target);
+
                 if (result == JFileChooser.APPROVE_OPTION) {
                     String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                     target.getImage().open(imageFilepath);
@@ -196,7 +198,7 @@ public class FileActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = new JFileChooser();
+            JFileChooser fileChooser = new AndieFileChooser();
             int result = fileChooser.showSaveDialog(target);
 
             if (result == JFileChooser.APPROVE_OPTION) {
@@ -204,8 +206,8 @@ public class FileActions {
                     String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                     target.getImage().saveAs(imageFilepath);
                 } catch (Exception ex) {
-                    //System.exit(1);
-                    new UserMessage(ex);
+                //System.exit(1);
+                new UserMessage(ex);
                 }
             }
         }
@@ -220,17 +222,16 @@ public class FileActions {
         }
 
         public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = new JFileChooser();
+            JFileChooser fileChooser = new AndieFileChooser();
             int result = fileChooser.showSaveDialog(target);
                 
-            if(result == JFileChooser.APPROVE_OPTION)
-            {
+            if(result == JFileChooser.APPROVE_OPTION){
                 try {
-                String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
-                target.getImage().export(imageFilepath);           
-            } catch (Exception ex) {
-                new UserMessage(ex);
-            }
+                    String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
+                    target.getImage().export(imageFilepath);           
+                } catch (Exception ex) {
+                    new UserMessage(ex);
+                }
             }
         }
     }
@@ -274,6 +275,61 @@ public class FileActions {
             System.exit(0);
         }
 
+    }
+
+    /**
+     * <p>
+     * A safer version of {@code JFileChooser}, asking the user whether they would
+     * like to overwrite their chosen filename if it already exists.
+     * </p>
+     **/
+    public class AndieFileChooser extends JFileChooser{
+
+        /**
+        * List of the file extensions that are displayed within the {@code JFileChooser} window.
+         */
+        protected FileNameExtensionFilter fileExtensionFilter = new FileNameExtensionFilter("JPEG, PNG, GIF, TIFF", "jpeg", "jpg", "png",
+            "gif", "tiff", "tif", "rgb", "ppm");
+
+        /**
+         * Default constructor which also initialises the file extensions that will be visible in the dialog box.
+         */
+        public AndieFileChooser(){
+            super();
+            setFileFilter(fileExtensionFilter);
+        }
+
+        /**
+         * <p>
+         * Approve the user's selection of file, confirming first whether they would like to overwrite an existing file where applicable.
+         * </p>
+         * 
+         * <p>
+         * Code adapted from
+         * https://stackoverflow.com/questions/3651494/jfilechooser-with-confirmation-dialog
+         * </p>
+         */
+        @Override
+        public void approveSelection(){
+
+            File file = getSelectedFile();
+
+            if(file.exists() && getDialogType() == SAVE_DIALOG){
+                int result = new UserMessage().showDialog(UserMessage.OVERWRITE_DIALOG);
+                if(result == UserMessage.YES_OPTION){
+                    super.approveSelection();
+                    return;
+                }else if(result == UserMessage.NO_OPTION){
+                    return;
+                }else if(result == UserMessage.CANCEL_OPTION){
+                    return;
+                }else{
+                    cancelSelection();
+                    return;
+                }
+            }
+            super.approveSelection();
+        }
     }
 
 }

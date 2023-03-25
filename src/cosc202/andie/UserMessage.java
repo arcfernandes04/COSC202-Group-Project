@@ -27,13 +27,37 @@ public class UserMessage {
      * If left blank, the pop-up box will instead appear in the middle of the
      * screen.
      */
-    private static JFrame parent;
+    private static JFrame PARENT;
 
     /**
      * The title for the pop-up box instance. Defaults to "Error Message Window".
      */
-    private static String title = "Error Message Window";
+    public static String TITLE = "Error Message Window";
 
+    public static final int OVERWRITE_DIALOG = 0;
+
+    public static final int INVALID_OPTION = -1;
+    public static final int YES_OPTION = 0;
+    public static final int NO_OPTION = 1;
+    public static final int CANCEL_OPTION = 2;
+    public static final int CLOSED_OPTION = 3;
+
+
+    public static final int GENERIC_WARN = 10;
+    public static final int EMPTY_REDO_STACK_WARN = 11;
+    public static final int EMPTY_UNDO_STACK_WARN = 12;
+    public static final int INVALID_IMG_FILE_WARN = 13;
+    public static final int INVALID_OPS_FILE_WARN = 14;
+    public static final int NULL_FULL_WARN = 15;
+    public static final int NON_IMG_FILE_WARN = 16;
+    public static final int FATAL_ERROR_WARN = 17;
+
+        /*//Exceptions from other libraries
+        else if(exception instanceof FileNotFoundException) this.message = "That file could not be located.";
+        else if(exception instanceof InvalidPathException) this.message = "The path provided is invalid.";
+        else if(exception instanceof SecurityException) this.message = "The program does not have the required permissions to open that file.";*/
+    
+    
     /**
      * The {@code Exception} that caused the UserMessage instance to be created.
      */
@@ -60,6 +84,23 @@ public class UserMessage {
     public UserMessage(String message) {
         this.message = message;
         this.displayMessage();
+    }
+
+    public int showDialog(int dialogOption){
+        int result = UserMessage.INVALID_OPTION;
+        String title = UserMessage.TITLE;
+
+        if(dialogOption == UserMessage.OVERWRITE_DIALOG){
+            title = "Overwrite file?";
+            String message = "The file already exists. Would you like to overwrite it?";
+            result = JOptionPane.showConfirmDialog(UserMessage.PARENT, message, title, JOptionPane.YES_NO_CANCEL_OPTION);
+        }
+
+        if(result == JOptionPane.YES_OPTION) return UserMessage.YES_OPTION;
+        else if(result == JOptionPane.NO_OPTION) return UserMessage.NO_OPTION;
+        else if(result == JOptionPane.CANCEL_OPTION) return UserMessage.CANCEL_OPTION;
+        else if(result == JOptionPane.CLOSED_OPTION) return UserMessage.CLOSED_OPTION;
+        else return UserMessage.INVALID_OPTION;
     }
 
     /**
@@ -92,7 +133,7 @@ public class UserMessage {
      * Display the message stored in this instance of UserMessage.
      */
     public void displayMessage(){
-        JOptionPane.showMessageDialog(UserMessage.parent, this.message, UserMessage.title, JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(UserMessage.PARENT, this.message, UserMessage.TITLE, JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -111,7 +152,7 @@ public class UserMessage {
      * @param title The desired title to use for UserMessage instances.
      */
     public static void setTitle(String title) {
-        UserMessage.title = title;
+        UserMessage.TITLE = title;
     }
 
     /**
@@ -120,7 +161,7 @@ public class UserMessage {
      * @param parent The parent JFrame instance
      */
     public static void setParent(JFrame parent) {
-        UserMessage.parent = parent;
+        UserMessage.PARENT = parent;
     }
 
 }
