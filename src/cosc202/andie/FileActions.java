@@ -218,8 +218,6 @@ public class FileActions {
         {
             super(name, icon, desc, mnemonic);
         }
-        
-
 
         public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser = new JFileChooser();
@@ -231,7 +229,7 @@ public class FileActions {
                 String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                 target.getImage().export(imageFilepath);           
             } catch (Exception ex) {
-                System.exit(1);
+                new UserMessage(ex);
             }
             }
         }

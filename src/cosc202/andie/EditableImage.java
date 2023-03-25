@@ -241,12 +241,16 @@ class EditableImage {
     }
 
     public void export(String filename) throws Exception {
-        // Write image file based on file extension
-        String extension = imageFilename.substring(1+imageFilename.lastIndexOf(".")).toLowerCase();
-        this.imageFilename = filename + "." + extension;
-        ImageIO.write(current, extension, new File(imageFilename));
-        // Write operations file
-
+        try{
+            // Write image file based on file extension
+            String extension = imageFilename.substring(1+imageFilename.lastIndexOf(".")).toLowerCase();
+            this.imageFilename = filename + "." + extension;
+            ImageIO.write(current, extension, new File(imageFilename));
+        } catch (IllegalArgumentException ex) { // There is no current image to save.
+            throw new NullFileException();
+        } catch (NullPointerException ex) { // Again, no file.
+            throw new NullFileException();
+        }
 
     }
 
