@@ -1,6 +1,5 @@
 package cosc202.andie;
 
-import cosc202.andie.exceptions.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -41,5 +40,5 @@ public interface ImageOperation {
      * @throws NullFileException Occurs if there is no file currently open
      * @throws Exception Raised if an unexpected {@code Exception} occurs.
      */
-    public BufferedImage apply(BufferedImage input) throws NullFileException, Exception;    
+    public BufferedImage apply(BufferedImage input) throws Exception;    
 }

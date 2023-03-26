@@ -2,8 +2,6 @@ package cosc202.andie;
 
 import java.awt.image.*;
 
-import cosc202.andie.exceptions.NullFileException;
-
 /**
  * <p>
  * ImageOperation to adjust the brightness/contrast levels of an image.
@@ -70,7 +68,7 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
      * @param input The image to be adjusted
      * @return The resulting adjusted image.
      */
-    public BufferedImage apply(BufferedImage input) throws NullFileException, Exception {
+    public BufferedImage apply(BufferedImage input) {
         try{
                 for (int y = 0; y < input.getHeight(); ++y) {
                 for (int x = 0; x < input.getWidth(); ++x) {
@@ -90,7 +88,7 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
                 }
             }
         }catch(NullPointerException ex){
-            throw new NullFileException();
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         }
 
         return input;

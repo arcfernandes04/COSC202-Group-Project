@@ -4,7 +4,6 @@ import java.util.*;
 import java.io.*;
 import java.awt.image.*;
 import javax.imageio.*;
-import cosc202.andie.exceptions.*;
 
 /**
  * <p>
@@ -110,22 +109,22 @@ class EditableImage {
      * 
      * @param bi The BufferedImage to copy.
      * @return A deep copy of the input.
-     * @throws NonImageFileException This indicates that the program has tried to copy the data in a non-image file as though it is an image.
-     * @throws InvalidImageFormatException This exception is thrown when the buffered image is in an invalid format. This may be due to
-     * incorrect processing during image operations (filters, colour changes, etc.)
-     * @throws Exception If an unexpected error occurs.
      */
-    private static BufferedImage deepCopy(BufferedImage bi) throws NonImageFileException, InvalidImageFormatException, Exception {
+    private static BufferedImage deepCopy(BufferedImage bi) {
+        BufferedImage result = null;
         try{
             ColorModel cm = bi.getColorModel();
             boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
             WritableRaster raster = bi.copyData(null);
-            return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+            result = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
         }catch(NullPointerException ex){ // If there is a NullPointerException, then "bi" is null and this is not an image file!
-            throw new NonImageFileException(ex);
+            UserMessage.showWarning(UserMessage.NON_IMG_FILE_WARN);
         }catch(java.awt.image.RasterFormatException ex){ // The image's data is in an incorrect format.
-            throw new InvalidImageFormatException(ex);
+            UserMessage.showWarning(UserMessage.INVALID_IMG_FILE_WARN);
+        } catch (Exception ex) {
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
+        return result;
     }
     
     /**
@@ -141,11 +140,8 @@ class EditableImage {
      * </p>
      * 
      * @param filePath The file to open the image from.
-     * @throws FileNotFoundException If the file being opened does not exist, this exception is thrown.
-     * @throws NonImageFileException Occurs if the program attempts to open a non-image file.
-     * @throws Exception If an unexpected issue arises.
      */
-    public void open(String filePath) throws FileNotFoundException, NonImageFileException, Exception {
+    public void open(String filePath) {
         imageFilename = filePath;
         opsFilename = imageFilename + ".ops";
         try {
@@ -172,11 +168,13 @@ class EditableImage {
 
             this.refresh();
         }catch (javax.imageio.IIOException ex) { //File doesn't exist
-            throw new FileNotFoundException();
+            UserMessage.showWarning(UserMessage.FILE_NOT_FOUND_WARN);
         }catch(FileNotFoundException ex){
-            //This Exception is not useful. It just means that there is no associated operations file, but it can keep running.
+            //This Exception means that there is no associated operations file - it's just an annoyance really.
         }catch(java.io.StreamCorruptedException ex) { // The operations file is incorrectly formatted
-            throw new InvalidOperationsFileException(ex);
+            UserMessage.showWarning(UserMessage.INVALID_OPS_FILE_WARN);
+        }catch(Exception ex){
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
     }
 
@@ -192,10 +190,8 @@ class EditableImage {
      * the current operations to <code>some/path/to/image.png.ops</code>.
      * </p>
      * 
-     * @throws Exception If something goes wrong.
-     * @throws NullFileException Raised if there is no current file open.
      */
-    public void save() throws NullFileException, Exception {
+    public void save() {
         if (this.opsFilename == null) {
             this.opsFilename = this.imageFilename + ".ops";
         }
@@ -209,10 +205,10 @@ class EditableImage {
             objOut.writeObject(this.ops);
             objOut.close();
             fileOut.close();
-        }catch(IllegalArgumentException ex){ // There is no current image to save.
-            throw new NullFileException();
-        }catch(NullPointerException ex){ // Again, no file.
-            throw new NullFileException();
+        }catch(IllegalArgumentException | NullPointerException ex){ //There is no file currently open
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+        } catch (Exception ex) {
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
     }
 
@@ -231,25 +227,23 @@ class EditableImage {
      * </p>
      * 
      * @param imageFilename The file location to save the image to.
-     * @throws NullFileException Raised if there is no current file open.
-     * @throws Exception If something goes wrong.
      */
-    public void saveAs(String imageFilename) throws NullFileException, Exception {
+    public void saveAs(String imageFilename) {
         this.imageFilename = imageFilename;
         this.opsFilename = imageFilename + ".ops";
         save();
     }
 
-    public void export(String filename) throws Exception {
+    public void export(String filename) {
         try{
             // Write image file based on file extension
             String extension = imageFilename.substring(1+imageFilename.lastIndexOf(".")).toLowerCase();
             this.imageFilename = filename + "." + extension;
             ImageIO.write(current, extension, new File(imageFilename));
-        } catch (IllegalArgumentException ex) { // There is no current image to save.
-            throw new NullFileException();
-        } catch (NullPointerException ex) { // Again, no file.
-            throw new NullFileException();
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+        } catch (Exception ex){
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
 
     }
@@ -260,28 +254,30 @@ class EditableImage {
      * </p>
      * 
      * @param op The operation to apply.
-     * @throws NullFileException If no file is currently open, this {@code Exception} is raised.
-     * @throws Exception Raised if an unexpected error occurs.
      */
-    public void apply(ImageOperation op) throws NullFileException, Exception {
-        current = op.apply(current);
-        ops.add(op);
+    public void apply(ImageOperation op) {
+        try{
+            BufferedImage result = op.apply(current);
+            if(result != null){ //Only count this as a valid operation if it returns non-null value.
+                current = result;
+                ops.add(op);
+            }
+        }catch(Exception ex){ //In case the filter forgets to catch exceptions inside the class
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
+        }
     }
 
     /**
      * <p>
      * Undo the last {@link ImageOperation} applied to the image.
      * </p>
-     * @throws EmptyUndoStackException Occurs if the program tries to pop() from 
-     * the stack of currently applied operations when it is empty.
-     * @throws Exception If an unexpected issue arises.
      */
-    public void undo() throws EmptyUndoStackException, Exception {
+    public void undo(){
         try{
             redoOps.push(ops.pop());
             refresh();
         }catch(EmptyStackException ex){
-            throw new EmptyUndoStackException(ex);
+            UserMessage.showWarning(UserMessage.EMPTY_UNDO_STACK_WARN);
         }
     }
 
@@ -289,16 +285,12 @@ class EditableImage {
      * <p>
      * Reapply the most recently {@link undo}ne {@link ImageOperation} to the image.
      * </p>
-     * 
-     * @throws EmptyUndoStackException Occurs if the program tries to pop() from
-     * the stack of undone operations when the stack is empty.
-     * @throws Exception If an unexpected issue arises.
      */
-    public void redo() throws EmptyRedoStackException, Exception {
+    public void redo() {
         try{
             apply(redoOps.pop());
         }catch(EmptyStackException ex){
-            throw new EmptyRedoStackException(ex);
+            UserMessage.showWarning(UserMessage.EMPTY_REDO_STACK_WARN);
         }
     }
 
@@ -325,13 +317,15 @@ class EditableImage {
      * cannot be easily incrementally updated. 
      * </p>
      * 
-     * @throws NonImageFileException This indicates that the program has tried to copy the data in a non-image file as though it is an image.
-     * @throws If an unexpected exception occurs.
      */
-    private void refresh() throws NonImageFileException, Exception {
+    private void refresh() {
         current = deepCopy(original);
-        for (ImageOperation op: ops) {
+        try{
+            for (ImageOperation op: ops) {
             current = op.apply(current);
+            }
+        }catch(Exception ex){
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
     }
 

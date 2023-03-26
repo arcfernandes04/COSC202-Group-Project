@@ -3,8 +3,6 @@ package cosc202.andie;
 import java.awt.image.*;
 import java.util.*;
 
-import cosc202.andie.exceptions.*;
-
 /**
  * <p>
  * ImageOperation to apply a Mean (simple blur) filter.
@@ -75,13 +73,10 @@ public class MeanFilter implements ImageOperation, java.io.Serializable {
      * 
      * @param input The image to apply the Mean filter to.
      * @return The resulting (blurred)) image.
-     * @throws NullFileException Occurs if there is no file currently open
-     * @throws InvalidImageFormatException If the current image is in an 
-     * unrecognised format. Probably due to erroneous manipulation.
      * @throws Exception Raised if an unexpected {@code Exception} occurs.
      * 
      */
-    public BufferedImage apply(BufferedImage input) throws NullFileException, InvalidImageFormatException, Exception {
+    public BufferedImage apply(BufferedImage input) throws Exception {
         BufferedImage output = null;
         try{
             int size = (2*radius+1) * (2*radius+1);
@@ -94,9 +89,9 @@ public class MeanFilter implements ImageOperation, java.io.Serializable {
             convOp.filter(input, output);
 
         }catch(NullPointerException ex){
-            throw new NullFileException(ex);
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         }catch(java.awt.image.RasterFormatException ex){
-            throw new InvalidImageFormatException(ex);
+            UserMessage.showWarning(UserMessage.INVALID_IMG_FILE_WARN);
         }
         return output;
     }

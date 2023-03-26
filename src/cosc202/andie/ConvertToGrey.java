@@ -1,7 +1,6 @@
 package cosc202.andie;
 
 import java.awt.image.*;
-import cosc202.andie.exceptions.*;
 
 /**
  * <p>
@@ -46,12 +45,8 @@ public class ConvertToGrey implements ImageOperation, java.io.Serializable {
      * 
      * @param input The image to be converted to greyscale
      * @return The resulting greyscale image.
-     * @throws NullFileException           If a file is not currently open.
-     * @throws InvalidImageFormatException If the current image is in an
-     * unrecognised format. Probably due to erroneous manipulation.
-     * @throws Exception If an unexpected {@code Exception} occurs.
      */
-    public BufferedImage apply(BufferedImage input) throws NullFileException, InvalidImageFormatException, Exception {
+    public BufferedImage apply(BufferedImage input) {
         try{
             for (int y = 0; y < input.getHeight(); ++y) {
                 for (int x = 0; x < input.getWidth(); ++x) {
@@ -68,9 +63,9 @@ public class ConvertToGrey implements ImageOperation, java.io.Serializable {
                 }
             }
         }catch(NullPointerException ex){
-            throw new NullFileException(ex);
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         }catch (java.awt.image.RasterFormatException ex) {
-            throw new InvalidImageFormatException(ex);
+            UserMessage.showWarning(UserMessage.INVALID_IMG_FILE_WARN);
         }
         
         return input;

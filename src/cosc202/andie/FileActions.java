@@ -3,7 +3,6 @@ package cosc202.andie;
 import java.util.*;
 import java.awt.event.*;
 import java.io.*;
-import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -97,19 +96,17 @@ public class FileActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            try {
-                JFileChooser fileChooser = new AndieFileChooser();
-                int result = fileChooser.showOpenDialog(target);
+            JFileChooser fileChooser = new AndieFileChooser();
+            int result = fileChooser.showOpenDialog(target);
 
+            try{
                 if (result == JFileChooser.APPROVE_OPTION) {
                     String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                     target.getImage().open(imageFilepath);
                 }
-            }catch (Exception ex) {
-                //System.exit(1);
-                new UserMessage(ex);
+            }catch(IOException ex){
+                UserMessage.showWarning(UserMessage.GENERIC_WARN);
             }
-
             target.repaint();
             target.getParent().revalidate();
         }
@@ -152,12 +149,7 @@ public class FileActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            try {
-                target.getImage().save();           
-            } catch (Exception ex) {
-                //System.exit(1);
-                new UserMessage(ex);
-            }
+            target.getImage().save();           
         }
 
     }
@@ -201,14 +193,13 @@ public class FileActions {
             JFileChooser fileChooser = new AndieFileChooser();
             int result = fileChooser.showSaveDialog(target);
 
-            if (result == JFileChooser.APPROVE_OPTION) {
-                try {
+            try{
+                if (result == JFileChooser.APPROVE_OPTION) {
                     String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                     target.getImage().saveAs(imageFilepath);
-                } catch (Exception ex) {
-                //System.exit(1);
-                new UserMessage(ex);
                 }
+            }catch(IOException ex){
+                UserMessage.showWarning(UserMessage.GENERIC_WARN);
             }
         }
 
@@ -225,13 +216,13 @@ public class FileActions {
             JFileChooser fileChooser = new AndieFileChooser();
             int result = fileChooser.showSaveDialog(target);
                 
-            if(result == JFileChooser.APPROVE_OPTION){
-                try {
+            try{
+                if(result == JFileChooser.APPROVE_OPTION){
                     String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                     target.getImage().export(imageFilepath);           
-                } catch (Exception ex) {
-                    new UserMessage(ex);
                 }
+            }catch(IOException ex){
+                UserMessage.showWarning(UserMessage.GENERIC_WARN);
             }
         }
     }
@@ -312,20 +303,25 @@ public class FileActions {
         @Override
         public void approveSelection(){
 
-            File file = getSelectedFile();
+            if(getDialogType() == SAVE_DIALOG){
+                if(ImageAction.target.getImage().hasImage() == false){ //If there is no current file open, tell the user off and cancel the selection.
+                    UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                    return;
+                }
 
-            if(file.exists() && getDialogType() == SAVE_DIALOG){
-                int result = new UserMessage().showDialog(UserMessage.OVERWRITE_DIALOG);
-                if(result == UserMessage.YES_OPTION){
-                    super.approveSelection();
-                    return;
-                }else if(result == UserMessage.NO_OPTION){
-                    return;
-                }else if(result == UserMessage.CANCEL_OPTION){
-                    return;
-                }else{
-                    cancelSelection();
-                    return;
+                if(getSelectedFile().exists()){
+                    int result = UserMessage.showDialog(UserMessage.OVERWRITE_EXISTING_FILE_DIALOG);
+                    if(result == UserMessage.YES_OPTION){
+                        super.approveSelection();
+                        return;
+                    }else if(result == UserMessage.NO_OPTION){
+                        return;
+                    }else if(result == UserMessage.CANCEL_OPTION){
+                        return;
+                    }else{
+                        cancelSelection();
+                        return;
+                    }
                 }
             }
             super.approveSelection();

@@ -2,9 +2,6 @@ package cosc202.andie;
 
 import java.awt.image.*;
 
-import org.w3c.dom.stylesheets.StyleSheetList;
-
-import cosc202.andie.exceptions.NullFileException;
 
 /**
  * <p>
@@ -47,7 +44,7 @@ public class FlipImage implements ImageOperation, java.io.Serializable {
      * @param input The image to be flipped
      * @return The resulting flipped image.
      */
-    public BufferedImage apply(BufferedImage input) throws NullFileException, Exception {
+    public BufferedImage apply(BufferedImage input) throws Exception{
         try{
             if (direction.toLowerCase().equals("vertical")) {
                 for (int y = 0; y < input.getHeight()/2; ++y) {
@@ -87,7 +84,7 @@ public class FlipImage implements ImageOperation, java.io.Serializable {
                 throw new IllegalArgumentException("Direction provided in EditActions.java is invalid");
             }
         }catch(NullPointerException ex){
-            throw new NullFileException(ex);
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         }
         
         return input;

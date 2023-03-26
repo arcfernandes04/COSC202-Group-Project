@@ -2,7 +2,6 @@ package cosc202.andie;
 
 import java.awt.image.*;
 
-import cosc202.andie.exceptions.NullFileException;
 
 public class GaussianBlurFilter implements ImageOperation, java.io.Serializable{
     private int radius;
@@ -15,7 +14,7 @@ public class GaussianBlurFilter implements ImageOperation, java.io.Serializable{
         this(1);
     }
 
-    public BufferedImage apply(BufferedImage input) throws NullFileException, Exception {
+    public BufferedImage apply(BufferedImage input) throws Exception {
         BufferedImage output = null;
         try{
             int size = (2*radius+1) * (2*radius+1);
@@ -46,7 +45,7 @@ public class GaussianBlurFilter implements ImageOperation, java.io.Serializable{
             output = new BufferedImage(input.getColorModel(), input.copyData(null), input.isAlphaPremultiplied(), null);
             convOp.filter(input, output);
         }catch(NullPointerException ex){
-            throw new NullFileException(ex);
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         }
 
         return output;

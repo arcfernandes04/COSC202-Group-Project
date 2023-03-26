@@ -1,9 +1,9 @@
 package cosc202.andie;
 
 import java.awt.*;
-import javax.swing.*;
+import java.nio.file.InvalidPathException;
 
-import cosc202.andie.exceptions.FatalRuntimeException;
+import javax.swing.*;
 
 import javax.imageio.*;
 
@@ -56,7 +56,11 @@ public class Andie {
         // https://stackoverflow.com/questions/12008662/swing-uncaughtexceptionhandler
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             public void uncaughtException(Thread t, Throwable e) {
-                new UserMessage((Exception) e);
+                if(e instanceof InvalidPathException){
+                    UserMessage.showWarning(UserMessage.INVALID_PATH_WARN);
+                }else{
+                    UserMessage.showWarning(UserMessage.GENERIC_WARN);
+                }
             }
         });
 
@@ -66,8 +70,7 @@ public class Andie {
         frame.setIconImage(image);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Set the title and parent frame for UserMessages
-        UserMessage.setTitle("ANDIE");
+        // Set the parent frame for UserMessages
         UserMessage.setParent(frame);
 
         // The main content area is an ImagePanel
@@ -129,7 +132,7 @@ public class Andie {
                     createAndShowGUI();
                 } catch (Throwable ex) {
                     ex.printStackTrace();
-                    new UserMessage(new FatalRuntimeException(ex));
+                    UserMessage.showWarning(UserMessage.FATAL_ERROR_WARN);
                     System.exit(1);
                 }
             }
