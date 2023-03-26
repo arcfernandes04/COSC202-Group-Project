@@ -32,7 +32,8 @@ public class UserMessage {
     public static final int CLOSED_OPTION = 3;
 
     public static final int OVERWRITE_EXISTING_FILE_DIALOG = 10;
-    public static final int EXIT_WITHOUT_SAVING_DIALOG = 11;
+    public static final int SAVE_AND_EXIT_DIALOG = 11;
+    public static final int SAVE_AND_OPEN_DIALOG = 12;
 
     public static final int GENERIC_WARN = 20;
     public static final int EMPTY_REDO_STACK_WARN = 21;
@@ -66,19 +67,31 @@ public class UserMessage {
         String message = "Are you sure you would like to continue with this action?";
         String title = "ANDIE Dialog Window";
 
+        //Dialog for when the user tries to overwrite a file.
         if(dialogOption == UserMessage.OVERWRITE_EXISTING_FILE_DIALOG){
-            title = "Overwrite file?";
-            message = "The file already exists. Would you like to overwrite it?";
-        }
-        else if(dialogOption == UserMessage.EXIT_WITHOUT_SAVING_DIALOG){
-            title = "Exit without saving?";
-            message = "Unsaved changes have been made. Would you like to save these before exiting?";
+            title = "Overwrite File?";
+            message = "Would you like to overwrite the existing file?";
+            Object[] possibleValues = new Object[]{"Overwrite", "Cancel"};
+            result = JOptionPane.showOptionDialog(UserMessage.parent, message, title,
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,possibleValues,possibleValues[1]);
+        }//Dialog for when the user tries to exit without saving changes.
+        else if(dialogOption == UserMessage.SAVE_AND_EXIT_DIALOG){
+            title = "Save and Exit?";
+            message = "Would you like to save changes before exiting?";
+            Object[] possibleValues = new Object[]{"Save and Exit", "Don't Save", "Cancel"};
+            result = JOptionPane.showOptionDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, possibleValues, possibleValues[0]);
+        }//Dialog for trying to open another file without saving changes.
+        else if (dialogOption == UserMessage.SAVE_AND_OPEN_DIALOG) {
+            title = "Save Changes?";
+            message = "Would you like to save the changes to the current file?";
+            Object[] possibleValues = new Object[] { "Save", "Don't Save", "Cancel" };
+            result = JOptionPane.showOptionDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, possibleValues, possibleValues[0]);
         }
         else{ //If it's not one of the expected dialog options, then that is an illegal argument.
             throw new IllegalArgumentException("Invalid dialog option.");
         }
-
-        result = JOptionPane.showConfirmDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_CANCEL_OPTION);
 
         if(result == JOptionPane.YES_OPTION) return UserMessage.YES_OPTION;
         else if(result == JOptionPane.NO_OPTION) return UserMessage.NO_OPTION;

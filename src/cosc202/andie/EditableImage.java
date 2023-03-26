@@ -45,6 +45,8 @@ class EditableImage {
     private String imageFilename;
     /** The file where the operation sequence is stored. */
     private String opsFilename;
+    /** Whether or not there are unsaved changes. */
+    private boolean unsavedChanges;
 
     /**
      * <p>
@@ -73,6 +75,17 @@ class EditableImage {
      */
     public boolean hasImage() {
         return current != null;
+    }
+
+    /**
+     * <p>
+     * Check if there are currently any unsaved changes to the open file.
+     * </p>
+     * 
+     * @return True if there are unsaved changes, false otherwise.
+     */
+    public boolean hasUnsavedChanges(){
+        return unsavedChanges;
     }
 
     /**
@@ -167,6 +180,7 @@ class EditableImage {
             fileIn.close();
 
             this.refresh();
+            unsavedChanges = false;
         }catch (javax.imageio.IIOException ex) { //File doesn't exist
             UserMessage.showWarning(UserMessage.FILE_NOT_FOUND_WARN);
         }catch(FileNotFoundException ex){
@@ -205,6 +219,9 @@ class EditableImage {
             objOut.writeObject(this.ops);
             objOut.close();
             fileOut.close();
+
+            //Make sure the program knows that there are no unsaved changes.
+            unsavedChanges = false;
         }catch(IllegalArgumentException | NullPointerException ex){ //There is no file currently open
             UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         } catch (Exception ex) {
@@ -261,6 +278,7 @@ class EditableImage {
             if(result != null){ //Only count this as a valid operation if it returns non-null value.
                 current = result;
                 ops.add(op);
+                unsavedChanges = true;
             }
         }catch(Exception ex){ //In case the filter forgets to catch exceptions inside the class
             UserMessage.showWarning(UserMessage.GENERIC_WARN);
@@ -276,6 +294,7 @@ class EditableImage {
         try{
             redoOps.push(ops.pop());
             refresh();
+            unsavedChanges = true;
         }catch(EmptyStackException ex){
             UserMessage.showWarning(UserMessage.EMPTY_UNDO_STACK_WARN);
         }
@@ -289,6 +308,7 @@ class EditableImage {
     public void redo() {
         try{
             apply(redoOps.pop());
+            unsavedChanges = true;
         }catch(EmptyStackException ex){
             UserMessage.showWarning(UserMessage.EMPTY_REDO_STACK_WARN);
         }

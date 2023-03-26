@@ -1,6 +1,10 @@
 package cosc202.andie;
 
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.geom.GeneralPath;
 import java.nio.file.InvalidPathException;
 
 import javax.swing.*;
@@ -68,7 +72,19 @@ public class Andie {
         JFrame frame = new JFrame("ANDIE");
         Image image = ImageIO.read(Andie.class.getClassLoader().getResource("icon.png"));
         frame.setIconImage(image);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        //Add an event listener that checks when the frame is closed.
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e){
+                if (ImageAction.getTarget().getImage().hasUnsavedChanges() == false) System.exit(0); // If there aren't unsaved changes, just exit as usual.
+
+                int result = UserMessage.showDialog(UserMessage.SAVE_AND_EXIT_DIALOG); //Does the user want to save before exiting?
+                if (result == UserMessage.YES_OPTION) ImageAction.getTarget().getImage().save(); //Yes, save the changes
+                else if (result == UserMessage.CANCEL_OPTION || result == UserMessage.CLOSED_OPTION) return; //Cancel or closed, do not save or exit.
+                System.exit(0); //Exit
+            }
+        });
 
         // Set the parent frame for UserMessages
         UserMessage.setParent(frame);

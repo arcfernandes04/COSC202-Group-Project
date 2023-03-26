@@ -263,7 +263,13 @@ public class FileActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            System.exit(0);
+            if(ImageAction.getTarget().getImage().hasUnsavedChanges() == false) System.exit(0); //If there aren't unsaved changes, just exit as usual.
+
+            int result = UserMessage.showDialog(UserMessage.SAVE_AND_EXIT_DIALOG); //Show the user a pop-up dialog.
+            if(result == UserMessage.YES_OPTION) ImageAction.getTarget().getImage().save();
+            else if(result == UserMessage.CLOSED_OPTION || result == UserMessage.CANCEL_OPTION) return; //Don't save OR exit
+
+            System.exit(0); //Only exit if they chose "Save and exit" or "Don't save"
         }
 
     }
@@ -271,7 +277,8 @@ public class FileActions {
     /**
      * <p>
      * A safer version of {@code JFileChooser}, asking the user whether they would
-     * like to overwrite their chosen filename if it already exists.
+     * like to overwrite their chosen filename if it already exists, or save changes
+     * to the current file before opening another file.
      * </p>
      **/
     public class AndieFileChooser extends JFileChooser{
@@ -303,25 +310,21 @@ public class FileActions {
         @Override
         public void approveSelection(){
 
-            if(getDialogType() == SAVE_DIALOG){
-                if(ImageAction.target.getImage().hasImage() == false){ //If there is no current file open, tell the user off and cancel the selection.
+            //Check if they are trying to open a new file and there are unsaved changes.
+            if(getDialogType() == OPEN_DIALOG && ImageAction.target.getImage().hasUnsavedChanges() == true){
+                int result = UserMessage.showDialog(UserMessage.SAVE_AND_OPEN_DIALOG);
+                if(result == UserMessage.YES_OPTION) ImageAction.getTarget().getImage().save(); //Save then open
+                else if(result != UserMessage.NO_OPTION) return; //If not "NO", then they have closed or cancelled. Do not save or open in this case.
+            }
+            else if(getDialogType() == SAVE_DIALOG){
+                if(ImageAction.getTarget().getImage().hasImage() == false){ //If there is no current file open, tell the user off and cancel the selection.
                     UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                    cancelSelection();
                     return;
                 }
-
-                if(getSelectedFile().exists()){
+                else if(getSelectedFile().exists()){ //If the file exists, ask if they want to overwrite.
                     int result = UserMessage.showDialog(UserMessage.OVERWRITE_EXISTING_FILE_DIALOG);
-                    if(result == UserMessage.YES_OPTION){
-                        super.approveSelection();
-                        return;
-                    }else if(result == UserMessage.NO_OPTION){
-                        return;
-                    }else if(result == UserMessage.CANCEL_OPTION){
-                        return;
-                    }else{
-                        cancelSelection();
-                        return;
-                    }
+                    if(result != UserMessage.YES_OPTION) return; //If they didn't say yes, then they don't want to overwrite it.
                 }
             }
             super.approveSelection();

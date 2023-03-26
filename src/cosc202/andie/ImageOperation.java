@@ -37,7 +37,6 @@ public interface ImageOperation {
      * 
      * @param input The image to apply the operation to
      * @return The image resulting from the operation
-     * @throws NullFileException Occurs if there is no file currently open
      * @throws Exception Raised if an unexpected {@code Exception} occurs.
      */
     public BufferedImage apply(BufferedImage input) throws Exception;    
