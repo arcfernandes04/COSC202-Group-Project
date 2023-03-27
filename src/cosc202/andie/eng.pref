@@ -1,0 +1,34 @@
+FileNam = "File"
+
+openFile = "Open"
+SaveFile = "Save"
+SaveAsFile = "Save As"
+ExportFile = "Export"
+ExitFile = "Exit"
+
+EditNam = "Edit"
+
+UndoEdit = "Undo"
+RedoEdit = "Redo"
+FlipHorizontallyEdit = "Flip Horizontally"
+FlipVerticallyEdit = "Flip Vertically"
+Rotate180Edit = "Rotate 180 degrees"
+Rotate90RightEdit = "Rotate 90 degrees right"
+Rotate90LeftEdit = "Rotate 90 degrees left"
+
+ZoomNam = "Zoom"
+
+ZoomIn = "Zoom In"
+ZoomOut = "Zoom Out"
+ZoomFull = "Zoom Full"
+
+FilterNam = "Filter"
+
+MeanFilter = "Mean filter"
+SharpenFilter = "Sharpen filter"
+GaussianBlurFilter = "Gaussian blur filter"
+
+ColourNam = "Colour"
+
+GreyscaleColour = "Greyscale"
+BrightnessContrast = "Brightness/Contrast"

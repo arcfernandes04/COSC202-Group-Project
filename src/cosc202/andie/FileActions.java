@@ -2,8 +2,6 @@ package cosc202.andie;
 
 import java.util.*;
 import java.awt.event.*;
-import java.io.*;
-import javax.imageio.*;
 import javax.swing.*;
 
 /**
@@ -212,6 +210,10 @@ public class FileActions {
 
     }
 
+    /** 
+     * class to export the image after all the changes are made to it, 
+     * much like {@link FileSaveAction} except with current instead of original 
+     * */
     public class FileExportAction extends ImageAction
     {
         FileExportAction(String name, ImageIcon icon, String desc, Integer mnemonic)
@@ -219,13 +221,11 @@ public class FileActions {
             super(name, icon, desc, mnemonic);
         }
         
-
-
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) { //what happens when its button is clicked
             JFileChooser fileChooser = new JFileChooser();
             int result = fileChooser.showSaveDialog(target);
                 
-            if(result == JFileChooser.APPROVE_OPTION)
+            if(result == JFileChooser.APPROVE_OPTION) 
             {
                 try {
                 String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
