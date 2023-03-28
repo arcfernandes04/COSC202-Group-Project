@@ -33,8 +33,8 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
     /**
      * Construct BrightnessContrastAdjustment with given values.
      * 
-     * @param brightness The percentage of brightness change
-     * @param contrast The percentage of contrast change
+     * @param brightness The percentage of brightness change (0 - 100 inclusive)
+     * @param contrast The percentage of contrast change (0 - 100 inclusive)
      */
     public BrightnessContrastAdjustment(int brightness, int contrast){
         this.brightness = brightness;
@@ -43,11 +43,11 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
 
     /**
      * <p> 
-     * Construct BrightnessContrastAdjustment with default the values.
+     * Construct BrightnessContrastAdjustment with the default values.
      * </p>
      * 
      * <p>
-     * By default, has brightness and a contrast percentage changes of 0.
+     * By default, brightness and contrast percentage changes are 0.
      * </p>
      */
     public BrightnessContrastAdjustment(){
@@ -104,7 +104,7 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
      * 
      * 
      * @param input The current value of the pixel
-     * @return The adjusted value of the pixel <p> Note that, if adjusted value 
+     * @return The adjusted value of the pixel <p> Note: if adjusted value 
      *         falls outside the range 0 - 255, return the closer bound instead </p>
      */
     private int calculateAdjustment(int pixelValue){

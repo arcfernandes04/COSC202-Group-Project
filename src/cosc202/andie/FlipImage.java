@@ -2,8 +2,6 @@ package cosc202.andie;
 
 import java.awt.image.*;
 
-import org.w3c.dom.stylesheets.StyleSheetList;
-
 import cosc202.andie.exceptions.NullFileException;
 
 /**

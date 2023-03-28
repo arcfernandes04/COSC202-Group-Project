@@ -28,6 +28,8 @@ public class FileActions {
     
     /** A list of actions for the File menu. */
     protected ArrayList<Action> actions;
+    
+    private static String lastDirectory = null;
 
     /**
      * <p>
@@ -97,12 +99,21 @@ public class FileActions {
          */
         public void actionPerformed(ActionEvent e) {
             try {
-                JFileChooser fileChooser = new JFileChooser();
+                JFileChooser fileChooser;
+                try{
+                    fileChooser = new JFileChooser(lastDirectory);
+
+                }catch (Exception ex){
+                    fileChooser = new JFileChooser();
+                }
+  
                 int result = fileChooser.showOpenDialog(target);  // Issue with this being in another thread - cannot catch exception!
                 if (result == JFileChooser.APPROVE_OPTION) {
                     String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                     target.getImage().open(imageFilepath);
+                    lastDirectory = fileChooser.getSelectedFile().getParent();
                 }
+
             }catch (Exception ex) {
                 //System.exit(1);
                 new UserMessage(ex);
