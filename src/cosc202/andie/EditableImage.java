@@ -264,50 +264,15 @@ class EditableImage {
      * @param imageFilename The file location to save the image to.
      */
     public void saveAs(String imageFilename) {
-        int lastDotIndex = imageFilename.lastIndexOf(".");
-        if (lastDotIndex == -1) { // There isn't an extension, so use the existing one.
-            this.imageFilename = imageFilename + "." + this.extension;
-        } else { //Check what the extension actually is.
-            String extensionCheck = imageFilename.substring(lastDotIndex + 1).toLowerCase();
-            boolean allowed = false;
-            for(String ext: allowedExtensions){ //If it's in the list of allowed extensions, then that's fine.
-                if(ext.equalsIgnoreCase(extensionCheck)){
-                    this.extension = extensionCheck;
-                    this.imageFilename = imageFilename;
-                    allowed = true;
-                    break;
-                }
-            }
-            if(!allowed){ //If not in the allowed list, then add the current extension.
-                this.imageFilename = imageFilename.substring(0, lastDotIndex + 1).toLowerCase() + this.extension;
-            }
-        }
+        this.extension = imageFilename.substring(imageFilename.lastIndexOf(".") + 1).toLowerCase();
+        this.imageFilename = imageFilename;
         this.opsFilename = this.imageFilename + ".ops";
         save();
     }
 
     public void export(String imageFilename) {
         try{
-            // Write image file based on file extension
-            String extensionCheck;
-            int lastDotIndex = imageFilename.lastIndexOf(".");
-            if(lastDotIndex == -1){ //There isn't an extension, so use the one from the current file.
-                imageFilename = imageFilename + "." + this.extension;
-                extensionCheck = this.extension;
-            } else { //Check what the extension actually is.
-                extensionCheck = imageFilename.substring(lastDotIndex + 1).toLowerCase();
-                boolean allowed = false;
-                for(String ext: allowedExtensions){ //If it's in the list of allowed extensions, then that's fine.
-                    if(ext.equalsIgnoreCase(extensionCheck)){
-                        allowed = true;
-                        break;
-                    }
-                }
-                if(!allowed){ //If not in the allowed list, then add the current extension.
-                    imageFilename = imageFilename.substring(0, lastDotIndex + 1).toLowerCase() + this.extension;
-                    extensionCheck = this.extension;
-                }
-            }
+            String extensionCheck = imageFilename.substring(imageFilename.lastIndexOf(".") + 1).toLowerCase();
             ImageIO.write(current, extensionCheck, new File(imageFilename));
         } catch (IllegalArgumentException | NullPointerException ex) {
             UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
@@ -315,6 +280,29 @@ class EditableImage {
             UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
 
+    }
+
+    /**
+     * Ensures that the extension on the file name is appropriate.
+     * 
+     * @param imageFilename
+     * @return The inputted imageFilename with the appropriate extension. If imageFilename did not
+     * have any extension, or it had an illegal extension (one that ANDIE cannot process), then an
+     * appropriate extension is added.
+     * @author Joshua Carter
+     */
+    public String makeSensible(String imageFilename) {
+        int lastDotIndex = imageFilename.lastIndexOf(".");
+        // If there isn't an extension, use the one from the current file.
+        if (lastDotIndex == -1) return imageFilename + "." + this.extension;
+        
+        // If there is an extension, check what it is and if it's allowed or not.
+        String extensionCheck = imageFilename.substring(lastDotIndex + 1).toLowerCase();
+        for (String ext : allowedExtensions) {
+            if (ext.equalsIgnoreCase(extensionCheck)) return imageFilename; // If it's in the list of allowed extensions, then that's fine - return it.
+        }
+        //Otherwise, it doesn't have an allowed extension so add the current one.
+        return imageFilename.substring(0, lastDotIndex + 1).toLowerCase() + this.extension;
     }
 
     /**

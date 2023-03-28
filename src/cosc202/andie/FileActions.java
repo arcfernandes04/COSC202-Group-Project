@@ -280,6 +280,9 @@ public class FileActions {
      * like to overwrite their chosen filename if it already exists, or save changes
      * to the current file before opening another file.
      * </p>
+     * 
+     * @author Joshua Carter
+     * @see javax.swing.JFileChooser
      **/
     public class AndieFileChooser extends JFileChooser{
 
@@ -298,30 +301,74 @@ public class FileActions {
 
         /**
          * <p>
-         * Approve the user's selection of file, confirming first whether they would like to overwrite an existing file where applicable.
+         * Safer version of JFileChooser that asks before overwriting files, or opening
+         * a new file without saving the current file's changes.
          * </p>
          * 
          * <p>
          * Code adapted from
          * https://stackoverflow.com/questions/3651494/jfilechooser-with-confirmation-dialog
          * </p>
+         * 
          */
         @Override
         public void approveSelection(){
 
-            //Check if they are trying to open a new file and there are unsaved changes.
-            if(getDialogType() == OPEN_DIALOG && ImageAction.target.getImage().hasUnsavedChanges() == true){
-                int result = UserMessage.showDialog(UserMessage.SAVE_AND_OPEN_DIALOG);
-                if(result == UserMessage.YES_OPTION) ImageAction.getTarget().getImage().save(); //Save then open
-                else if(result != UserMessage.NO_OPTION) return; //If not "NO", then they have closed or cancelled. Do not save or open in this case.
+            //Get the image and the desired filename
+            EditableImage currImg = ImageAction.target.getImage();
+            String filename;
+            try{
+                filename = getSelectedFile().getCanonicalPath();
+            }catch(IOException ex){
+                UserMessage.showWarning(UserMessage.GENERIC_WARN);
+                return;
             }
-            else if(getDialogType() == SAVE_DIALOG){
-                if(ImageAction.getTarget().getImage().hasImage() == false){ //If there is no current file open, tell the user off and cancel the selection.
+
+            /// Dialog box for OPENING files
+            if(getDialogType() == OPEN_DIALOG){
+                // If the file doesn't even exist, deny selection.
+                if(!getSelectedFile().exists()){
+                    UserMessage.showWarning(UserMessage.FILE_NOT_FOUND_WARN);
+                    return;
+                }
+
+                //Does the file end with one of the allowed extensions?
+                String extension = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+                boolean allowed = false;
+                for (String ext : EditableImage.allowedExtensions) {
+                    if (ext.equalsIgnoreCase(extension)) {
+                        allowed = true;
+                        break;
+                    }
+                }
+                if (!allowed) { // If not in the allowed list, tell the user off and deny the selection.
+                    UserMessage.showWarning(UserMessage.NON_IMG_FILE_WARN);
+                    return;
+                }
+                
+                //If it is indeed an allowed and existing file, but there are unsaved changes, then ask if they want to save first.
+                if(currImg.hasUnsavedChanges() == true){
+                    int result = UserMessage.showDialog(UserMessage.SAVE_AND_OPEN_DIALOG);
+                    if(result == UserMessage.YES_OPTION) ImageAction.getTarget().getImage().save(); //Save then open if the user wants to do this
+                    else if(result != UserMessage.NO_OPTION) return; //If not "NO", then they have closed or cancelled. Do not save or open in this case.
+                } //The other possible case is they said "Don't save", in which case don't do anything - just approve the selection.
+
+            //Dialog for SAVING files (either save as or export)
+            }else if(getDialogType() == SAVE_DIALOG){
+                // If there is no current file open, tell the user off and cancel the selection.
+                if(ImageAction.getTarget().getImage().hasImage() == false){
                     UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
                     cancelSelection();
                     return;
                 }
-                else if(getSelectedFile().exists()){ //If the file exists, ask if they want to overwrite.
+
+                // Run the current selected file through the syntax rules to see what its actual name is.
+                // Check out EditableImage.makeSensible() - it just makes sure that there is always an appropriate extension
+                String sensibleFilename = currImg.makeSensible(filename);
+                setSelectedFile(new File(sensibleFilename));
+                
+                // If the file exists, ask if they want to overwrite.
+                if(getSelectedFile().exists()){
                     int result = UserMessage.showDialog(UserMessage.OVERWRITE_EXISTING_FILE_DIALOG);
                     if(result != UserMessage.YES_OPTION) return; //If they didn't say yes, then they don't want to overwrite it.
                 }
