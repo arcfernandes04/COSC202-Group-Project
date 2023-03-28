@@ -4,8 +4,8 @@ import javax.swing.*;
 
 /**
  * <p>
- * Create a pop up box to notify the user when an error has occurred, instead of
- * crashing with no explanation.
+ * Create a pop up box with {@code showWarning()} to notify the user when an error has occurred, instead of
+ * crashing with no explanation. Or, to ask the user for input using the {@code showDialog()} method.
  * </p>
  * 
  * 
@@ -25,26 +25,44 @@ public class UserMessage {
      * screen.
      */
     private static JFrame parent;
-
+    /**The result when the user choses the "yes" option for a dialog message. */
     public static final int YES_OPTION = 0;
+    /** The result when the user choses the "no" option for a dialog message. */
     public static final int NO_OPTION = 1;
+    /** The result when the user choses the "cancel" option for a dialog message. */
     public static final int CANCEL_OPTION = 2;
+    /** The result when the user closes the dialog message window. */
     public static final int CLOSED_OPTION = 3;
 
+    /** The dialog option asking the user whether they would like to overwrite the existing file, or not. */
     public static final int OVERWRITE_EXISTING_FILE_DIALOG = 10;
+    /** The dialog option asking the user whether they would like to save and exit, or exit without saving, or cancel. */
     public static final int SAVE_AND_EXIT_DIALOG = 11;
+    /** The dialog option asking the user whether they would like to save the current file and option the selection,
+     * or open the selection without saving the current file, or cancel. */
     public static final int SAVE_AND_OPEN_DIALOG = 12;
 
+    /** A generic warning to tell the user that an error has occurred. */
     public static final int GENERIC_WARN = 20;
+    /** A warning to tell the user that the redo stack is empty. */
     public static final int EMPTY_REDO_STACK_WARN = 21;
+    /** A warning to tell the user that the undo stack is empty. */
     public static final int EMPTY_UNDO_STACK_WARN = 22;
+    /** A warning to tell the user that the image file they are trying to open is in an unreadable format. */
     public static final int INVALID_IMG_FILE_WARN = 23;
+    /** A warning to tell the user that the operations file they are trying to open is unreadable. */
     public static final int INVALID_OPS_FILE_WARN = 24;
+    /** A warning to tell the user that no file is currently open. */
     public static final int NULL_FILE_WARN = 25;
+    /** A warning to tell the user that the file the program can only open image files. */
     public static final int NON_IMG_FILE_WARN = 26;
+    /** A warning to tell the user that a fatal error has occurred. */
     public static final int FATAL_ERROR_WARN = 27;
+    /** A warning to tell the user that the desired file was not found. */
     public static final int FILE_NOT_FOUND_WARN = 28;
+    /** A warning to tell the user that the entered file path is invalid. */
     public static final int INVALID_PATH_WARN = 29;
+    /** A warning to tell the user that the program does not have permission to open the desired file. */
     public static final int SECURITY_WARN = 30;
 
 
@@ -57,11 +75,31 @@ public class UserMessage {
         UserMessage.parent = parent;
     }
 
-
+    /**
+     * <p>
+     * Show the user a dialog window, asking them to choose between different options.
+     * </p>
+     * 
+     * @param dialogOption The type of query in the dialog box - e.g. if they would like to overwrite
+     * the existing file, or save before exiting with unsaved changes.
+     * @return The user's answer in response to the dialog - e.g. they may choose {@code UserMessage.YES_OPTION}
+     * when asked shown the dialog for {@code UserMessage.showDialog(UserMessage.SAVE_AND_EXIT_DIALOG)}
+     */
     public static int showDialog(int dialogOption){
         return showDialog(dialogOption, UserMessage.parent);
     }
 
+    /**
+     * <p>
+     * Show the user a dialog window, asking them to choose between different options.
+     * </p>
+     * 
+     * @param dialogOption The type of query in the dialog box - e.g. if they would like to overwrite
+     * the existing file, or save before exiting with unsaved changes.
+     * @param parent The parent component for the dialog box to appear over.
+     * @return The user's answer in response to the dialog - e.g. they may choose {@code UserMessage.YES_OPTION}
+     * when asked shown the dialog for {@code UserMessage.showDialog(UserMessage.SAVE_AND_EXIT_DIALOG)}
+     */
     public static int showDialog(int dialogOption, JFrame parent){
         int result = -1;
         String message = "Are you sure you would like to continue with this action?";
@@ -100,7 +138,14 @@ public class UserMessage {
         else return -1; // If something goes wrong
     }
 
-
+    /**
+     * <p>
+     * Show the user a warning window advising them that something has gone wrong, or that an action is disallowed.
+     * </p>
+     * 
+     * @param warning The warning message to be displayed.
+     * @param parent The parent component for the warning window to appear over.
+     */
     public static void showWarning(int warning, JFrame parent) {
         String message;
         String title = "ANDIE Error Message";
@@ -122,7 +167,11 @@ public class UserMessage {
     }
 
     /**
-     * Display the message stored in this instance of UserMessage.
+     * <p>
+     * Show the user a warning window advising them that something has gone wrong, or that an action is disallowed.
+     * </p>
+     * 
+     * @param warning The warning message to be displayed.
      */
     public static void showWarning(int warning){
         showWarning(warning, UserMessage.parent);

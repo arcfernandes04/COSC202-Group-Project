@@ -47,6 +47,11 @@ class EditableImage {
     private String opsFilename;
     /** Whether or not there are unsaved changes. */
     private boolean unsavedChanges;
+    /** The file extension of the most recently opened image. */
+    private String extension;
+
+    /** The allowed extensions for files that ANDIE can open. */
+    protected static String[] allowedExtensions = {"jpeg","jpg","png","gif","tiff","tif","rgb","ppm"};
 
     /**
      * <p>
@@ -134,7 +139,7 @@ class EditableImage {
             UserMessage.showWarning(UserMessage.NON_IMG_FILE_WARN);
         }catch(java.awt.image.RasterFormatException ex){ // The image's data is in an incorrect format.
             UserMessage.showWarning(UserMessage.INVALID_IMG_FILE_WARN);
-        } catch (Exception ex) {
+        } catch (Exception ex) { // Just in case!
             UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
         return result;
@@ -159,32 +164,44 @@ class EditableImage {
         opsFilename = imageFilename + ".ops";
         try {
             File imageFile = new File(imageFilename);
-            original = ImageIO.read(imageFile);
-            current = deepCopy(original);
+            BufferedImage originalCheck = ImageIO.read(imageFile); //Need to make sure these don't return null, otherwise we're gonna reset the current image :(
+            BufferedImage currentCheck = deepCopy(originalCheck);
+            String extensionCheck = imageFilename.substring(1 + imageFilename.lastIndexOf(".")).toLowerCase();
 
-            FileInputStream fileIn = new FileInputStream(this.opsFilename);
-            ObjectInputStream objIn = new ObjectInputStream(fileIn);
+            if (originalCheck != null && currentCheck != null) {
+                original = originalCheck;
+                current = currentCheck;
+                extension = extensionCheck;
+            } else {
+                //UserMessage.showWarning(UserMessage.NON_IMG_FILE_WARN); //Tell the user off and leave before more damage is done.
+                return;
+            }
 
-            // Silence the Java compiler warning about type casting.
-            // Understanding the cause of the warning is way beyond
-            // the scope of COSC202, but if you're interested, it has
-            // to do with "type erasure" in Java: the compiler cannot
-            // produce code that fails at this point in all cases in
-            // which there is actually a type mismatch for one of the
-            // elements within the Stack, i.e., a non-ImageOperation.
-            @SuppressWarnings("unchecked")
-            Stack<ImageOperation> opsFromFile = (Stack<ImageOperation>) objIn.readObject();
-            ops = opsFromFile;
-            redoOps.clear();
-            objIn.close();
-            fileIn.close();
+            try{
+                FileInputStream fileIn = new FileInputStream(this.opsFilename);
+                ObjectInputStream objIn = new ObjectInputStream(fileIn);
+                // Silence the Java compiler warning about type casting.
+                // Understanding the cause of the warning is way beyond
+                // the scope of COSC202, but if you're interested, it has
+                // to do with "type erasure" in Java: the compiler cannot
+                // produce code that fails at this point in all cases in
+                // which there is actually a type mismatch for one of the
+                // elements within the Stack, i.e., a non-ImageOperation.
+                @SuppressWarnings("unchecked")
+                Stack<ImageOperation> opsFromFile = (Stack<ImageOperation>) objIn.readObject();
+                redoOps.clear();
+                objIn.close();
+                fileIn.close();
+                if(opsFromFile != null) ops = opsFromFile; // If there is an ops file, then set it.
+            }catch(FileNotFoundException e){// This Exception means that there is no associated operations file - so need to reset it in case there was a previous file open.
+                ops = new Stack<ImageOperation>();
+                redoOps = new Stack<ImageOperation>();
+            }
 
             this.refresh();
             unsavedChanges = false;
         }catch (javax.imageio.IIOException ex) { //File doesn't exist
             UserMessage.showWarning(UserMessage.FILE_NOT_FOUND_WARN);
-        }catch(FileNotFoundException ex){
-            //This Exception means that there is no associated operations file - it's just an annoyance really.
         }catch(java.io.StreamCorruptedException ex) { // The operations file is incorrectly formatted
             UserMessage.showWarning(UserMessage.INVALID_OPS_FILE_WARN);
         }catch(Exception ex){
@@ -211,7 +228,8 @@ class EditableImage {
         }
         try{
             // Write image file based on file extension
-            String extension = imageFilename.substring(1+imageFilename.lastIndexOf(".")).toLowerCase();
+            //String extensionCheck = imageFilename.substring(1+imageFilename.lastIndexOf(".")).toLowerCase();
+            //if(extensionCheck != null) extension = extensionCheck;
             ImageIO.write(original, extension, new File(imageFilename));
             // Write operations file
             FileOutputStream fileOut = new FileOutputStream(this.opsFilename);
@@ -232,7 +250,7 @@ class EditableImage {
 
     /**
      * <p>
-     * Save an image to a speficied file.
+     * Save an image to a specified file.
      * </p>
      * 
      * <p>
@@ -246,17 +264,51 @@ class EditableImage {
      * @param imageFilename The file location to save the image to.
      */
     public void saveAs(String imageFilename) {
-        this.imageFilename = imageFilename;
-        this.opsFilename = imageFilename + ".ops";
+        int lastDotIndex = imageFilename.lastIndexOf(".");
+        if (lastDotIndex == -1) { // There isn't an extension, so use the existing one.
+            this.imageFilename = imageFilename + "." + this.extension;
+        } else { //Check what the extension actually is.
+            String extensionCheck = imageFilename.substring(lastDotIndex + 1).toLowerCase();
+            boolean allowed = false;
+            for(String ext: allowedExtensions){ //If it's in the list of allowed extensions, then that's fine.
+                if(ext.equalsIgnoreCase(extensionCheck)){
+                    this.extension = extensionCheck;
+                    this.imageFilename = imageFilename;
+                    allowed = true;
+                    break;
+                }
+            }
+            if(!allowed){ //If not in the allowed list, then add the current extension.
+                this.imageFilename = imageFilename.substring(0, lastDotIndex + 1).toLowerCase() + this.extension;
+            }
+        }
+        this.opsFilename = this.imageFilename + ".ops";
         save();
     }
 
-    public void export(String filename) {
+    public void export(String imageFilename) {
         try{
             // Write image file based on file extension
-            String extension = imageFilename.substring(1+imageFilename.lastIndexOf(".")).toLowerCase();
-            this.imageFilename = filename + "." + extension;
-            ImageIO.write(current, extension, new File(imageFilename));
+            String extensionCheck;
+            int lastDotIndex = imageFilename.lastIndexOf(".");
+            if(lastDotIndex == -1){ //There isn't an extension, so use the one from the current file.
+                imageFilename = imageFilename + "." + this.extension;
+                extensionCheck = this.extension;
+            } else { //Check what the extension actually is.
+                extensionCheck = imageFilename.substring(lastDotIndex + 1).toLowerCase();
+                boolean allowed = false;
+                for(String ext: allowedExtensions){ //If it's in the list of allowed extensions, then that's fine.
+                    if(ext.equalsIgnoreCase(extensionCheck)){
+                        allowed = true;
+                        break;
+                    }
+                }
+                if(!allowed){ //If not in the allowed list, then add the current extension.
+                    imageFilename = imageFilename.substring(0, lastDotIndex + 1).toLowerCase() + this.extension;
+                    extensionCheck = this.extension;
+                }
+            }
+            ImageIO.write(current, extensionCheck, new File(imageFilename));
         } catch (IllegalArgumentException | NullPointerException ex) {
             UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         } catch (Exception ex){

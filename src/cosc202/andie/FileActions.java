@@ -286,8 +286,7 @@ public class FileActions {
         /**
         * List of the file extensions that are displayed within the {@code JFileChooser} window.
          */
-        protected FileNameExtensionFilter fileExtensionFilter = new FileNameExtensionFilter("JPEG, PNG, GIF, TIFF", "jpeg", "jpg", "png",
-            "gif", "tiff", "tif", "rgb", "ppm");
+        protected static FileNameExtensionFilter fileExtensionFilter = new FileNameExtensionFilter("JPEG, PNG, GIF, TIFF", EditableImage.allowedExtensions);
 
         /**
          * Default constructor which also initialises the file extensions that will be visible in the dialog box.
