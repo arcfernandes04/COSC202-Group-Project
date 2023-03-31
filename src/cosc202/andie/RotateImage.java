@@ -2,7 +2,6 @@ package cosc202.andie;
 
 import java.awt.image.*;
 
-import cosc202.andie.exceptions.NullFileException;
 
 /**
  * <p>
@@ -45,7 +44,8 @@ public class RotateImage implements ImageOperation, java.io.Serializable {
      * @param input The image to be retated
      * @return The resulting rotated image.
      */
-    public BufferedImage apply(BufferedImage input) throws NullFileException, IllegalArgumentException {
+    public BufferedImage apply(BufferedImage input) throws IllegalArgumentException, Exception {
+        BufferedImage newImage = null;
         try{
             if (this.rotation.toLowerCase().equals("180")) {
                 for (int y = 0; y < input.getHeight(); ++y) {
@@ -83,7 +83,7 @@ public class RotateImage implements ImageOperation, java.io.Serializable {
                 return input;
             }
             else if (this.rotation.toLowerCase().equals("90 right") || this.rotation.toLowerCase().equals("90 left")) {
-                BufferedImage newImage = new BufferedImage(input.getHeight(), input.getWidth(), 2);
+                newImage = new BufferedImage(input.getHeight(), input.getWidth(), 2);
                 for (int y = 0; y < input.getHeight(); ++y) {
                     for (int x = 0; x < input.getWidth(); ++x) {
 
@@ -107,8 +107,9 @@ public class RotateImage implements ImageOperation, java.io.Serializable {
                 throw new IllegalArgumentException("Rotation provided in EditActions.java is invalid");
             }
         }catch(NullPointerException ex){
-            throw new NullFileException(ex);
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         }
+        return newImage;
     }
     
 }

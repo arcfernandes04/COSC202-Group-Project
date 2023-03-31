@@ -97,13 +97,9 @@ public class TransformActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            try {
-                target.getImage().apply(new FlipImage(this.direction));
-                target.repaint();
-                target.getParent().revalidate();
-            } catch (Exception ex) {
-                new UserMessage(ex);
-            }
+            target.getImage().apply(new FlipImage(this.direction));
+            target.repaint();
+            target.getParent().revalidate();
         }
     }
 
@@ -141,13 +137,9 @@ public class TransformActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            try {
-                target.getImage().apply(new RotateImage(rotation));
-                target.repaint();
-                target.getParent().revalidate();
-            } catch (Exception ex) {
-                new UserMessage(ex);
-            }
+            target.getImage().apply(new RotateImage(rotation));
+            target.repaint();
+            target.getParent().revalidate();
         }
     }
 

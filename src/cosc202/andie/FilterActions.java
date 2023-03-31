@@ -109,14 +109,10 @@ public class FilterActions {
                 radius = radiusModel.getNumber().intValue();
             }
 
-            try{
-                // Create and apply the filter
-                target.getImage().apply(new MeanFilter(radius));
-                target.repaint();
-                target.getParent().revalidate();
-            }catch(Exception ex){
-                new UserMessage(ex);
-            }
+            // Create and apply the filter
+            target.getImage().apply(new MeanFilter(radius));
+            target.repaint();
+            target.getParent().revalidate();
         }
 
     }
@@ -128,13 +124,9 @@ public class FilterActions {
         }
         
         public void actionPerformed(ActionEvent e) {
-            try{
-                target.getImage().apply(new SharpenFilter());
-                target.repaint();
-                target.getParent().revalidate();
-            }catch(Exception ex){
-                new UserMessage(ex);
-            }
+            target.getImage().apply(new SharpenFilter());
+            target.repaint();
+            target.getParent().revalidate();
         }
     }
 
@@ -161,13 +153,9 @@ public class FilterActions {
                 radius = radiusModel.getNumber().intValue();
             }
 
-            try{
-                target.getImage().apply(new GaussianBlurFilter(radius));
-                target.repaint();
-                target.getParent().revalidate();
-            }catch(Exception ex){
-                new UserMessage(ex);
-            }
+            target.getImage().apply(new GaussianBlurFilter(radius));
+            target.repaint();
+            target.getParent().revalidate();
         }
 
     }
@@ -222,14 +210,10 @@ public class FilterActions {
                 radius = radiusModel.getNumber().intValue();
             }
 
-            try{
-                //Create and apply the filter
-                target.getImage().apply(new MedianFilter(radius));
-                target.repaint();
-                target.getParent().revalidate();
-            }catch(Exception ex){
-                new UserMessage(ex);
-            }
+            //Create and apply the filter
+            target.getImage().apply(new MedianFilter(radius));
+            target.repaint();
+            target.getParent().revalidate();
         }
     
     }

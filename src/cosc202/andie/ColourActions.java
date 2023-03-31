@@ -92,13 +92,9 @@ public class ColourActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            try{
-                target.getImage().apply(new ConvertToGrey());
-                target.repaint();
-                target.getParent().revalidate();
-            }catch(Exception ex){
-                new UserMessage(ex);
-            }
+            target.getImage().apply(new ConvertToGrey());
+            target.repaint();
+            target.getParent().revalidate();
         }
 
     }
@@ -163,14 +159,10 @@ public class ColourActions {
                 contrast = contrastModel.getNumber().intValue();
             }
 
-            try{
-                // Create and apply filter
-                target.getImage().apply(new BrightnessContrastAdjustment(brightness, contrast));
-                target.repaint();
-                target.getParent().revalidate();
-            }catch(Exception ex){
-                new UserMessage(ex);
-            }
+            // Create and apply filter
+            target.getImage().apply(new BrightnessContrastAdjustment(brightness, contrast));
+            target.repaint();
+            target.getParent().revalidate();
 
         }
     }

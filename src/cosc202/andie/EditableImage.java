@@ -4,7 +4,6 @@ import java.util.*;
 import java.io.*;
 import java.awt.image.*;
 import javax.imageio.*;
-import cosc202.andie.exceptions.*;
 
 /**
  * <p>
@@ -46,6 +45,13 @@ class EditableImage {
     private String imageFilename;
     /** The file where the operation sequence is stored. */
     private String opsFilename;
+    /** Whether or not there are unsaved changes. */
+    private boolean unsavedChanges;
+    /** The file extension of the most recently opened image. */
+    private String extension;
+
+    /** The allowed extensions for files that ANDIE can open. */
+    protected static String[] allowedExtensions = {"jpeg","jpg","png","gif","tiff","tif","rgb","ppm"};
 
     /**
      * <p>
@@ -74,6 +80,17 @@ class EditableImage {
      */
     public boolean hasImage() {
         return current != null;
+    }
+
+    /**
+     * <p>
+     * Check if there are currently any unsaved changes to the open file.
+     * </p>
+     * 
+     * @return True if there are unsaved changes, false otherwise.
+     */
+    public boolean hasUnsavedChanges(){
+        return unsavedChanges;
     }
 
     /**
@@ -110,22 +127,22 @@ class EditableImage {
      * 
      * @param bi The BufferedImage to copy.
      * @return A deep copy of the input.
-     * @throws NonImageFileException This indicates that the program has tried to copy the data in a non-image file as though it is an image.
-     * @throws InvalidImageFormatException This exception is thrown when the buffered image is in an invalid format. This may be due to
-     * incorrect processing during image operations (filters, colour changes, etc.)
-     * @throws Exception If an unexpected error occurs.
      */
-    private static BufferedImage deepCopy(BufferedImage bi) throws NonImageFileException, InvalidImageFormatException, Exception {
+    private static BufferedImage deepCopy(BufferedImage bi) {
+        BufferedImage result = null;
         try{
             ColorModel cm = bi.getColorModel();
             boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
             WritableRaster raster = bi.copyData(null);
-            return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+            result = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
         }catch(NullPointerException ex){ // If there is a NullPointerException, then "bi" is null and this is not an image file!
-            throw new NonImageFileException(ex);
+            UserMessage.showWarning(UserMessage.NON_IMG_FILE_WARN);
         }catch(java.awt.image.RasterFormatException ex){ // The image's data is in an incorrect format.
-            throw new InvalidImageFormatException(ex);
+            UserMessage.showWarning(UserMessage.INVALID_IMG_FILE_WARN);
+        } catch (Exception ex) { // Just in case!
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
+        return result;
     }
     
     /**
@@ -141,42 +158,54 @@ class EditableImage {
      * </p>
      * 
      * @param filePath The file to open the image from.
-     * @throws FileNotFoundException If the file being opened does not exist, this exception is thrown.
-     * @throws NonImageFileException Occurs if the program attempts to open a non-image file.
-     * @throws Exception If an unexpected issue arises.
      */
-    public void open(String filePath) throws FileNotFoundException, NonImageFileException, Exception {
+    public void open(String filePath) {
         imageFilename = filePath;
         opsFilename = imageFilename + ".ops";
         try {
             File imageFile = new File(imageFilename);
-            original = ImageIO.read(imageFile);
-            current = deepCopy(original);
+            BufferedImage originalCheck = ImageIO.read(imageFile); //Need to make sure these don't return null, otherwise we're gonna reset the current image :(
+            BufferedImage currentCheck = deepCopy(originalCheck);
+            String extensionCheck = imageFilename.substring(1 + imageFilename.lastIndexOf(".")).toLowerCase();
 
-            FileInputStream fileIn = new FileInputStream(this.opsFilename);
-            ObjectInputStream objIn = new ObjectInputStream(fileIn);
+            if (originalCheck != null && currentCheck != null) {
+                original = originalCheck;
+                current = currentCheck;
+                extension = extensionCheck;
+            } else {
+                //UserMessage.showWarning(UserMessage.NON_IMG_FILE_WARN); //Tell the user off and leave before more damage is done.
+                return;
+            }
 
-            // Silence the Java compiler warning about type casting.
-            // Understanding the cause of the warning is way beyond
-            // the scope of COSC202, but if you're interested, it has
-            // to do with "type erasure" in Java: the compiler cannot
-            // produce code that fails at this point in all cases in
-            // which there is actually a type mismatch for one of the
-            // elements within the Stack, i.e., a non-ImageOperation.
-            @SuppressWarnings("unchecked")
-            Stack<ImageOperation> opsFromFile = (Stack<ImageOperation>) objIn.readObject();
-            ops = opsFromFile;
-            redoOps.clear();
-            objIn.close();
-            fileIn.close();
+            try{
+                FileInputStream fileIn = new FileInputStream(this.opsFilename);
+                ObjectInputStream objIn = new ObjectInputStream(fileIn);
+                // Silence the Java compiler warning about type casting.
+                // Understanding the cause of the warning is way beyond
+                // the scope of COSC202, but if you're interested, it has
+                // to do with "type erasure" in Java: the compiler cannot
+                // produce code that fails at this point in all cases in
+                // which there is actually a type mismatch for one of the
+                // elements within the Stack, i.e., a non-ImageOperation.
+                @SuppressWarnings("unchecked")
+                Stack<ImageOperation> opsFromFile = (Stack<ImageOperation>) objIn.readObject();
+                redoOps.clear();
+                objIn.close();
+                fileIn.close();
+                if(opsFromFile != null) ops = opsFromFile; // If there is an ops file, then set it.
+            }catch(FileNotFoundException e){// This Exception means that there is no associated operations file - so need to reset it in case there was a previous file open.
+                ops = new Stack<ImageOperation>();
+                redoOps = new Stack<ImageOperation>();
+            }
 
             this.refresh();
+            unsavedChanges = false;
         }catch (javax.imageio.IIOException ex) { //File doesn't exist
-            throw new FileNotFoundException();
-        }catch(FileNotFoundException ex){
-            //This Exception is not useful. It just means that there is no associated operations file, but it can keep running.
+            UserMessage.showWarning(UserMessage.FILE_NOT_FOUND_WARN);
         }catch(java.io.StreamCorruptedException ex) { // The operations file is incorrectly formatted
-            throw new InvalidOperationsFileException(ex);
+            UserMessage.showWarning(UserMessage.INVALID_OPS_FILE_WARN);
+        }catch(Exception ex){
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
     }
 
@@ -192,16 +221,15 @@ class EditableImage {
      * the current operations to <code>some/path/to/image.png.ops</code>.
      * </p>
      * 
-     * @throws Exception If something goes wrong.
-     * @throws NullFileException Raised if there is no current file open.
      */
-    public void save() throws NullFileException, Exception {
+    public void save() {
         if (this.opsFilename == null) {
             this.opsFilename = this.imageFilename + ".ops";
         }
         try{
             // Write image file based on file extension
-            String extension = imageFilename.substring(1+imageFilename.lastIndexOf(".")).toLowerCase();
+            //String extensionCheck = imageFilename.substring(1+imageFilename.lastIndexOf(".")).toLowerCase();
+            //if(extensionCheck != null) extension = extensionCheck;
             ImageIO.write(original, extension, new File(imageFilename));
             // Write operations file
             FileOutputStream fileOut = new FileOutputStream(this.opsFilename);
@@ -209,17 +237,20 @@ class EditableImage {
             objOut.writeObject(this.ops);
             objOut.close();
             fileOut.close();
-        }catch(IllegalArgumentException ex){ // There is no current image to save.
-            throw new NullFileException();
-        }catch(NullPointerException ex){ // Again, no file.
-            throw new NullFileException();
+
+            //Make sure the program knows that there are no unsaved changes.
+            unsavedChanges = false;
+        }catch(IllegalArgumentException | NullPointerException ex){ //There is no file currently open
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+        } catch (Exception ex) {
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
     }
 
 
     /**
      * <p>
-     * Save an image to a speficied file.
+     * Save an image to a specified file.
      * </p>
      * 
      * <p>
@@ -231,27 +262,47 @@ class EditableImage {
      * </p>
      * 
      * @param imageFilename The file location to save the image to.
-     * @throws NullFileException Raised if there is no current file open.
-     * @throws Exception If something goes wrong.
      */
-    public void saveAs(String imageFilename) throws NullFileException, Exception {
+    public void saveAs(String imageFilename) {
+        this.extension = imageFilename.substring(imageFilename.lastIndexOf(".") + 1).toLowerCase();
         this.imageFilename = imageFilename;
-        this.opsFilename = imageFilename + ".ops";
+        this.opsFilename = this.imageFilename + ".ops";
         save();
     }
 
-    public void export(String filename) throws Exception {
+    public void export(String imageFilename) {
         try{
-            // Write image file based on file extension
-            String extension = imageFilename.substring(1+imageFilename.lastIndexOf(".")).toLowerCase();
-            this.imageFilename = filename + "." + extension;
-            ImageIO.write(current, extension, new File(imageFilename));
-        } catch (IllegalArgumentException ex) { // There is no current image to save.
-            throw new NullFileException();
-        } catch (NullPointerException ex) { // Again, no file.
-            throw new NullFileException();
+            String extensionCheck = imageFilename.substring(imageFilename.lastIndexOf(".") + 1).toLowerCase();
+            ImageIO.write(current, extensionCheck, new File(imageFilename));
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+        } catch (Exception ex){
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
 
+    }
+
+    /**
+     * Ensures that the extension on the file name is appropriate.
+     * 
+     * @param imageFilename
+     * @return The inputted imageFilename with the appropriate extension. If imageFilename did not
+     * have any extension, or it had an illegal extension (one that ANDIE cannot process), then an
+     * appropriate extension is added.
+     * @author Joshua Carter
+     */
+    public String makeSensible(String imageFilename) {
+        int lastDotIndex = imageFilename.lastIndexOf(".");
+        // If there isn't an extension, use the one from the current file.
+        if (lastDotIndex == -1) return imageFilename + "." + this.extension;
+        
+        // If there is an extension, check what it is and if it's allowed or not.
+        String extensionCheck = imageFilename.substring(lastDotIndex + 1).toLowerCase();
+        for (String ext : allowedExtensions) {
+            if (ext.equalsIgnoreCase(extensionCheck)) return imageFilename; // If it's in the list of allowed extensions, then that's fine - return it.
+        }
+        //Otherwise, it doesn't have an allowed extension so add the current one.
+        return imageFilename.substring(0, lastDotIndex + 1).toLowerCase() + this.extension;
     }
 
     /**
@@ -260,28 +311,32 @@ class EditableImage {
      * </p>
      * 
      * @param op The operation to apply.
-     * @throws NullFileException If no file is currently open, this {@code Exception} is raised.
-     * @throws Exception Raised if an unexpected error occurs.
      */
-    public void apply(ImageOperation op) throws NullFileException, Exception {
-        current = op.apply(current);
-        ops.add(op);
+    public void apply(ImageOperation op) {
+        try{
+            BufferedImage result = op.apply(current);
+            if(result != null){ //Only count this as a valid operation if it returns non-null value.
+                current = result;
+                ops.add(op);
+                unsavedChanges = true;
+            }
+        }catch(Exception ex){ //In case the filter forgets to catch exceptions inside the class
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
+        }
     }
 
     /**
      * <p>
      * Undo the last {@link ImageOperation} applied to the image.
      * </p>
-     * @throws EmptyUndoStackException Occurs if the program tries to pop() from 
-     * the stack of currently applied operations when it is empty.
-     * @throws Exception If an unexpected issue arises.
      */
-    public void undo() throws EmptyUndoStackException, Exception {
+    public void undo(){
         try{
             redoOps.push(ops.pop());
             refresh();
+            unsavedChanges = true;
         }catch(EmptyStackException ex){
-            throw new EmptyUndoStackException(ex);
+            UserMessage.showWarning(UserMessage.EMPTY_UNDO_STACK_WARN);
         }
     }
 
@@ -289,16 +344,13 @@ class EditableImage {
      * <p>
      * Reapply the most recently {@link undo}ne {@link ImageOperation} to the image.
      * </p>
-     * 
-     * @throws EmptyUndoStackException Occurs if the program tries to pop() from
-     * the stack of undone operations when the stack is empty.
-     * @throws Exception If an unexpected issue arises.
      */
-    public void redo() throws EmptyRedoStackException, Exception {
+    public void redo() {
         try{
             apply(redoOps.pop());
+            unsavedChanges = true;
         }catch(EmptyStackException ex){
-            throw new EmptyRedoStackException(ex);
+            UserMessage.showWarning(UserMessage.EMPTY_REDO_STACK_WARN);
         }
     }
 
@@ -325,13 +377,15 @@ class EditableImage {
      * cannot be easily incrementally updated. 
      * </p>
      * 
-     * @throws NonImageFileException This indicates that the program has tried to copy the data in a non-image file as though it is an image.
-     * @throws If an unexpected exception occurs.
      */
-    private void refresh() throws NonImageFileException, Exception {
+    private void refresh() {
         current = deepCopy(original);
-        for (ImageOperation op: ops) {
+        try{
+            for (ImageOperation op: ops) {
             current = op.apply(current);
+            }
+        }catch(Exception ex){
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
     }
 

@@ -1,9 +1,11 @@
 package cosc202.andie;
 
 import java.awt.*;
-import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.nio.file.InvalidPathException;
 
-import cosc202.andie.exceptions.FatalRuntimeException;
+import javax.swing.*;
 
 import javax.imageio.*;
 
@@ -56,7 +58,11 @@ public class Andie {
         // https://stackoverflow.com/questions/12008662/swing-uncaughtexceptionhandler
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             public void uncaughtException(Thread t, Throwable e) {
-                new UserMessage((Exception) e);
+                if(e instanceof InvalidPathException){
+                    UserMessage.showWarning(UserMessage.INVALID_PATH_WARN);
+                }else{
+                    UserMessage.showWarning(UserMessage.GENERIC_WARN);
+                }
             }
         });
 
@@ -64,10 +70,21 @@ public class Andie {
         JFrame frame = new JFrame("ANDIE");
         Image image = ImageIO.read(Andie.class.getClassLoader().getResource("icon.png"));
         frame.setIconImage(image);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Set the title and parent frame for UserMessages
-        UserMessage.setTitle("ANDIE");
+        //Add an event listener that checks when the frame is closed.
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e){
+                if (ImageAction.getTarget().getImage().hasUnsavedChanges() == false) System.exit(0); // If there aren't unsaved changes, just exit as usual.
+
+                int result = UserMessage.showDialog(UserMessage.SAVE_AND_EXIT_DIALOG); //Does the user want to save before exiting?
+                if (result == UserMessage.YES_OPTION) ImageAction.getTarget().getImage().save(); //Yes, save the changes
+                else if (result == UserMessage.CANCEL_OPTION || result == UserMessage.CLOSED_OPTION) return; //Cancel or closed, do not save or exit.
+                System.exit(0); //Exit
+            }
+        });
+
+        // Set the parent frame for UserMessages
         UserMessage.setParent(frame);
 
         // The main content area is an ImagePanel
@@ -129,7 +146,7 @@ public class Andie {
                     createAndShowGUI();
                 } catch (Throwable ex) {
                     ex.printStackTrace();
-                    new UserMessage(new FatalRuntimeException(ex));
+                    UserMessage.showWarning(UserMessage.FATAL_ERROR_WARN);
                     System.exit(1);
                 }
             }

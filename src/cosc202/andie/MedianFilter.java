@@ -3,7 +3,6 @@ package cosc202.andie;
 import java.awt.Color;
 import java.awt.image.*;
 import java.util.*;
-import cosc202.andie.exceptions.*;
 
 public class MedianFilter implements ImageOperation, java.io.Serializable {
 
@@ -60,7 +59,7 @@ public class MedianFilter implements ImageOperation, java.io.Serializable {
      * @param input The image to apply the Median filter to.
      * @return The resulting image.
      */
-    public BufferedImage apply(BufferedImage input) throws NullFileException, Exception {
+    public BufferedImage apply(BufferedImage input) throws Exception {
         BufferedImage output = null;
         try{
             int size = (2*radius+1) * (2*radius+1);
@@ -95,7 +94,7 @@ public class MedianFilter implements ImageOperation, java.io.Serializable {
             }
             output = new BufferedImage(input.getColorModel(), input.copyData(null), input.isAlphaPremultiplied(), null);
         }catch(NullPointerException ex){
-            throw new NullFileException(ex);
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         }
         return output;
     }
