@@ -4,6 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 
 import cosc202.andie.exceptions.FatalRuntimeException;
+//import cosc202.andie.test;
 
 import javax.imageio.*;
 
@@ -59,6 +60,7 @@ public class Andie {
         // Set the title and parent frame for UserMessages
         UserMessage.setTitle("ANDIE");
         UserMessage.setParent(frame);
+        Language.setup();
 
         // The main content area is an ImagePanel
         ImagePanel imagePanel = new ImagePanel();
@@ -120,5 +122,7 @@ public class Andie {
                 }
             }
         });
+
+        //test.work();
     }
 }

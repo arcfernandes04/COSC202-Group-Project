@@ -26,7 +26,6 @@ public class FileActions {
     
     /** A list of actions for the File menu. */
     protected ArrayList<Action> actions;
-
     /**
      * <p>
      * Create a set of File menu actions.
@@ -34,11 +33,11 @@ public class FileActions {
      */
     public FileActions() {
         actions = new ArrayList<Action>();
-        actions.add(new FileOpenAction("Open", null, "Open a file", Integer.valueOf(KeyEvent.VK_O)));
-        actions.add(new FileSaveAction("Save", null, "Save the file", Integer.valueOf(KeyEvent.VK_S)));
-        actions.add(new FileSaveAsAction("Save As", null, "Save a copy", Integer.valueOf(KeyEvent.VK_A)));
-        actions.add(new FileExportAction("Export", null, "Export the image", Integer.valueOf(KeyEvent.VK_E)));
-        actions.add(new FileExitAction("Exit", null, "Exit the program", Integer.valueOf(0)));
+        actions.add(new FileOpenAction(Language.getWord("Open"), null, "Open a file", Integer.valueOf(KeyEvent.VK_O)));
+        actions.add(new FileSaveAction(Language.getWord("Save"), null, "Save the file", Integer.valueOf(KeyEvent.VK_S)));
+        actions.add(new FileSaveAsAction(Language.getWord("SaveAs"), null, "Save a copy", Integer.valueOf(KeyEvent.VK_A)));
+        actions.add(new FileExportAction(Language.getWord("Export"), null, "Export the image", Integer.valueOf(KeyEvent.VK_E)));
+        actions.add(new FileExitAction(Language.getWord("Exit"), null, "Exit the program", Integer.valueOf(0)));
     }
 
     /**
@@ -49,7 +48,7 @@ public class FileActions {
      * @return The File menu UI element.
      */
     public JMenu createMenu() {
-        JMenu fileMenu = new JMenu("File");
+        JMenu fileMenu = new JMenu(Language.getWord("File"));
 
         for(Action action: actions) {
             fileMenu.add(new JMenuItem(action));

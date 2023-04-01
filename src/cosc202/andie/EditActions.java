@@ -34,13 +34,13 @@ public class EditActions {
      */
     public EditActions() {
         actions = new ArrayList<Action>();
-        actions.add(new UndoAction("Undo", null, "Undo", Integer.valueOf(KeyEvent.VK_Z)));
-        actions.add(new RedoAction("Redo", null, "Redo", Integer.valueOf(KeyEvent.VK_Y)));
-        actions.add(new FlipImageAction("Flip Horizontally", null, "Flip Image Horizontally", Integer.valueOf(KeyEvent.VK_H), "horizontal"));
-        actions.add(new FlipImageAction("Flip Vertically", null, "Flip Image Vertically", Integer.valueOf(KeyEvent.VK_H), "vertical"));
-        actions.add(new RotateImageAction("Rotate 180 Degrees", null, "Rotate Image 180 Degrees", Integer.valueOf(KeyEvent.VK_H), "180"));
-        actions.add(new RotateImageAction("Rotate 90 Degrees Right", null, "Rotate Image 90 Degrees Right", Integer.valueOf(KeyEvent.VK_H), "90 Right"));
-        actions.add(new RotateImageAction("Rotate 90 Degrees Left", null, "Rotate Image 90 Degrees Left", Integer.valueOf(KeyEvent.VK_H), "90 Left"));
+        actions.add(new UndoAction(Language.getWord("Undo"), null, "Undo", Integer.valueOf(KeyEvent.VK_Z)));
+        actions.add(new RedoAction(Language.getWord("Redo"), null, "Redo", Integer.valueOf(KeyEvent.VK_Y)));
+        actions.add(new FlipImageAction(Language.getWord("FlipHorizontally"), null, "Flip Image Horizontally", Integer.valueOf(KeyEvent.VK_H), "horizontal"));
+        actions.add(new FlipImageAction(Language.getWord("FlipVertically"), null, "Flip Image Vertically", Integer.valueOf(KeyEvent.VK_H), "vertical"));
+        actions.add(new RotateImageAction(Language.getWord("Rotate180"), null, "Rotate Image 180 Degrees", Integer.valueOf(KeyEvent.VK_H), "180"));
+        actions.add(new RotateImageAction(Language.getWord("Rotate90Right"), null, "Rotate Image 90 Degrees Right", Integer.valueOf(KeyEvent.VK_H), "90 Right"));
+        actions.add(new RotateImageAction(Language.getWord("Rotate90Left"), null, "Rotate Image 90 Degrees Left", Integer.valueOf(KeyEvent.VK_H), "90 Left"));
     }
 
     /**
@@ -51,7 +51,7 @@ public class EditActions {
      * @return The edit menu UI element.
      */
     public JMenu createMenu() {
-        JMenu editMenu = new JMenu("Edit");
+        JMenu editMenu = new JMenu(Language.getWord("Edit"));
 
         for (Action action: actions) {
             editMenu.add(new JMenuItem(action));
