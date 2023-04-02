@@ -41,7 +41,7 @@ public class RotateImage implements ImageOperation, java.io.Serializable {
      * The image is rotated by swapping pixels either vertically or horizontally.
      * </p>
      * 
-     * @param input The image to be retated
+     * @param input The image to be rotated
      * @return The resulting rotated image.
      */
     public BufferedImage apply(BufferedImage input) throws IllegalArgumentException, Exception {

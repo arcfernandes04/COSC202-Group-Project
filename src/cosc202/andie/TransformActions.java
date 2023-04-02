@@ -38,6 +38,8 @@ public class TransformActions {
                 Integer.valueOf(KeyEvent.VK_H), "90 Right"));
         actions.add(new RotateImageAction("Rotate 90 Degrees Left", null, "Rotate Image 90 Degrees Left",
                 Integer.valueOf(KeyEvent.VK_H), "90 Left"));
+        actions.add(new ResizeImageAction("Resize Image", null, "Resize Image with a Spinner",
+                Integer.valueOf(KeyEvent.VK_H)));
     }
 
     /**
@@ -140,6 +142,64 @@ public class TransformActions {
             target.getImage().apply(new RotateImage(rotation));
             target.repaint();
             target.getParent().revalidate();
+        }
+    }
+
+    public class ResizeImageAction extends ImageAction {
+        private boolean slider = true;
+
+        /**
+         * <p>
+         * Create a new rotate-image action.
+         * </p>
+         * 
+         * @param name     The name of the action (ignored if null).
+         * @param icon     An icon to use to represent the action (ignored if null).
+         * @param desc     A brief description of the action (ignored if null).
+         * @param mnemonic A mnemonic key to use as a shortcut (ignored if null).
+         * @param rotation The direction and degree of rotation.
+         */
+        ResizeImageAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+            super(name, icon, desc, mnemonic);
+        }
+
+        /**
+         * <p>
+         * Callback for when the rotate-image action is triggered.
+         * </p>
+         * 
+         * <p>
+         * This method is called whenever the RotateImageAction is triggered.
+         * It Rotates the image based on the degree and direction given by the
+         * rotation datafield.
+         * </p>
+         * 
+         * @param e The event triggering this callback.
+         */
+        public void actionPerformed(ActionEvent e) {
+            try {
+
+                // set default sizePercentageIncrease to 100%
+                int sizePercentageIncrease = 100;
+                    // Determine the size percentage multiplier - ask the user.
+                    // Pop-up dialog box to ask for the sizePercentageIncrease value.
+                    SpinnerNumberModel percentageModel = new SpinnerNumberModel(100, 10, 1000, 1);
+                    JSpinner percentageSpinner = new JSpinner(percentageModel);
+                    int option = JOptionPane.showOptionDialog(null, percentageSpinner, "Enter Resize Percentage", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+
+                    // Check the return value from the dialog box.
+                    if (option == JOptionPane.CANCEL_OPTION) {
+                        return;
+                    } else if (option == JOptionPane.OK_OPTION) {
+                        sizePercentageIncrease = percentageModel.getNumber().intValue();
+                    }
+                target.getImage().apply(new ResizeImage(sizePercentageIncrease));
+                target.repaint();
+                target.getParent().revalidate();
+
+            } catch (Exception ex){
+                UserMessage.showWarning(UserMessage.GENERIC_WARN);
+            }
         }
     }
 
