@@ -13,15 +13,12 @@ public abstract class Language
     protected static ArrayList<Action> actions;
     private static String lang = "en";
     
+    static Preferences prefs = Preferences.userNodeForPackage(Language.class);
+
     public static void setup(/*String lang*/) //after button for language is pressed and premade lang code is given it creates a default locale to pull words
     {
-        actions = new ArrayList<Action>();
-        actions.add(new engLang(getWord("eng"), null, "language change to english", Integer.valueOf(0)));
-        actions.add(new maoLang(getWord("mao"), null, "language change to maori", Integer.valueOf(0)));
 
-        Preferences prefs = Preferences.userNodeForPackage(Language.class);
-
-        Locale.setDefault(new Locale(prefs.get("language", "en"/*lang*/), prefs.get("country", "NZ")));
+        Locale.setDefault(new Locale(prefs.get("language", "mi"/*lang*/), prefs.get("country", "NZ")));
         
         bund = ResourceBundle.getBundle("MessageBundle");
     }
@@ -41,27 +38,16 @@ public abstract class Language
         return fileMenu;
     }
 
-    public class engLang extends ImageAction
+    public static String getLang()
     {
-        engLang(String name, ImageIcon icon, String desc, Integer mnemonic) {
-            super(name, icon, desc, mnemonic);
-        }
-
-        public void actionPerformed(ActionEvent e)
-        {
-            lang = "en";
-        }
+        return lang;
     }
 
-    public class maoLang extends ImageAction
+    public static void setLang(String lang)
     {
-        maoLang(String name, ImageIcon icon, String desc, Integer mnemonic) {
-            super(name, icon, desc, mnemonic);
-        }
+        Language.lang = lang;
 
-        public void actionPerformed(ActionEvent e)
-        {
-            lang = "mao";
-        }
+        prefs.put("language", lang);
+        prefs.put("country", "NZ");
     }
 }

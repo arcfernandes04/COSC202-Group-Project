@@ -90,6 +90,9 @@ public class Andie {
         // Actions that affect the representation of colour in the image
         ColourActions colourActions = new ColourActions();
         menuBar.add(colourActions.createMenu());
+
+        LanguageActions langAct = new LanguageActions();
+        menuBar.add(langAct.createMenu());
         
         frame.setJMenuBar(menuBar);
         frame.pack();
