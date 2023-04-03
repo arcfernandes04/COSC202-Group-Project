@@ -38,11 +38,11 @@ public class FileActions {
      */
     public FileActions() {
         actions = new ArrayList<Action>();
-        actions.add(new FileOpenAction("Open", null, "Open a file", Integer.valueOf(KeyEvent.VK_O)));
-        actions.add(new FileSaveAction("Save", null, "Save the file", Integer.valueOf(KeyEvent.VK_S)));
-        actions.add(new FileSaveAsAction("Save As", null, "Save a copy", Integer.valueOf(KeyEvent.VK_A)));
-        actions.add(new FileExportAction("Export", null, "Export the image", Integer.valueOf(KeyEvent.VK_E)));
-        actions.add(new FileExitAction("Exit", null, "Exit the program", Integer.valueOf(0)));
+        actions.add(new FileOpenAction(Language.getWord("Open"), null, Language.getWord("Open_desc"), Integer.valueOf(KeyEvent.VK_O)));
+        actions.add(new FileSaveAction(Language.getWord("Save"), null, Language.getWord("Save_desc"), Integer.valueOf(KeyEvent.VK_S)));
+        actions.add(new FileSaveAsAction(Language.getWord("SaveAs"), null, Language.getWord("SaveAs_desc"), Integer.valueOf(KeyEvent.VK_A)));
+        actions.add(new FileExportAction(Language.getWord("Export"), null, Language.getWord("Export_desc"), Integer.valueOf(KeyEvent.VK_E)));
+        actions.add(new FileExitAction(Language.getWord("Exit"), null, Language.getWord("Exit_desc"), Integer.valueOf(0)));
     }
 
     /**
@@ -53,7 +53,7 @@ public class FileActions {
      * @return The File menu UI element.
      */
     public JMenu createMenu() {
-        JMenu fileMenu = new JMenu("File");
+        JMenu fileMenu = new JMenu(Language.getWord("File"));
 
         for(Action action: actions) {
             fileMenu.add(new JMenuItem(action));

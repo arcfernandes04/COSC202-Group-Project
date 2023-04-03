@@ -35,8 +35,8 @@ public class ColourActions {
      */
     public ColourActions() {
         actions = new ArrayList<Action>();
-        actions.add(new ConvertToGreyAction("Greyscale", null, "Convert to greyscale", Integer.valueOf(KeyEvent.VK_G)));
-        actions.add(new BrightnessContrastAction("Brightness/Contrast", null, "Adjust brightness and contrast levels", Integer.valueOf(KeyEvent.VK_B)));
+        actions.add(new ConvertToGreyAction(Language.getWord("Greyscale"), null, Language.getWord("Greyscale_desc"), Integer.valueOf(KeyEvent.VK_G)));
+        actions.add(new BrightnessContrastAction(Language.getWord("BrightnessContrast"), null, Language.getWord("BrightnessContrast_desc"), Integer.valueOf(KeyEvent.VK_B)));
     }
 
     /**
@@ -47,7 +47,7 @@ public class ColourActions {
      * @return The colour menu UI element.
      */
     public JMenu createMenu() {
-        JMenu fileMenu = new JMenu("Colour");
+        JMenu fileMenu = new JMenu(Language.getWord("Colour"));
 
         for(Action action: actions) {
             fileMenu.add(new JMenuItem(action));

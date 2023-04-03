@@ -31,7 +31,7 @@ public class UserMessage {
     public static final int NO_OPTION = 1;
     /** The result when the user choses the "cancel" option for a dialog message. */
     public static final int CANCEL_OPTION = 2;
-    /** The result when the user closes the dialog message window. */
+    /** The result when the user closes the dialog message windo4w. */
     public static final int CLOSED_OPTION = 3;
 
     /** The dialog option asking the user whether they would like to overwrite the existing file, or not. */

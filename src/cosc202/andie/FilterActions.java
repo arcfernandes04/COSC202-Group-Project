@@ -26,7 +26,6 @@ public class FilterActions {
     
     /** A list of actions for the Filter menu. */
     protected ArrayList<Action> actions;
-
     /**
      * <p>
      * Create a set of Filter menu actions.
@@ -34,10 +33,10 @@ public class FilterActions {
      */
     public FilterActions() {
         actions = new ArrayList<Action>();
-        actions.add(new MeanFilterAction("Mean filter", null, "Apply a mean filter", Integer.valueOf(KeyEvent.VK_M)));
-        actions.add(new SharpenFilterAction("Sharpen filter", null, "Apply a sharpen filter", Integer.valueOf(KeyEvent.VK_S)));
-        actions.add(new GaussianBlurFilterAction("Gaussian blur filter", null, "Apply a Gaussian blur filter", Integer.valueOf(KeyEvent.VK_G)));
-        actions.add(new MedianFilterAction("Median filter", null, "Apply a median filter", Integer.valueOf(KeyEvent.VK_E)));
+        actions.add(new MeanFilterAction(Language.getWord("Mean"), null, Language.getWord("Mean_desc"), Integer.valueOf(KeyEvent.VK_M)));
+        actions.add(new SharpenFilterAction(Language.getWord("Sharpen"), null, Language.getWord("Sharpen_desc"), Integer.valueOf(KeyEvent.VK_S)));
+        actions.add(new GaussianBlurFilterAction(Language.getWord("Gaussian"), null, Language.getWord("Gaussian_desc"), Integer.valueOf(KeyEvent.VK_G)));
+        actions.add(new MedianFilterAction(Language.getWord("Median"), null, Language.getWord("Median_desc"), Integer.valueOf(KeyEvent.VK_E)));
     }
 
     /**
@@ -48,7 +47,7 @@ public class FilterActions {
      * @return The filter menu UI element.
      */
     public JMenu createMenu() {
-        JMenu fileMenu = new JMenu("Filter");
+        JMenu fileMenu = new JMenu(Language.getWord("Filter"));
 
         for(Action action: actions) {
             fileMenu.add(new JMenuItem(action));
