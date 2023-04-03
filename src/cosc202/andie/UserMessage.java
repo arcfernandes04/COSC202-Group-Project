@@ -41,6 +41,9 @@ public class UserMessage {
     /** The dialog option asking the user whether they would like to save the current file and option the selection,
      * or open the selection without saving the current file, or cancel. */
     public static final String SAVE_AND_OPEN_DIALOG = "SAVE_AND_OPEN_DIALOG";
+    /** The dialog option informing the user that the operations file is corrupted, and asking if they would like to
+     * continue opening the image by first deleting the operations file. */
+    public static final String DELETE_OPS_DIALOG = "DELETE_OPS_DIALOG";
 
     /** A generic warning to tell the user that an error has occurred. */
     public static final String GENERIC_WARN = "GENERIC_WARN";
@@ -104,30 +107,35 @@ public class UserMessage {
      */
     public static int showDialog(String dialogOption, JFrame parent){
         int result = -1;
-        String message = "Are you sure you would like to continue with this action?";
-        String title = "ANDIE Dialog Window";
+        String message = Language.getWord("DEFAULT_DIALOG");
+        String title = Language.getWord("DIALOG_TITLE");
 
         //Dialog for when the user tries to overwrite a file.
         if(dialogOption.equalsIgnoreCase(UserMessage.OVERWRITE_EXISTING_FILE_DIALOG)){
-            title = "Overwrite File?";
-            message = "Would you like to overwrite the existing file?";
-            Object[] possibleValues = new Object[]{"Overwrite", "Cancel"};
+            message = Language.getWord(dialogOption);
+            Object[] possibleValues = new Object[]{Language.getWord("OVERWRITE_OK"), Language.getWord("DEFAULT_CANCEL")};
             result = JOptionPane.showOptionDialog(UserMessage.parent, message, title,
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,possibleValues,possibleValues[1]);
+            if(result == JOptionPane.NO_OPTION) result = JOptionPane.CANCEL_OPTION;
         }//Dialog for when the user tries to exit without saving changes.
         else if(dialogOption.equalsIgnoreCase(UserMessage.SAVE_AND_EXIT_DIALOG)){
-            title = "Save and Exit?";
-            message = "Would you like to save changes before exiting?";
-            Object[] possibleValues = new Object[]{"Save and Exit", "Don't Save", "Cancel"};
+            message = Language.getWord(dialogOption);
+            Object[] possibleValues = new Object[]{Language.getWord("SAVE_AND_EXIT_OK"), Language.getWord("SAVE_AND_EXIT_NO"), Language.getWord("DEFAULT_CANCEL")};
             result = JOptionPane.showOptionDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, possibleValues, possibleValues[0]);
         }//Dialog for trying to open another file without saving changes.
         else if (dialogOption.equalsIgnoreCase(UserMessage.SAVE_AND_OPEN_DIALOG)) {
-            title = "Save Changes?";
-            message = "Would you like to save the changes to the current file?";
-            Object[] possibleValues = new Object[] { "Save", "Don't Save", "Cancel" };
+            message = Language.getWord(dialogOption);
+            Object[] possibleValues = new Object[] {Language.getWord("SAVE_AND_OPEN_OK"), Language.getWord("SAVE_AND_OPEN_NO"), Language.getWord("DEFAULT_CANCEL")};
             result = JOptionPane.showOptionDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE, null, possibleValues, possibleValues[0]);
+        }//If the operations file is corrupted, ask if they want to delete it.
+        else if (dialogOption.equalsIgnoreCase(UserMessage.DELETE_OPS_DIALOG)) {
+            message = Language.getWord(dialogOption);
+            Object[] possibleValues = new Object[] {Language.getWord("DELETE_OPS_OK"), Language.getWord("DEFAULT_CANCEL")};
+            result = JOptionPane.showOptionDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, possibleValues, possibleValues[0]);
+            if(result == JOptionPane.NO_OPTION) result = JOptionPane.CANCEL_OPTION;
         }
         else{ //If it's not one of the expected dialog options, then that is an illegal argument.
             throw new IllegalArgumentException("Invalid dialog option.");
@@ -150,7 +158,7 @@ public class UserMessage {
      */
     public static void showWarning(String warning, JFrame parent) {
         String message;
-        String title = Language.getWord("Error_title");
+        String title = Language.getWord("ERROR_TITLE");
 
         if(warning.equalsIgnoreCase(MISSING_LANG_WARN)) message = "Fatal language error."; // Can't have this error use Language.getWord() otherwise it will create a loop
         else message = Language.getWord(warning);
