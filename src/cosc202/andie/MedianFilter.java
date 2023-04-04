@@ -4,6 +4,16 @@ import java.awt.Color;
 import java.awt.image.*;
 import java.util.*;
 
+/**
+ * <p>
+ * ImageOperation to apply a Median filter.
+ * </p>
+ * 
+ * <p>
+ * A Median filter blurs an image by taking the median of a radius of pixels.
+ * This is implemented by accessing each and every pixel needed to get the 
+ * median value.
+ */
 public class MedianFilter implements ImageOperation, java.io.Serializable {
 
     /**
