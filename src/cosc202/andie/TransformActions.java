@@ -28,17 +28,17 @@ public class TransformActions {
      */
     public TransformActions() {
         actions = new ArrayList<Action>();
-        actions.add(new FlipImageAction("Flip Horizontally", null, "Flip Image Horizontally",
+        actions.add(new FlipImageAction(Language.getWord("FlipHorizontal"), null, Language.getWord("FlipHorizontal_desc"),
                 Integer.valueOf(KeyEvent.VK_H), "horizontal"));
-        actions.add(new FlipImageAction("Flip Vertically", null, "Flip Image Vertically",
+        actions.add(new FlipImageAction(Language.getWord("FlipVertical"), null, Language.getWord("FlipVertical_desc"),
                 Integer.valueOf(KeyEvent.VK_H), "vertical"));
-        actions.add(new RotateImageAction("Rotate 180 Degrees", null, "Rotate Image 180 Degrees",
+        actions.add(new RotateImageAction(Language.getWord("Rotate180"), null, Language.getWord("Rotate180_desc"),
                 Integer.valueOf(KeyEvent.VK_H), "180"));
-        actions.add(new RotateImageAction("Rotate 90 Degrees Right", null, "Rotate Image 90 Degrees Right",
+        actions.add(new RotateImageAction(Language.getWord("Rotate90Right"), null, Language.getWord("Rotate90Right_desc"),
                 Integer.valueOf(KeyEvent.VK_H), "90 Right"));
-        actions.add(new RotateImageAction("Rotate 90 Degrees Left", null, "Rotate Image 90 Degrees Left",
+        actions.add(new RotateImageAction(Language.getWord("Rotate90Left"), null, Language.getWord("Rotate90Left_desc"),
                 Integer.valueOf(KeyEvent.VK_H), "90 Left"));
-        actions.add(new ResizeImageAction("Resize Image", null, "Resize Image with a Spinner",
+        actions.add(new ResizeImageAction(Language.getWord("Resize"), null, Language.getWord("Resize_desc"),
                 Integer.valueOf(KeyEvent.VK_H)));
     }
 
@@ -50,7 +50,7 @@ public class TransformActions {
      * @return The Transform menu UI element.
      */
     public JMenu createMenu() {
-        JMenu transformMenu = new JMenu("Transform");
+        JMenu transformMenu = new JMenu(Language.getWord("Transform"));
 
         for (Action action : actions) {
             transformMenu.add(new JMenuItem(action));
