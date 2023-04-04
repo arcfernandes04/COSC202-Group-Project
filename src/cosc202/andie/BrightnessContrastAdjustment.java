@@ -8,8 +8,8 @@ import java.awt.image.*;
  * </p>
  * 
  * <p> 
- * The image asjustments are done by taking the red, green, and blue values of each
- * pixel and using the brigtness and contrast percentage changes to calculate the 
+ * The image adjustments are done by taking the red, green, and blue values of each
+ * pixel and using the brightness and contrast percentage changes to calculate the 
  * new pixel value.
  * </p>
  * 
@@ -59,7 +59,7 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
      * </p>
      * 
      * <p>
-     * The adjustments are applied to the red, gree, and blue values usig a 
+     * The adjustments are applied to the red, gree, and blue values using a 
      * simple model that uses the brightness and contrast percentage changes, 
      * and the current value of the pixel.
      * 
