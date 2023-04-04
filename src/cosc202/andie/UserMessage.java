@@ -67,8 +67,10 @@ public class UserMessage {
     public static final String INVALID_PATH_WARN = "INVALID_PATH_WARN";
     /** A warning to tell the user that the program does not have permission to open the desired file. */
     public static final String SECURITY_WARN = "SECURITY_WARN";
-    /** A warning to tell the user that the desired language file is missing. */
+    /** A warning to tell the user that some values in the desired language are missing. */
     public static final String MISSING_LANG_WARN = "MISSING_LANG_WARN";
+    /** A warning to tell the user that a fatal language error has occurred, and the program cannot continue. */
+    public static final String FATAL_LANG_WARN = "FATAL_LANG_WARN";
 
 
     /**
@@ -158,10 +160,17 @@ public class UserMessage {
      */
     public static void showWarning(String warning, JFrame parent) {
         String message;
-        String title = Language.getWord("ERROR_TITLE");
+        String title;
 
-        if(warning.equalsIgnoreCase(MISSING_LANG_WARN)) message = "Fatal language error."; // Can't have this error use Language.getWord() otherwise it will create a loop
-        else message = Language.getWord(warning);
+        //I have not used a Language.getWord() call, because it may not be retrievable due to issues with the language file.
+        if(warning.equalsIgnoreCase(FATAL_LANG_WARN)){
+            message = "ANDIE encountered a fatal error accessing the\nlanguage assets. Please contact the\nadministrators if this problem persists.";
+            title = "ANDIE Fatal Error Message";
+        }
+        else{
+            message = Language.getWord(warning);
+            title = Language.getWord("ERROR_TITLE"); //Can't have this out in the open, otherwise it creates an infinite loop
+        }
         //else throw new IllegalArgumentException("Invalid warning option.");
 
         JOptionPane.showMessageDialog(parent, message, title, JOptionPane.INFORMATION_MESSAGE);

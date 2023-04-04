@@ -99,12 +99,10 @@ public class FileActions {
          */
         public void actionPerformed(ActionEvent e) {
             try {
-                JFileChooser fileChooser;
+                AndieFileChooser fileChooser;
                 try{
                     fileChooser = new AndieFileChooser(lastDirectory);
                 }catch (Exception ex){
-                    System.out.println(ex);
-                    System.out.println("Here");
                     fileChooser = new AndieFileChooser();
                 }
 
@@ -204,7 +202,6 @@ public class FileActions {
             try {
                 fileChooser = new AndieFileChooser(lastDirectory);
             } catch (Exception ex) {
-                // System.out.println(ex);
                 fileChooser = new AndieFileChooser();
             }
             int result = fileChooser.showSaveDialog(target);
@@ -221,19 +218,47 @@ public class FileActions {
 
     }
 
+    /**
+     * <p>
+     * Action to export the current image to a new file location.
+     * </p>
+     * 
+     * @see EditableImage#export(String)
+     */
     public class FileExportAction extends ImageAction
     {
+        /**
+         * <p>
+         * Create a new file-export action.
+         * </p>
+         * 
+         * @param name     The name of the action (ignored if null).
+         * @param icon     An icon to use to represent the action (ignored if null).
+         * @param desc     A brief description of the action (ignored if null).
+         * @param mnemonic A mnemonic key to use as a shortcut (ignored if null).
+         */
         FileExportAction(String name, ImageIcon icon, String desc, Integer mnemonic)
         {
             super(name, icon, desc, mnemonic);
         }
 
+        /**
+         * <p>
+         * Callback for when the file-export action is triggered.
+         * </p>
+         * 
+         * <p>
+         * This method is called whenever the FileExportAction is triggered.
+         * It prompts the user to select a path where the current file will be saved to.
+         * </p>
+         * 
+         * @param e The event triggering this callback.
+         */
         public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser;
             try {
                 fileChooser = new AndieFileChooser(lastDirectory);
             } catch (Exception ex) {
-                // System.out.println(ex);
                 fileChooser = new AndieFileChooser();
             }
             int result = fileChooser.showSaveDialog(target);
@@ -290,7 +315,7 @@ public class FileActions {
 
             int result = UserMessage.showDialog(UserMessage.SAVE_AND_EXIT_DIALOG); //Show the user a pop-up dialog.
             if(result == UserMessage.YES_OPTION) ImageAction.getTarget().getImage().save();
-            else if(result == UserMessage.CLOSED_OPTION || result == UserMessage.CANCEL_OPTION) return; //Don't save OR exit
+            else if(result == UserMessage.CLOSED_OPTION || result == UserMessage.CANCEL_OPTION) return; //Don't save, but also don't exit
 
             System.exit(0); //Only exit if they chose "Save and exit" or "Don't save"
         }
@@ -315,20 +340,40 @@ public class FileActions {
         protected static FileNameExtensionFilter fileExtensionFilter = new FileNameExtensionFilter("JPEG, PNG, GIF, TIFF", EditableImage.allowedExtensions);
 
         /**
-         * Default constructor which also initialises the file extensions that will be visible in the dialog box.
+         * The fields to be renamed in each language.
+         */
+        private static String[] stringsToRename = new String[]{"lookInLabelText", "filesOfTypeLabelText", "upFolderToolTipText", "fileNameLabelText", "homeFolderToolTipText", "newFolderToolTipText", "listViewButtonToolTipTextlist", 
+        "detailsViewButtonToolTipText", "saveButtonText", "openButtonText","cancelButtonText", "updateButtonText", "helpButtonText", "saveButtonToolTipText", 
+        "openButtonToolTipText", "cancelButtonToolTipText", "updateButtonToolTipText", "helpButtonToolTipText"};
+
+        /**
+         * Default constructor which calls {@code setUp()} to make sure everything is in the correct language.
          */
         public AndieFileChooser(){
             super();
-            setFileFilter(fileExtensionFilter);
+            setUp();
         }
 
         /**
-         * Constructor which initialises the file extensions that will be visible in the dialog box.
+         * Constructor which calls {@code setUp()} to make sure everything is in the correct language.
          * Takes a directory and initialises the {@code JFileChooser} box at that location.
          */
         public AndieFileChooser(String directory){
             super(directory);
+            setUp();
+        }
+
+        /**
+         * Sets the GUI components to display in the correct language, and sets only some
+         * file extensions to be visible in the file chooser.
+         */
+        private void setUp(){
             setFileFilter(fileExtensionFilter);
+            this.setDialogTitle(Language.getWord("FileChooser.Title"));
+            for(String option: stringsToRename){
+                UIManager.put("FileChooser." + option, Language.getWord("FileChooser." + option));
+            }
+            this.updateUI();
         }
 
         /**

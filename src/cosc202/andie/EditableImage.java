@@ -41,7 +41,7 @@ class EditableImage {
     private Stack<ImageOperation> ops;
     /** A memory of 'undone' operations to support 'redo'. */
     private Stack<ImageOperation> redoOps;
-    /** The file where the original image is stored/ */
+    /** The file where the original image is stored */
     private String imageFilename;
     /** The file where the operation sequence is stored. */
     private String opsFilename;
@@ -139,6 +139,7 @@ class EditableImage {
             UserMessage.showWarning(UserMessage.NON_IMG_FILE_WARN);
         }catch(java.awt.image.RasterFormatException ex){ // The image's data is in an incorrect format.
             UserMessage.showWarning(UserMessage.INVALID_IMG_FILE_WARN);
+            return null;
         } catch (Exception ex) { // Just in case!
             UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
@@ -160,52 +161,72 @@ class EditableImage {
      * @param filePath The file to open the image from.
      */
     public void open(String filePath) {
-        imageFilename = filePath;
-        opsFilename = imageFilename + ".ops";
-        try {
-            File imageFile = new File(imageFilename);
-            BufferedImage originalCheck = ImageIO.read(imageFile); //Need to make sure these don't return null, otherwise we're gonna reset the current image :(
-            BufferedImage currentCheck = deepCopy(originalCheck);
-            String extensionCheck = imageFilename.substring(1 + imageFilename.lastIndexOf(".")).toLowerCase();
 
-            if (originalCheck != null && currentCheck != null) {
-                original = originalCheck;
-                current = currentCheck;
-                extension = extensionCheck;
-            } else {
-                //UserMessage.showWarning(UserMessage.NON_IMG_FILE_WARN); //Tell the user off and leave before more damage is done.
+        //Variables that we want to ensure are not null before making the datafields point to them
+        String imageFilenameCheck = filePath;
+        String opsFilenameCheck = filePath + ".ops";
+        String extensionCheck = null;
+        BufferedImage originalCheck = null;
+        BufferedImage currentCheck = null;
+
+        Stack<ImageOperation> opsFromFile = null;
+        FileInputStream fileIn = null;
+        ObjectInputStream objIn = null;
+
+        try {
+            //Attempt to open the file and get the extension
+            File imageFile = new File(imageFilenameCheck);
+            originalCheck = ImageIO.read(imageFile);
+            currentCheck = deepCopy(originalCheck);
+            extensionCheck = imageFilenameCheck.substring(1 + imageFilenameCheck.lastIndexOf(".")).toLowerCase();
+            
+            //Attempt to load in the operations
+            fileIn = new FileInputStream(opsFilenameCheck);
+            objIn = new ObjectInputStream(fileIn);
+            // Silence the Java compiler warning about type casting.
+            // Understanding the cause of the warning is way beyond
+            // the scope of COSC202, but if you're interested, it has
+            // to do with "type erasure" in Java: the compiler cannot
+            // produce code that fails at this point in all cases in
+            // which there is actually a type mismatch for one of the
+            // elements within the Stack, i.e., a non-ImageOperation.
+            @SuppressWarnings("unchecked")
+            Stack<ImageOperation> opsTemp = (Stack<ImageOperation>) objIn.readObject();
+            opsFromFile = opsTemp;
+            objIn.close();
+            fileIn.close();
+        }catch(FileNotFoundException e){// This Exception means that there is no associated operations file - so need to reset it in case there was a previous file open.
+            opsFromFile = new Stack<ImageOperation>();
+        }catch (javax.imageio.IIOException ex) { //File doesn't exist - don't load any of the local variables to the datafields.
+            UserMessage.showWarning(UserMessage.FILE_NOT_FOUND_WARN);
+            return;
+        }catch(java.io.StreamCorruptedException ex) { //The operations file is incorrectly formatted. Attempt to resolve by deleting/overwriting it, otherwise return.
+            int result = UserMessage.showDialog(UserMessage.DELETE_OPS_DIALOG);
+            if(result == UserMessage.YES_OPTION){
+                try{
+                    if(objIn != null) objIn.close();
+                    if(fileIn != null) fileIn.close();
+                    File corruptedOps = new File(opsFilenameCheck);
+                    corruptedOps.delete();
+                }catch(Exception e){/*Pretend like nothing happened (if it can't delete the file, it'll just overwrite it anyway)*/}
+            }else{
                 return;
             }
+        }catch(Exception ex){ //Something else goes wrong
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
+        }
 
-            try{
-                FileInputStream fileIn = new FileInputStream(this.opsFilename);
-                ObjectInputStream objIn = new ObjectInputStream(fileIn);
-                // Silence the Java compiler warning about type casting.
-                // Understanding the cause of the warning is way beyond
-                // the scope of COSC202, but if you're interested, it has
-                // to do with "type erasure" in Java: the compiler cannot
-                // produce code that fails at this point in all cases in
-                // which there is actually a type mismatch for one of the
-                // elements within the Stack, i.e., a non-ImageOperation.
-                @SuppressWarnings("unchecked")
-                Stack<ImageOperation> opsFromFile = (Stack<ImageOperation>) objIn.readObject();
-                redoOps.clear();
-                objIn.close();
-                fileIn.close();
-                if(opsFromFile != null) ops = opsFromFile; // If there is an ops file, then set it.
-            }catch(FileNotFoundException e){// This Exception means that there is no associated operations file - so need to reset it in case there was a previous file open.
-                ops = new Stack<ImageOperation>();
-                redoOps = new Stack<ImageOperation>();
-            }
-
+        //Only load the files in if there aren't any big issues.
+        if (originalCheck != null && currentCheck != null) {
+            this.original = originalCheck;
+            this.current = currentCheck;
+            this.extension = extensionCheck;
+            this.imageFilename = imageFilenameCheck;
+            this.opsFilename = opsFilenameCheck;
+            this.ops = opsFromFile;
+            redoOps.clear();
             this.refresh();
             unsavedChanges = false;
-        }catch (javax.imageio.IIOException ex) { //File doesn't exist
-            UserMessage.showWarning(UserMessage.FILE_NOT_FOUND_WARN);
-        }catch(java.io.StreamCorruptedException ex) { // The operations file is incorrectly formatted
-            UserMessage.showWarning(UserMessage.INVALID_OPS_FILE_WARN);
-        }catch(Exception ex){
-            UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
     }
 
@@ -228,8 +249,6 @@ class EditableImage {
         }
         try{
             // Write image file based on file extension
-            //String extensionCheck = imageFilename.substring(1+imageFilename.lastIndexOf(".")).toLowerCase();
-            //if(extensionCheck != null) extension = extensionCheck;
             ImageIO.write(original, extension, new File(imageFilename));
             // Write operations file
             FileOutputStream fileOut = new FileOutputStream(this.opsFilename);
@@ -270,6 +289,19 @@ class EditableImage {
         save();
     }
 
+    /**
+     * <p>
+     * Export an image with the current operations to a specified file.
+     * </p>
+     * 
+     * <p>
+     * Exports an image to the file provided as a parameter.
+     * The current operations applied to the image are saved onto the
+     * new file, and no operations file is generated.
+     * </p>
+     * 
+     * @param imageFilename The file location to export the image to.
+     */
     public void export(String imageFilename) {
         try{
             String extensionCheck = imageFilename.substring(imageFilename.lastIndexOf(".") + 1).toLowerCase();

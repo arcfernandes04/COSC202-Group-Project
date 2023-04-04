@@ -50,7 +50,7 @@ public class TransformActions {
      * @return The Transform menu UI element.
      */
     public JMenu createMenu() {
-        JMenu transformMenu = new JMenu("Transform");
+        JMenu transformMenu = new JMenu(Language.getWord("Transform"));
 
         for (Action action : actions) {
             transformMenu.add(new JMenuItem(action));
