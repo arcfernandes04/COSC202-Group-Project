@@ -4,6 +4,8 @@ import java.util.*;
 import java.awt.GridLayout;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * <p>
@@ -142,17 +144,63 @@ public class ColourActions {
             SpinnerNumberModel contrastModel = new SpinnerNumberModel(0, -100, 100, 1);
             JSpinner brightnessSpinner = new JSpinner(brightnessModel);
             JSpinner contrastSpinner = new JSpinner(contrastModel);
+
+            JSlider brightnessSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+            JSlider contrastSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+
+            class JSpinnerListener implements ChangeListener{
+                public void stateChanged(ChangeEvent e){
+                    try {
+                        // set brightness and contrast slider to spinner values
+                        brightnessSlider.setValue((int)brightnessSpinner.getValue());
+                        contrastSlider.setValue((int)contrastSpinner.getValue());
+                        target.getImage().previewApply(new BrightnessContrastAdjustment((int)brightnessSpinner.getValue(), (int)contrastSpinner.getValue()));
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                    target.repaint();
+                    target.getParent().revalidate();
+                }
+            }
+
+            class JSliderListener implements ChangeListener{
+                public void stateChanged(ChangeEvent e){
+                    try {
+                        // set brightness and contrast spinner to slider values
+                        brightnessSpinner.setValue((int)brightnessSlider.getValue());
+                        contrastSpinner.setValue((int)contrastSlider.getValue());
+                        target.getImage().previewApply(new BrightnessContrastAdjustment((int)brightnessSlider.getValue(), (int)contrastSlider.getValue()));
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                    target.repaint();
+                    target.getParent().revalidate();
+                }
+            }
+
+            // add listener to brightness and contrast spinners
+            brightnessSpinner.addChangeListener(new JSpinnerListener());
+            contrastSpinner.addChangeListener(new JSpinnerListener());
+            
+            // add listener to brightness and contrast sliders
+            brightnessSlider.addChangeListener(new JSliderListener());
+            contrastSlider.addChangeListener(new JSliderListener());
             
             JPanel spinnerPanel = new JPanel(new GridLayout(0, 1));
             spinnerPanel.add(new JLabel("Brightness:"));
+            spinnerPanel.add(brightnessSlider);
             spinnerPanel.add(brightnessSpinner);
             spinnerPanel.add(new JLabel("Contrast:"));
+            spinnerPanel.add(contrastSlider);
             spinnerPanel.add(contrastSpinner);
 
             int option = JOptionPane.showOptionDialog(null, spinnerPanel, "Adjust brightness/contrast", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
             // Check return value from the dialog box
             if(option != JOptionPane.OK_OPTION) {
+                target.getImage().previewApply(new BrightnessContrastAdjustment(0, 0));
+                target.repaint();
+                target.getParent();
                 return;
             }else {
                 brightness = brightnessModel.getNumber().intValue();

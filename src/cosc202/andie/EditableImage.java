@@ -378,7 +378,7 @@ class EditableImage {
             if (this.tempOriginal == null){
                 this.tempOriginal = deepCopy(current);
             }
-            BufferedImage result = op.apply(tempOriginal);
+            BufferedImage result = op.apply(deepCopy(tempOriginal));
             if(result != null){ //Only count this as a valid operation if it returns non-null value.
                 current = result;
             }
