@@ -133,7 +133,7 @@ public class ColourActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            // Determine brigtness/contrast - ask the user
+            // Determine brightness/contrast - ask the user
             int brightness = 0;
             int contrast = 0;
 
