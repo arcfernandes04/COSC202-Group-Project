@@ -11,15 +11,19 @@ import java.util.Properties;
  */
 public abstract class Language
 {
+    /** The current language. */
     private static String lang = "en";
+    /** The properties holding the current language's information. */
     private static Properties prop;
+    /** The directory that is being searched for the language files. */
+    private static String directory = "src/resources/";
     
     public static void setup()
     {
         try{//try get the current language, and the file associated with it.
-            Properties getLang = getProperties("src/resources/config.properties");
+            Properties getLang = getProperties(directory + "config.properties");
             lang = getLang.getProperty("language");
-            Language.prop = getProperties("src/resources/lang_" + lang + ".properties");
+            Language.prop = getProperties(directory + "lang_" + lang + ".properties");
         } catch (IOException ex) {
             recover(); //if it fails, attempt to recover, or find a more systemic problem.
         }
@@ -46,11 +50,11 @@ public abstract class Language
     {
         try{
             String output = prop.getProperty(word);
-            if (output == null) return "?"; //ff it can't find the value, then return a question mark
+            if (output == null) return word; //if it can't find the value, then return the key.
             return output;
         }catch(Exception e){ //if the 'prop' is null, then the language file can't be found
             recover();
-            return "?";
+            return word;
         }
     }
 
@@ -61,7 +65,7 @@ public abstract class Language
             storeLang(lang);
 
             //get the language file for the new language
-            Language.prop = getProperties("src/resources/lang_" + lang + ".properties");
+            Language.prop = getProperties(directory + "lang_" + lang + ".properties");
             //redraw everything to be in the right language.
             Andie.redrawMenuBar();
         }catch(IOException ex){
@@ -77,7 +81,7 @@ public abstract class Language
      */
     private static void storeLang(String lang) throws IOException {
         //store the new language in the config files
-        FileOutputStream output = new FileOutputStream("src/resources/config.properties");
+        FileOutputStream output = new FileOutputStream(directory + "config.properties");
         Properties setLang = new Properties();
         setLang.setProperty("language", lang);
         setLang.store(output, null);
@@ -94,7 +98,7 @@ public abstract class Language
         try { //try default to english
             lang = "en";
             storeLang(lang);
-            Language.prop = getProperties("src/resources/lang_en.properties");
+            Language.prop = getProperties(directory + "lang_en.properties");
             UserMessage.showWarning(UserMessage.MISSING_LANG_WARN);
         } catch (Exception e) { //if english isn't there, the languages are screwed and we need to just exit.
             UserMessage.showWarning(UserMessage.FATAL_LANG_WARN);
