@@ -102,9 +102,9 @@ public class FilterActions {
             int option = JOptionPane.showOptionDialog(null, radiusSpinner, "Enter filter radius", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
             // Check the return value from the dialog box.
-            if (option == JOptionPane.CANCEL_OPTION) {
-                return;
-            } else if (option == JOptionPane.OK_OPTION) {
+            if (option != JOptionPane.OK_OPTION) {
+                return;   
+            }else{
                 radius = radiusModel.getNumber().intValue();
             }
 
@@ -203,9 +203,9 @@ public class FilterActions {
             int option = JOptionPane.showOptionDialog(null, radiusSpinner, "Enter filter radius", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
             // Check the return value from the dialog box.
-            if (option == JOptionPane.CANCEL_OPTION) {
+            if (option != JOptionPane.OK_OPTION) {
                 return;
-            } else if (option == JOptionPane.OK_OPTION) {
+            } else {
                 radius = radiusModel.getNumber().intValue();
             }
 
@@ -262,9 +262,9 @@ public class FilterActions {
             int option = JOptionPane.showOptionDialog(null, radiusSpinner, "Enter filter radius", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
             // Check the return value from the dialog box.
-            if (option == JOptionPane.CANCEL_OPTION) {
+            if (option != JOptionPane.OK_OPTION) {
                 return;
-            } else if (option == JOptionPane.OK_OPTION) {
+            } else {
                 radius = radiusModel.getNumber().intValue();
             }
 

@@ -188,9 +188,9 @@ public class TransformActions {
                     int option = JOptionPane.showOptionDialog(null, percentageSpinner, "Enter Resize Percentage", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
                     // Check the return value from the dialog box.
-                    if (option == JOptionPane.CANCEL_OPTION) {
+                    if (option != JOptionPane.OK_OPTION) {
                         return;
-                    } else if (option == JOptionPane.OK_OPTION) {
+                    } else {
                         sizePercentageIncrease = percentageModel.getNumber().intValue();
                     }
                 target.getImage().apply(new ResizeImage(sizePercentageIncrease));

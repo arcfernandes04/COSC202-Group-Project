@@ -152,7 +152,7 @@ public class ColourActions {
             int option = JOptionPane.showOptionDialog(null, spinnerPanel, "Adjust brightness/contrast", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
             // Check return value from the dialog box
-            if(option == JOptionPane.CANCEL_OPTION) {
+            if(option != JOptionPane.OK_OPTION) {
                 return;
             }else {
                 brightness = brightnessModel.getNumber().intValue();
