@@ -41,7 +41,7 @@ public class FileActions {
         actions.add(new FileOpenAction(Language.getWord("Open"), null, Language.getWord("Open_desc"), Integer.valueOf(KeyEvent.VK_O)));
         actions.add(new FileSaveAction(Language.getWord("Save"), null, Language.getWord("Save_desc"), Integer.valueOf(KeyEvent.VK_S)));
         actions.add(new FileSaveAsAction(Language.getWord("SaveAs"), null, Language.getWord("SaveAs_desc"), Integer.valueOf(KeyEvent.VK_A)));
-        actions.add(new FileExportAction(Language.getWord("Export"), null, Language.getWord("Export_desc"), Integer.valueOf(KeyEvent.VK_E)));
+        actions.add(new FileExportAction(Language.getWord("Export"), null, Language.getWord("Export_desc"), Integer.valueOf(KeyEvent.VK_E))); //exports image using current instead of 
         actions.add(new FileExitAction(Language.getWord("Exit"), null, Language.getWord("Exit_desc"), Integer.valueOf(0)));
     }
 
