@@ -33,9 +33,9 @@ public class FilterActions {
      */
     public FilterActions() {
         actions = new ArrayList<Action>();
-        actions.add(new MeanFilterAction(Language.getWord("Mean"), null, Language.getWord("Mean_desc"), Integer.valueOf(KeyEvent.VK_M)));
+        actions.add(new MeanFilterAction(Language.getWord("Mean"), null, Language.getWord("Mean_desc"), Integer.valueOf(KeyEvent.VK_M), true, 1, 10, 1, 0));
         actions.add(new SharpenFilterAction(Language.getWord("Sharpen"), null, Language.getWord("Sharpen_desc"), Integer.valueOf(KeyEvent.VK_S)));
-        actions.add(new GaussianBlurFilterAction(Language.getWord("Gaussian"), null, Language.getWord("Gaussian_desc"), Integer.valueOf(KeyEvent.VK_G)));
+        actions.add(new GaussianBlurFilterAction(Language.getWord("Gaussian"), null, Language.getWord("Gaussian_desc"), Integer.valueOf(KeyEvent.VK_G), true, 1, 10, 1, 0));
         actions.add(new MedianFilterAction(Language.getWord("Median"), null, Language.getWord("Median_desc"), Integer.valueOf(KeyEvent.VK_E)));
     }
 
@@ -63,7 +63,7 @@ public class FilterActions {
      * 
      * @see MeanFilter
      */
-    public class MeanFilterAction extends ImageAction {
+    public class MeanFilterAction extends UserInput {
 
         /**
          * <p>
@@ -75,44 +75,17 @@ public class FilterActions {
          * @param desc A brief description of the action  (ignored if null).
          * @param mnemonic A mnemonic key to use as a shortcut  (ignored if null).
          */
-        MeanFilterAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
-            super(name, icon, desc, mnemonic);
+        MeanFilterAction(String name, ImageIcon icon, String desc, Integer mnemonic,
+                            boolean slider, int min, int max, int val, int zeroVal) {
+            super(name, icon, desc, mnemonic, slider, min, max, val, zeroVal);
         }
 
-        /**
-         * <p>
-         * Callback for when the convert-to-grey action is triggered.
-         * </p>
-         * 
-         * <p>
-         * This method is called whenever the MeanFilterAction is triggered.
-         * It prompts the user for a filter radius, then applys an appropriately sized {@link MeanFilter}.
-         * </p>
-         * 
-         * @param e The event triggering this callback.
-         */
-        public void actionPerformed(ActionEvent e) {
-
-            // Determine the radius - ask the user.
-            int radius = 1;
-
-            // Pop-up dialog box to ask for the radius value.
-            SpinnerNumberModel radiusModel = new SpinnerNumberModel(1, 1, 10, 1);
-            JSpinner radiusSpinner = new JSpinner(radiusModel);
-            int option = JOptionPane.showOptionDialog(null, radiusSpinner, "Enter filter radius", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-
-            // Check the return value from the dialog box.
-            if (option != JOptionPane.OK_OPTION) {
-                return;   
-            }else{
-                radius = radiusModel.getNumber().intValue();
-            }
-
-            // Create and apply the filter
-            target.getImage().apply(new MeanFilter(radius));
-            target.repaint();
-            target.getParent().revalidate();
+        @Override
+        Object mutateImage(int input) {
+            return new MeanFilter(input);
         }
+
+        
 
     }
 
@@ -158,61 +131,20 @@ public class FilterActions {
         }
     }
 
-    /**
-     * <p>
-     * Action to blur an image with a gaussian blur filter.
-     * </p>
-     * 
-     * @see GaussianBlurFilter
-     */
-    public class GaussianBlurFilterAction extends ImageAction {
 
-        /**
-         * <p>
-         * Create a new gaussian-blur-filter action.
-         * </p>
-         * 
-         * @param name The name of the action (ignored if null).
-         * @param icon An icon used to represent the action (ignored if null).
-         * @param desc A brief description of the action (ignored if null).
-         * @param mnemonic A mnemonic key to use as a shortcut (ignored if null).
-         */
-        GaussianBlurFilterAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
-            super(name, icon, desc, mnemonic);
+    public class GaussianBlurFilterAction extends UserInput {
+
+        GaussianBlurFilterAction(String name, ImageIcon icon, String desc, Integer mnemonic,
+                                    boolean slider, int min, int max, int val, int zeroVal) {
+            super(name, icon, desc, mnemonic, slider, min, max, val, zeroVal);
         }
 
-        /**
-         * <p>
-         * Callback for when the convert-to-grey action is triggered.
-         * </p>
-         * 
-         * <p>
-         * This method is called whenever the GaussianBlurFilterAction is triggered.
-         * It prompts the user for a filter radius, then applys an appropriately sized {@link GaussianBlurFilter}.
-         * </p>
-         * 
-         * @param e The event triggering this callback.
-         */
-        public void actionPerformed(ActionEvent e) {
-            // Determine the radius - ask the user.
-            int radius = 1;
-
-            // Pop-up dialog box to ask for the radius value.
-            SpinnerNumberModel radiusModel = new SpinnerNumberModel(1, 1, 10, 1);
-            JSpinner radiusSpinner = new JSpinner(radiusModel);
-            int option = JOptionPane.showOptionDialog(null, radiusSpinner, "Enter filter radius", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-
-            // Check the return value from the dialog box.
-            if (option != JOptionPane.OK_OPTION) {
-                return;
-            } else {
-                radius = radiusModel.getNumber().intValue();
-            }
-
-            target.getImage().apply(new GaussianBlurFilter(radius));
-            target.repaint();
-            target.getParent().revalidate();
+        @Override
+        Object mutateImage(int input) {
+            return new GaussianBlurFilter(input);
         }
+
+        
 
     }
 

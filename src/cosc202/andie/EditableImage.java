@@ -37,6 +37,8 @@ class EditableImage {
     private BufferedImage original;
     /** The current image, the result of applying {@link ops} to {@link original}. */
     private BufferedImage current;
+    /** Stored image from when previewApply method is called */
+    private BufferedImage tempOriginal;
     /** The sequence of operations currently applied to the image. */
     private Stack<ImageOperation> ops;
     /** A memory of 'undone' operations to support 'redo'. */
@@ -346,7 +348,11 @@ class EditableImage {
      */
     public void apply(ImageOperation op) {
         try{
-            BufferedImage result = op.apply(current);
+            if (this.tempOriginal == null){
+                this.tempOriginal = deepCopy(current);
+            }
+            BufferedImage result = op.apply(tempOriginal);
+            tempOriginal = null;
             if(result != null){ //Only count this as a valid operation if it returns non-null value.
                 current = result;
                 ops.add(op);
@@ -356,6 +362,31 @@ class EditableImage {
             UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
     }
+
+    /**
+     * <p>
+     * Show what image will look like when this.apply(ImageOperation op) is executed.
+     * Does not save operation to ops.
+     * </p>
+     * 
+     * @param op The operation to apply.
+     * @throws NullFileException If no file is currently open, this {@code Exception} is raised.
+     * @throws Exception Raised if an unexpected error occurs.
+     */
+    public void previewApply(ImageOperation op) {
+        try {
+            if (this.tempOriginal == null){
+                this.tempOriginal = deepCopy(current);
+            }
+            BufferedImage result = op.apply(tempOriginal);
+            if(result != null){ //Only count this as a valid operation if it returns non-null value.
+                current = result;
+            }
+        }catch(Exception ex){ //In case the filter forgets to catch exceptions inside the class
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
+        }
+    }
+        
 
     /**
      * <p>

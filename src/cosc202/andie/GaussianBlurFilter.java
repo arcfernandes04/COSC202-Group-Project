@@ -73,6 +73,10 @@ public class GaussianBlurFilter implements ImageOperation, java.io.Serializable{
     public BufferedImage apply(BufferedImage input) throws Exception {
         BufferedImage output = null;
         try{
+            // if radius is 0 then return original image;
+            if (radius == 0) {
+                return input;
+            }
             int size = (2*radius+1) * (2*radius+1);
             float[] array = new float[size];
             float sigma = ((float) radius) / 3; 
