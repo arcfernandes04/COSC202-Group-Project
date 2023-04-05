@@ -96,7 +96,7 @@ public abstract class UserInput extends ImageAction {
                 optionPanel.add(percentageSlider);
                 optionPanel.add(percentageSpinner);
 
-                int option = JOptionPane.showOptionDialog(null, optionPanel, "Enter Size(%)", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+                int option = JOptionPane.showOptionDialog(null, optionPanel, Language.getWord("EnterValue"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
                 
                 // Check the return value from the dialog box.
                 if (option != JOptionPane.OK_OPTION) {
@@ -128,7 +128,7 @@ public abstract class UserInput extends ImageAction {
                 SpinnerNumberModel percentageModel = new SpinnerNumberModel(val, min, max, 1);
                 JSpinner percentageSpinner = new JSpinner(percentageModel);
                 percentageSpinner.addChangeListener(new JSpinnerListener());
-                int option = JOptionPane.showOptionDialog(null, percentageSpinner, "Enter Resize Percentage", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+                int option = JOptionPane.showOptionDialog(null, percentageSpinner, Language.getWord("EnterValue"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
                 // Check the return value from the dialog box.
                 if (option != JOptionPane.OK_OPTION) {
