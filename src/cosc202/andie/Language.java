@@ -7,6 +7,8 @@ import java.util.Properties;
 
 /**
  * 
+ * A static class that manages translations inside of ANDIE.
+ * 
  * @author Christopher Jones
  */
 public abstract class Language
@@ -32,9 +34,9 @@ public abstract class Language
     /**
      * A helper method that opens a properties file
      * 
-     * @param filePath
+     * @param filePath The file path to be opened
      * @return The properties file that was loaded in
-     * @throws IOException
+     * @throws IOException If the file in the provided path cannot be found
      */
     private static Properties getProperties(String filePath) throws IOException {
         FileInputStream inputStream = new FileInputStream(filePath);
@@ -46,6 +48,12 @@ public abstract class Language
         return getProperties;
     }
 
+    /**
+     * Retrieve the value associated with a key. If the corresponding value cannot be found, then the
+     * inputted key is returned as is.
+     * @param word The key
+     * @return The value corresponding to the key, or the key if there is no value.
+     */
     public static String getWord(String word)
     {
         try{
@@ -58,6 +66,10 @@ public abstract class Language
         }
     }
 
+    /**
+     * Changes the program's language, refreshing all of the toolbar elements to reflect this change.
+     * @param lang The new language to be using
+     */
     public static void setLang(String lang)
     {
         try{

@@ -5,49 +5,34 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
- * <p>
- * Actions provided by the File menu.
- * </p>
+ * The class which manages changing languages through the menu item in the GUI.
  * 
- * <p>
- * The File menu is very common across applications, 
- * and there are several items that the user will expect to find here.
- * Opening and saving files is an obvious one, but also exiting the program.
- * </p>
- * 
- * <p> 
- * <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
- * </p>
- * 
- * @author Steven Mills
- * @version 1.0
+ * @author Christopher Jones
  */
 public class LanguageActions {
     
     /** A list of actions for the File menu. */
     protected ArrayList<Action> actions;
     /**
-     * <p>
-     * Create a set of File menu actions.
-     * </p>
+     * Create a set of Language menu actions.
      */
     public LanguageActions() {
         actions = new ArrayList<Action>();
-        actions.add(new engLang(Language.getWord("eng"), null, Language.getWord("eng_desc"), Integer.valueOf(0)));
-        actions.add(new maoLang(Language.getWord("mao"), null, Language.getWord("mao_desc"), Integer.valueOf(0)));
-}
-
+        actions.add(new engLang(Language.getWord("eng"), null, Language.getWord("eng_desc"), Integer.valueOf(0))); // button that changes language to english
+        actions.add(new maoLang(Language.getWord("mao"), null, Language.getWord("mao_desc"), Integer.valueOf(0))); // button that changes language to maori
+        actions.add(new afrLang(Language.getWord("afr"), null, Language.getWord("afr_desc"), Integer.valueOf(0))); // button that changes language to afrikaans
+    }
     /**
      * <p>
-     * Create a menu contianing the list of File actions.
+     * Create a menu containing the list of Language actions.
      * </p>
      * 
-     * @return The File menu UI element.
+     * @return The Language menu UI element.
      */
-    public JMenu createMenu() {
+    public JMenu createMenu() { // Creates a new JMenu with the name Language
         JMenu fileMenu = new JMenu(Language.getWord("Language"));
 
-        for(Action action: actions) {
+        for(Action action: actions) { // for each loop to add all languages provided to arraylist
             fileMenu.add(new JMenuItem(action));
         }
 
@@ -55,11 +40,7 @@ public class LanguageActions {
     }
 
     /**
-     * <p>
-     * Action to open an image from file.
-     * </p>
-     * 
-     * @see EditableImage#open(String)
+     * class to set language to english and create buttons under the fileMenu
      */
     public class engLang extends ImageAction
     {
@@ -73,6 +54,9 @@ public class LanguageActions {
         }
     }
 
+    /**
+     * class to set language to maori and create buttons under the fileMenu
+     */
     public class maoLang extends ImageAction
     {
         maoLang(String name, ImageIcon icon, String desc, Integer mnemonic) {
@@ -85,4 +69,18 @@ public class LanguageActions {
         }
     }
 
+    /**
+     * class to set language to afrikaans and create buttons under the fileMenu
+     */
+    public class afrLang extends ImageAction
+    {
+        afrLang(String name, ImageIcon icon, String desc, Integer mnemonic) {
+            super(name, icon, desc, mnemonic);
+        }
+
+        public void actionPerformed(ActionEvent e)
+        {
+            Language.setLang("af");
+        }
+    }
 }
