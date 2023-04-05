@@ -342,7 +342,7 @@ public class FileActions {
         /**
          * The fields to be renamed in each language.
          */
-        private static String[] stringsToRename = new String[]{"lookInLabelText", "filesOfTypeLabelText", "upFolderToolTipText", "fileNameLabelText", "homeFolderToolTipText", "newFolderToolTipText", "listViewButtonToolTipTextlist", 
+        private static String[] stringsToRename = new String[]{"lookInLabelText", "filesOfTypeLabelText", "upFolderToolTipText", "fileNameLabelText", "homeFolderToolTipText", "newFolderToolTipText", "listViewButtonToolTipText", 
         "detailsViewButtonToolTipText", "saveButtonText", "openButtonText","cancelButtonText", "updateButtonText", "helpButtonText", "saveButtonToolTipText", 
         "openButtonToolTipText", "cancelButtonToolTipText", "updateButtonToolTipText", "helpButtonToolTipText"};
 

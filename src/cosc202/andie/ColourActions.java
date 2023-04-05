@@ -187,14 +187,14 @@ public class ColourActions {
             contrastSlider.addChangeListener(new JSliderListener());
             
             JPanel spinnerPanel = new JPanel(new GridLayout(0, 1));
-            spinnerPanel.add(new JLabel("Brightness:"));
+            spinnerPanel.add(new JLabel(Language.getWord("Brightness")));
             spinnerPanel.add(brightnessSlider);
             spinnerPanel.add(brightnessSpinner);
-            spinnerPanel.add(new JLabel("Contrast:"));
+            spinnerPanel.add(new JLabel(Language.getWord("Contrast")));
             spinnerPanel.add(contrastSlider);
             spinnerPanel.add(contrastSpinner);
 
-            int option = JOptionPane.showOptionDialog(null, spinnerPanel, "Adjust brightness/contrast", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+            int option = JOptionPane.showOptionDialog(null, spinnerPanel, Language.getWord("EnterValue"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
             // Check return value from the dialog box
             if(option != JOptionPane.OK_OPTION) {

@@ -171,7 +171,10 @@ public class UserMessage {
             message = Language.getWord(warning);
             title = Language.getWord("ERROR_TITLE"); //Can't have this out in the open, otherwise it creates an infinite loop
         }
-        //else throw new IllegalArgumentException("Invalid warning option.");
+
+        // Make sure JOptionPane is in the right language
+        UIManager.put("OptionPane.cancelButtonText", Language.getWord("OptionPane.cancelButtonText"));
+        UIManager.put("OptionPane.okButtonText", Language.getWord("OptionPane.okButtonText"));
 
         JOptionPane.showMessageDialog(parent, message, title, JOptionPane.INFORMATION_MESSAGE);
     }

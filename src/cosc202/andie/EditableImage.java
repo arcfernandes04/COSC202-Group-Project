@@ -138,22 +138,16 @@ class EditableImage {
      * 
      * @param bi The BufferedImage to copy.
      * @return A deep copy of the input.
+     * @throws Exception If the inputted image is null, incorrectly formatted, or if an unexpected error occurs.
      */
-    private static BufferedImage deepCopy(BufferedImage bi) {
+    private static BufferedImage deepCopy(BufferedImage bi) throws Exception {
         BufferedImage result = null;
-        try{
-            ColorModel cm = bi.getColorModel();
-            boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-            WritableRaster raster = bi.copyData(null);
-            result = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-        }catch(NullPointerException ex){ // If there is a NullPointerException, then "bi" is null and this is not an image file!
-            UserMessage.showWarning(UserMessage.NON_IMG_FILE_WARN);
-        }catch(java.awt.image.RasterFormatException ex){ // The image's data is in an incorrect format.
-            UserMessage.showWarning(UserMessage.INVALID_IMG_FILE_WARN);
-            return null;
-        } catch (Exception ex) { // Just in case!
-            UserMessage.showWarning(UserMessage.GENERIC_WARN);
-        }
+
+        ColorModel cm = bi.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = bi.copyData(null);
+        result = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+        
         return result;
     }
     
@@ -369,9 +363,12 @@ class EditableImage {
                 ops.add(op);
                 unsavedChanges = true;
             }
-        }catch(Exception ex){ //In case the filter forgets to catch exceptions inside the class
+        }catch(NullPointerException ex){ // If there is a NullPointerException, then we have a null image
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+        }catch(java.awt.image.RasterFormatException ex){ // The image's data is in an incorrect format.
+            UserMessage.showWarning(UserMessage.INVALID_IMG_FILE_WARN);
+        } catch (Exception ex) { // Just in case!
             UserMessage.showWarning(UserMessage.GENERIC_WARN);
-            System.out.println(ex);
         }
     }
 
@@ -395,8 +392,8 @@ class EditableImage {
             if(result != null){ //Only count this as a valid operation if it returns non-null value.
                 current = result;
             }
-        }catch(Exception ex){ //In case the filter forgets to catch exceptions inside the class
-            UserMessage.showWarning(UserMessage.GENERIC_WARN);
+        }catch(Exception ex){ //Do not want to show the warning here, otherwise the user could be spammed.
+            //UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
     }
         
