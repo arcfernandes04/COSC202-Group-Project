@@ -96,6 +96,15 @@ class EditableImage {
     }
 
     /**
+     * Resets the temp original image after an operation, even if it was not applied,
+     * because otherwise the program will continue to apply the next operation to 
+     * tempOriginal, even if the file has been changed or several operations were pushed/popped.
+     */
+    public void resetTempOriginal(){
+        tempOriginal = null;
+    }
+
+    /**
      * <p>
      * Make a 'deep' copy of a BufferedImage. 
      * </p>
@@ -210,6 +219,7 @@ class EditableImage {
                     if(fileIn != null) fileIn.close();
                     File corruptedOps = new File(opsFilenameCheck);
                     corruptedOps.delete();
+                    opsFromFile = new Stack<ImageOperation>(); //Make sure that there is an operation stack to use!
                 }catch(Exception e){/*Pretend like nothing happened (if it can't delete the file, it'll just overwrite it anyway)*/}
             }else{
                 return;
@@ -226,8 +236,9 @@ class EditableImage {
             this.imageFilename = imageFilenameCheck;
             this.opsFilename = opsFilenameCheck;
             this.ops = opsFromFile;
-            redoOps.clear();
+            this.redoOps = new Stack<ImageOperation>();
             this.refresh();
+            resetTempOriginal(); //Need to reset this, otherwise the new image will think it is still the old image
             unsavedChanges = false;
         }
     }
@@ -352,7 +363,7 @@ class EditableImage {
                 this.tempOriginal = deepCopy(current);
             }
             BufferedImage result = op.apply(tempOriginal);
-            tempOriginal = null;
+            resetTempOriginal(); //Need to reset this, otherwise the new image will think it is still the old image
             if(result != null){ //Only count this as a valid operation if it returns non-null value.
                 current = result;
                 ops.add(op);
@@ -360,6 +371,7 @@ class EditableImage {
             }
         }catch(Exception ex){ //In case the filter forgets to catch exceptions inside the class
             UserMessage.showWarning(UserMessage.GENERIC_WARN);
+            System.out.println(ex);
         }
     }
 
@@ -369,6 +381,7 @@ class EditableImage {
      * Does not save operation to ops.
      * </p>
      * 
+     * @author Corban Surtees
      * @param op The operation to apply.
      * @throws NullFileException If no file is currently open, this {@code Exception} is raised.
      * @throws Exception Raised if an unexpected error occurs.
@@ -395,6 +408,7 @@ class EditableImage {
      */
     public void undo(){
         try{
+            resetTempOriginal(); // make sure we aren't using an old version of the image
             redoOps.push(ops.pop());
             refresh();
             unsavedChanges = true;
@@ -410,6 +424,7 @@ class EditableImage {
      */
     public void redo() {
         try{
+            resetTempOriginal(); //make sure we aren't using an old version of the image
             apply(redoOps.pop());
             unsavedChanges = true;
         }catch(EmptyStackException ex){
@@ -442,13 +457,16 @@ class EditableImage {
      * 
      */
     private void refresh() {
-        current = deepCopy(original);
-        try{
-            for (ImageOperation op: ops) {
-            current = op.apply(current);
+        try {
+            BufferedImage result = deepCopy(original);
+            for (ImageOperation op : ops) {
+                result = op.apply(result);
             }
-        }catch(Exception ex){
-            UserMessage.showWarning(UserMessage.GENERIC_WARN);
+            if (result != null) { //Only store the result on the 'current' data field if it returns successfully.
+                current = result;
+            }
+        } catch (Exception ex) { //There could be no operations in the file, so using refresh would throw an error. Don't want to alert the user since this isn't a problem.
+            return;
         }
     }
 

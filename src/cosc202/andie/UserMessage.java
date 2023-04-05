@@ -164,7 +164,7 @@ public class UserMessage {
 
         //I have not used a Language.getWord() call, because it may not be retrievable due to issues with the language file.
         if(warning.equalsIgnoreCase(FATAL_LANG_WARN)){
-            message = "ANDIE encountered a fatal error accessing the\nlanguage assets. Please contact the\nadministrators if this problem persists.";
+            message = "ANDIE encountered a fatal error accessing the\nlanguage assets. Please make sure the program\nis being opened from the ANDIE directory, and contact the\nadministrators if this problem persists.";
             title = "ANDIE Fatal Error Message";
         }
         else{

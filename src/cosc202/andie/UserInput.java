@@ -7,7 +7,9 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-
+/**
+ * @author Corban Surtees
+ */
 public abstract class UserInput extends ImageAction {
 
     private boolean slider = true;
@@ -97,12 +99,12 @@ public abstract class UserInput extends ImageAction {
                 int option = JOptionPane.showOptionDialog(null, optionPanel, "Enter Size(%)", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
                 
                 // Check the return value from the dialog box.
-                if (option == JOptionPane.CANCEL_OPTION) {
+                if (option != JOptionPane.OK_OPTION) {
                     target.getImage().previewApply((ImageOperation)mutateImage(zeroVal));
                     target.repaint();
                     target.getParent().revalidate();
                     return;
-                } else if (option == JOptionPane.OK_OPTION) {
+                } else {
                     sizeIncrease = (int)percentageSpinner.getValue();
                 }
             }
@@ -129,11 +131,11 @@ public abstract class UserInput extends ImageAction {
                 int option = JOptionPane.showOptionDialog(null, percentageSpinner, "Enter Resize Percentage", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
                 // Check the return value from the dialog box.
-                if (option == JOptionPane.CANCEL_OPTION) {
+                if (option != JOptionPane.OK_OPTION) {
                     sizeIncrease = val;
                     target.getImage().previewApply((ImageOperation)mutateImage(zeroVal));
                     return;
-                } else if (option == JOptionPane.OK_OPTION) {
+                } else {
                     sizeIncrease = percentageModel.getNumber().intValue();
                 }
             }
