@@ -35,7 +35,9 @@ public class EditActions {
     public EditActions() {
         actions = new ArrayList<Action>();
         actions.add(new UndoAction(Language.getWord("Undo"), null, Language.getWord("Undo_desc"), Integer.valueOf(KeyEvent.VK_Z)));
+        actions.add(new UndoAllAction(Language.getWord("Undo_all"), null, Language.getWord("Undo_all_desc"), Integer.valueOf(KeyEvent.VK_Z)));
         actions.add(new RedoAction(Language.getWord("Redo"), null, Language.getWord("Redo_desc"), Integer.valueOf(KeyEvent.VK_Y)));
+        actions.add(new RedoAllAction(Language.getWord("Redo_all"), null, Language.getWord("Redo_all_desc"), Integer.valueOf(KeyEvent.VK_Y)));
     }
 
     /**
@@ -97,6 +99,48 @@ public class EditActions {
         }
     }
 
+    /**
+     * <p>
+     * Action to undo all {@link ImageOperation} operations applied to image.
+     * </p>
+     * 
+     * @see EditableImage#undoAll()
+     */
+    public class UndoAllAction extends ImageAction {
+
+        /**
+         * <p>
+         * Create a new undoAll action.
+         * </p>
+         * 
+         * @param name The name of the action (ignored if null).
+         * @param icon An icon to use to represent the action (ignored if null).
+         * @param desc A brief description of the action  (ignored if null).
+         * @param mnemonic A mnemonic key to use as a shortcut  (ignored if null).
+         */
+        UndoAllAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+            super(name, icon, desc, mnemonic);
+        }
+
+        /**
+         * <p>
+         * Callback for when the undoAll action is triggered.
+         * </p>
+         * 
+         * <p>
+         * This method is called whenever the UndoAllAction is triggered.
+         * It undoes all of the applied operations.
+         * </p>
+         * 
+         * @param e The event triggering this callback.
+         */
+        public void actionPerformed(ActionEvent e) {
+            target.getImage().undoAll();
+            target.repaint();
+            target.getParent().revalidate();
+        }
+    }
+
      /**
      * <p>
      * Action to redo an {@link ImageOperation}.
@@ -135,6 +179,49 @@ public class EditActions {
          */
         public void actionPerformed(ActionEvent e) {
             target.getImage().redo();
+            target.repaint();
+            target.getParent().revalidate();
+        }
+    }
+
+    /**
+     * <p>
+     * Action to redo all {@link ImageOperation} operations applied to the image.
+     * </p>
+     * 
+     * @see EditableImage#redoAll()
+     */   
+    public class RedoAllAction extends ImageAction {
+
+        /**
+         * <p>
+         * Create a new redoAll action.
+         * </p>
+         * 
+         * @param name The name of the action (ignored if null).
+         * @param icon An icon to use to represent the action (ignored if null).
+         * @param desc A brief description of the action  (ignored if null).
+         * @param mnemonic A mnemonic key to use as a shortcut  (ignored if null).
+         */
+        RedoAllAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+            super(name, icon, desc, mnemonic);
+        }
+
+        
+        /**
+         * <p>
+         * Callback for when the redoAll action is triggered.
+         * </p>
+         * 
+         * <p>
+         * This method is called whenever the RedoAllAction is triggered.
+         * It redoes all undone operations.
+         * </p>
+         * 
+         * @param e The event triggering this callback.
+         */
+        public void actionPerformed(ActionEvent e) {
+            target.getImage().redoAll();
             target.repaint();
             target.getParent().revalidate();
         }
