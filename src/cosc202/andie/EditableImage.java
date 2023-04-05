@@ -419,6 +419,18 @@ class EditableImage {
 
     /**
      * <p>
+     *  Undo all operations applied to the image.
+     * </p>
+     */
+    public void undoAll(){
+        if(ops.size() == 0) UserMessage.showWarning(UserMessage.EMPTY_UNDO_STACK_WARN);
+        while(ops.size() > 0){
+            undo();
+        }
+    }
+
+    /**
+     * <p>
      * Reapply the most recently {@link undo}ne {@link ImageOperation} to the image.
      * </p>
      */
@@ -429,6 +441,18 @@ class EditableImage {
             unsavedChanges = true;
         }catch(EmptyStackException ex){
             UserMessage.showWarning(UserMessage.EMPTY_REDO_STACK_WARN);
+        }
+    }
+
+    /**
+     * <p>
+     *  Reapply all operations applied to the image
+     * </p>
+     */
+    public void redoAll(){
+        if(redoOps.size() == 0) UserMessage.showWarning(UserMessage.EMPTY_REDO_STACK_WARN);
+        while(redoOps.size() > 0){
+            redo();
         }
     }
 
