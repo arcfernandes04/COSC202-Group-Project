@@ -198,6 +198,11 @@ public class FileActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
+            if(!target.getImage().hasImage()){
+                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                return;
+            }
+
             JFileChooser fileChooser;
             try {
                 fileChooser = new AndieFileChooser(lastDirectory);
@@ -255,6 +260,10 @@ public class FileActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
+            if (!target.getImage().hasImage()) {
+                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                return;
+            }
             JFileChooser fileChooser;
             try {
                 fileChooser = new AndieFileChooser(lastDirectory);
@@ -343,8 +352,8 @@ public class FileActions {
          * The fields to be renamed in each language.
          */
         private static String[] stringsToRename = new String[]{"lookInLabelText", "filesOfTypeLabelText", "upFolderToolTipText", "fileNameLabelText", "homeFolderToolTipText", "newFolderToolTipText", "listViewButtonToolTipText", 
-        "detailsViewButtonToolTipText", "saveButtonText", "openButtonText","cancelButtonText", "updateButtonText", "helpButtonText", "saveButtonToolTipText", 
-        "openButtonToolTipText", "cancelButtonToolTipText", "updateButtonToolTipText", "helpButtonToolTipText"};
+        "detailsViewButtonToolTipText", "saveButtonText", "directoryOpenButtonText", "openButtonText","cancelButtonText", "updateButtonText", "helpButtonText", "saveButtonToolTipText", 
+        "openButtonToolTipText", "directoryOpenButtonToolTipText", "cancelButtonToolTipText", "updateButtonToolTipText", "helpButtonToolTipText"};
 
         /**
          * Default constructor which calls {@code setUp()} to make sure everything is in the correct language.

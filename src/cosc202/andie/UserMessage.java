@@ -17,7 +17,7 @@ import javax.swing.*;
  * @see javax.swing.JOptionPane
  * @author Joshua Carter
  */
-public class UserMessage {
+public abstract class UserMessage {
 
     /**
      * The parent frame that the UserMessage instance will appear over.

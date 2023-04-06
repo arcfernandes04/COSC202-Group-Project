@@ -404,6 +404,10 @@ class EditableImage {
      * </p>
      */
     public void undo(){
+        if (!hasImage()) {
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+            return;
+        }
         try{
             resetTempOriginal(); // make sure we aren't using an old version of the image
             redoOps.push(ops.pop());
@@ -420,6 +424,10 @@ class EditableImage {
      * </p>
      */
     public void undoAll(){
+        if (!hasImage()) {
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+            return;
+        }
         if(ops.size() == 0) UserMessage.showWarning(UserMessage.EMPTY_UNDO_STACK_WARN);
         while(ops.size() > 0){
             undo();
@@ -432,6 +440,10 @@ class EditableImage {
      * </p>
      */
     public void redo() {
+        if (!hasImage()) {
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+            return;
+        }
         try{
             resetTempOriginal(); //make sure we aren't using an old version of the image
             apply(redoOps.pop());
@@ -447,6 +459,10 @@ class EditableImage {
      * </p>
      */
     public void redoAll(){
+        if (!hasImage()) {
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+            return;
+        }
         if(redoOps.size() == 0) UserMessage.showWarning(UserMessage.EMPTY_REDO_STACK_WARN);
         while(redoOps.size() > 0){
             redo();
