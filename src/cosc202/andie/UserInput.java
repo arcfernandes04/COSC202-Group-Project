@@ -8,12 +8,23 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
+ * An abstract class that allows for consistent user input methods, using JSlider and JSpinner.
+ * Image operations which have slider functionality extend this class.
+ * 
  * @author Corban Surtees
  */
 public abstract class UserInput extends ImageAction {
 
+    /** True if the action uses a JSlider, false if it uses a JSpinner. */
     private boolean slider = true;
-    private int min, max, val, zeroVal;
+    /** The minimum value that can be inputted. */
+    private int min;
+    /** The maximum value that can be inputted. */
+    private int max;
+    /** The starting value */
+    private int val;
+    /** The value that represents zero, i.e. when the filter needs to be turned off in the previewApply() method. */
+    private int zeroVal;
 
     /**
      * <p>
