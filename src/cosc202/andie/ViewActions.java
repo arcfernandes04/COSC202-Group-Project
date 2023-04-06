@@ -128,7 +128,7 @@ public class ViewActions {
 
         /**
          * <p>
-         * Callback for when the zoom-iout action is triggered.
+         * Callback for when the zoom-out action is triggered.
          * </p>
          * 
          * <p>
@@ -185,7 +185,7 @@ public class ViewActions {
          */
         public void actionPerformed(ActionEvent e) {
             target.setZoom(100);
-            target.revalidate();
+            target.repaint();
             target.getParent().revalidate();
         }
 
