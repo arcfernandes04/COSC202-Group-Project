@@ -6,6 +6,8 @@ import java.util.Properties;
 
 import javax.swing.UIManager;
 
+import cosc202.andie.FileActions.AndieFileChooser;
+
 
 /**
  * 
@@ -28,11 +30,22 @@ public abstract class Language
             Properties getLang = getProperties(directory + "config.properties");
             lang = getLang.getProperty("language");
             Language.prop = getProperties(directory + "lang_" + lang + ".properties");
-            // Make sure JOptionPane is in the right language
-            UIManager.put("OptionPane.cancelButtonText", Language.getWord("OptionPane.cancelButtonText"));
-            UIManager.put("OptionPane.okButtonText", Language.getWord("OptionPane.okButtonText"));
+            // Make sure JOptionPane and AndieFileChooser is in the right language
+            updateUIManager();
         } catch (IOException ex) {
             recover(); //if it fails, attempt to recover, or find a more systemic problem.
+        }
+    }
+
+    /**
+     * Update the GUI elements managed by the UIManager; i.e. {@code OptionPane}
+     * (used by {@code UserMessage}) and {@code JFileChooser} (extended by {@code AndieFileChooser}).
+     */
+    private static void updateUIManager(){
+        UIManager.put("OptionPane.cancelButtonText", Language.getWord("OptionPane.cancelButtonText"));
+        UIManager.put("OptionPane.okButtonText", Language.getWord("OptionPane.okButtonText"));
+        for (String option : AndieFileChooser.getElementsToRename()) {
+            UIManager.put("FileChooser." + option, Language.getWord("FileChooser." + option));
         }
     }
 
@@ -83,9 +96,8 @@ public abstract class Language
 
             //get the language file for the new language
             Language.prop = getProperties(directory + "lang_" + lang + ".properties");
-            // Make sure JOptionPane is in the right language
-            UIManager.put("OptionPane.cancelButtonText", Language.getWord("OptionPane.cancelButtonText"));
-            UIManager.put("OptionPane.okButtonText", Language.getWord("OptionPane.okButtonText"));
+            // Make sure JOptionPane and AndieFileChooser is in the right language
+            updateUIManager();
             //redraw everything to be in the right language.
             Andie.redrawMenuBar();
         }catch(IOException ex){

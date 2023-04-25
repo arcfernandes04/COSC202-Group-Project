@@ -30,6 +30,21 @@ public class ColourActions {
     /** A list of actions for the Colour menu. */
     protected ArrayList<Action> actions;
 
+    /** The program's main icon, which will be displayed inside JOptionPane dialog messages. */
+    private static Icon icon = Andie.getIcon();
+
+    /** The JFrame to create pop up windows inside of. */
+    private static JFrame parent;
+
+    /**
+     * Set the parent component for all ColourActions instances.
+     * 
+     * @param parent The parent JFrame instance
+     */
+    public static void setParent(JFrame parent) {
+        ColourActions.parent = parent;
+    }
+
     /**
      * <p>
      * Create a set of Colour menu actions.
@@ -194,7 +209,7 @@ public class ColourActions {
             spinnerPanel.add(contrastSlider);
             spinnerPanel.add(contrastSpinner);
 
-            int option = JOptionPane.showOptionDialog(null, spinnerPanel, Language.getWord("EnterValue"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+            int option = JOptionPane.showOptionDialog(ColourActions.parent, spinnerPanel, Language.getWord("EnterValue"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, ColourActions.icon, null, null);
 
             // Check return value from the dialog box
             if(option != JOptionPane.OK_OPTION) {

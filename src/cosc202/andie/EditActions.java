@@ -38,6 +38,8 @@ public class EditActions {
         actions.add(new UndoAllAction(Language.getWord("Undo_all"), null, Language.getWord("Undo_all_desc"), Integer.valueOf(KeyEvent.VK_Z)));
         actions.add(new RedoAction(Language.getWord("Redo"), null, Language.getWord("Redo_desc"), Integer.valueOf(KeyEvent.VK_Y)));
         actions.add(new RedoAllAction(Language.getWord("Redo_all"), null, Language.getWord("Redo_all_desc"), Integer.valueOf(KeyEvent.VK_Y)));
+        actions.add(new PasteAction(Language.getWord("Paste"), null, Language.getWord("Paste_desc"), Integer.valueOf(KeyEvent.VK_V)));
+        actions.add(new CopyAction(Language.getWord("Copy"), null, Language.getWord("Copy_desc"), Integer.valueOf(KeyEvent.VK_C)));
     }
 
     /**
@@ -222,6 +224,92 @@ public class EditActions {
          */
         public void actionPerformed(ActionEvent e) {
             target.getImage().redoAll();
+            target.repaint();
+            target.getParent().revalidate();
+        }
+    }
+
+    /**
+     * <p>
+     * Action to paste an image from the clipboard onto the current {@code EditableImage}.
+     * </p>
+     * 
+     * @see EditableImage#pasteFromClipboard()
+     */
+    public class PasteAction extends ImageAction {
+
+        /**
+         * <p>
+         * Create a new paste action.
+         * </p>
+         * 
+         * @param name     The name of the action (ignored if null).
+         * @param icon     An icon to use to represent the action (ignored if null).
+         * @param desc     A brief description of the action (ignored if null).
+         * @param mnemonic A mnemonic key to use as a shortcut (ignored if null).
+         */
+        PasteAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+            super(name, icon, desc, mnemonic);
+        }
+
+        /**
+         * <p>
+         * Callback for when the paste action is triggered.
+         * </p>
+         * 
+         * <p>
+         * This method is called whenever PasteAction is triggered.
+         * It calls a method inside EditableImage, {@code pasteFromClipboard()}, which inspects the 
+         * contents of the current clipboard and tries to read it as an image.
+         * </p>
+         * 
+         * @param e The event triggering this callback.
+         */
+        public void actionPerformed(ActionEvent e) {
+            target.getImage().pasteFromClipboard();
+            target.repaint();
+            target.getParent().revalidate();
+        }
+    }
+
+        /**
+     * <p>
+     * Action to copy an image from the current {@code EditableImage} onto the clipboard.
+     * </p>
+     * 
+     * @see EditableImage#copyToClipboard()
+     */
+    public class CopyAction extends ImageAction {
+
+        /**
+         * <p>
+         * Create a new copy action.
+         * </p>
+         * 
+         * @param name     The name of the action (ignored if null).
+         * @param icon     An icon to use to represent the action (ignored if null).
+         * @param desc     A brief description of the action (ignored if null).
+         * @param mnemonic A mnemonic key to use as a shortcut (ignored if null).
+         */
+        CopyAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+            super(name, icon, desc, mnemonic);
+        }
+
+        /**
+         * <p>
+         * Callback for when the copy action is triggered.
+         * </p>
+         * 
+         * <p>
+         * This method is called whenever CopyAction is triggered.
+         * It calls a method inside EditableImage, {@code copyToClipboard()},
+         * pasting the current image (including its current operations) onto the clipboard
+         * </p>
+         * 
+         * @param e The event triggering this callback.
+         */
+        public void actionPerformed(ActionEvent e) {
+            target.getImage().copyToClipboard();
             target.repaint();
             target.getParent().revalidate();
         }

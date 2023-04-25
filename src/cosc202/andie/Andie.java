@@ -3,6 +3,7 @@ package cosc202.andie;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.nio.file.InvalidPathException;
 
 import javax.swing.*;
@@ -37,6 +38,23 @@ public class Andie {
      * The JMenuBar that holds all of the user actions for the program.
      */
     private static JMenuBar menuBar;
+
+    /**
+     * ANDIE's main icon used throughout the program.
+     */
+    private static Icon icon;
+
+    /**
+     * How much to scale the program's icon by.
+     */
+    private static final double ICON_SCALE_FACTOR = 0.1;
+
+    /**
+     * An accessor for ANDIE's icon data field.
+     */
+    public static Icon getIcon(){
+        return Andie.icon;
+    }
 
     /**
      * <p>
@@ -79,8 +97,9 @@ public class Andie {
 
         // Set up the main GUI frame
         frame = new JFrame("ANDIE");
-        Image image = ImageIO.read(Andie.class.getClassLoader().getResource("icon.png"));
+        BufferedImage image = ImageIO.read(Andie.class.getClassLoader().getResource("icon.png"));
         frame.setIconImage(image);
+        icon = new ImageIcon(image.getScaledInstance((int)(image.getWidth() * ICON_SCALE_FACTOR), (int)(image.getHeight() * ICON_SCALE_FACTOR), 0));
 
         //Add an event listener that checks when the frame is closed.
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -95,8 +114,11 @@ public class Andie {
             }
         });
 
-        // Set the parent frame for UserMessages
+        // Set the parent frame for classes which create pop up windows.
         UserMessage.setParent(frame);
+        UserInput.setParent(frame);
+        ColourActions.setParent(frame);
+        //Initialise all of the language data by retrieving it from the appropriate properties file.
         Language.setup();
 
         // The main content area is an ImagePanel
