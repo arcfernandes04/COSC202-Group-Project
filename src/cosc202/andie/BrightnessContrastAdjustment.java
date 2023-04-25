@@ -27,6 +27,7 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
      */
     private int brightness;
     private int contrast;
+    private int x1, x2, y1, y2 = -1;
     
     /**
      * Construct BrightnessContrastAdjustment with given values.
@@ -37,6 +38,15 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
     public BrightnessContrastAdjustment(int brightness, int contrast){
         this.brightness = brightness;
         this.contrast = contrast;
+    }
+
+    public BrightnessContrastAdjustment(int brightness, int contrast, int x1, int y1, int x2, int y2) {
+        this.brightness = brightness;
+        this.contrast = contrast;
+        this.x1 = Math.min(x1, x2);
+        this.x2 = Math.max(x1, x2);
+        this.y1 = Math.min(y1, y2);
+        this.y2 = Math.max(y1, y2);
     }
 
     /**
@@ -70,18 +80,32 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
      */
     public BufferedImage apply(BufferedImage input) {
         try{
-                for (int y = 0; y < input.getHeight(); ++y) {
+            for (int y = 0; y < input.getHeight(); ++y) {
                 for (int x = 0; x < input.getWidth(); ++x) {
                     int argb = input.getRGB(x, y);
                     int a = (argb & 0xFF000000) >> 24;
                     int r = (argb & 0x00FF0000) >> 16;
                     int g = (argb & 0x0000FF00) >> 8;
                     int b = (argb & 0x000000FF);
-
-
-                    r = (calculateAdjustment(r));
-                    g = (calculateAdjustment(g));
-                    b = (calculateAdjustment(b));
+                    if (x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1) {
+                        if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
+                            r = (calculateAdjustment(r));
+                            g = (calculateAdjustment(g));
+                            b = (calculateAdjustment(b));
+                        }
+                        else {
+                            this.brightness = 0-(this.brightness);
+                            r = (calculateAdjustment(r));
+                            g = (calculateAdjustment(g));
+                            b = (calculateAdjustment(b));
+                            this.brightness = 0-(this.brightness);
+                        }
+                    }
+                    else {
+                        r = (calculateAdjustment(r));
+                        g = (calculateAdjustment(g));
+                        b = (calculateAdjustment(b));
+                    }
 
                     argb = (a << 24) | (r << 16) | (g << 8) | b;
                     input.setRGB(x, y, argb);
