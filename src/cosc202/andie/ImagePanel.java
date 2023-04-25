@@ -1,7 +1,10 @@
 package cosc202.andie;
 
 import java.awt.*;
+import java.awt.event.*;
+
 import javax.swing.*;
+import javax.swing.event.*;
 
 /**
  * <p>
@@ -21,6 +24,14 @@ import javax.swing.*;
  * @version 1.0
  */
 public class ImagePanel extends JPanel {
+
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+
+    boolean beenDragged = false;
+    boolean mouseSelectionOn = false;
     
     /**
      * The image to display in the ImagePanel.
@@ -51,6 +62,80 @@ public class ImagePanel extends JPanel {
     public ImagePanel() {
         image = new EditableImage();
         scale = 1.0;
+
+        addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (image.hasImage()) {
+                    mouseSelectionOn = true;
+                }
+                if (mouseSelectionOn) {
+                    beenDragged = false;
+                    x1 = e.getX();
+                    y1 = e.getY();
+                    if (x1 < 0) x1 = 0;
+                    if (x1 > image.getImageDimensions()[0]) x1 = image.getImageDimensions()[0];
+                    if (y1 < 0) y1 = 0;
+                    if (y1 > image.getImageDimensions()[1]) y1 = image.getImageDimensions()[1];
+                }
+            }
+        });
+
+        addMouseMotionListener(new MouseAdapter() {
+            public void mouseDragged(MouseEvent e) {
+                if (mouseSelectionOn) {
+                    beenDragged = true;
+                    x2 = e.getX();
+                    y2 = e.getY();
+                    if (x2 < 0) x2 = 0;
+                    if (x2 > image.getImageDimensions()[0]) x2 = image.getImageDimensions()[0];
+                    if (y2 < 0) y2 = 0;
+                    if (y2 > image.getImageDimensions()[1]) y2 = image.getImageDimensions()[1];
+                    image.previewApply(new BrightnessContrastAdjustment(25, 0, x1, y1, x2, y2));
+                }
+            }
+        });
+
+        addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if(mouseSelectionOn) {
+                    if (!beenDragged) {
+                        image.previewApply(new BrightnessContrastAdjustment(0, 0));;
+                    }
+                }
+            }
+        });
+
+    }
+
+    /**
+     * <p>
+     * set the mouse selection to be on or off.
+     * </p>
+     * 
+     * <p>
+     * mouse selection will decide whether a use can select an area of the screen with their mouse.
+     * </p>
+     * @param mouseSelectionOn mouse selection on, true or false.
+     */
+    public void setMouseSelectionOn(boolean mouseSelectionOn){
+        this.mouseSelectionOn = mouseSelectionOn;
+    }
+
+    /**
+     * <p>
+     * Get the currently selected area of image.
+     * </p>
+     *
+     * @return a 2D array of ints in form [x,y][x,y] where the first set of points
+     *  is the top left corner and the second set is the bottom right corner.
+     */
+    public int[][] getSelectedArea() {
+        int[][] points = new int[2][2];
+        points[0][0] = Math.min(x1, x2);
+        points[1][0] = Math.max(x1, x2);
+        points[0][1] = Math.min(y1, y2);
+        points[1][1] = Math.max(y1, y2);
+        return points;
     }
 
     /**
@@ -137,5 +222,6 @@ public class ImagePanel extends JPanel {
             g2.drawImage(image.getCurrentImage(), null, 0, 0);
             g2.dispose();
         }
+        repaint();
     }
 }

@@ -75,6 +75,26 @@ class EditableImage {
 
     /**
      * <p>
+     *  Returns the current image dimensions.
+     * </p>
+     * 
+     * @author Corban Surtees
+     * @throws Exception Raised if an unexpected error occurs.
+     */
+    public int[] getImageDimensions() {
+        int[] dimensions = new int[2];
+        try {
+            dimensions[0] = current.getWidth();
+            dimensions[1] = current.getHeight();
+        }
+        catch (Exception e){
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
+        }
+        return dimensions;
+    }
+
+    /**
+     * <p>
      * Check if there is an image loaded.
      * </p>
      * 
@@ -353,6 +373,7 @@ class EditableImage {
      */
     public void apply(ImageOperation op) {
         try{
+            refresh();
             if (this.tempOriginal == null){
                 this.tempOriginal = deepCopy(current);
             }
