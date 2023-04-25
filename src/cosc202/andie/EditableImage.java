@@ -2,6 +2,12 @@ package cosc202.andie;
 
 import java.util.*;
 import java.io.*;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.*;
 import javax.imageio.*;
 
@@ -51,9 +57,8 @@ class EditableImage {
     private boolean unsavedChanges;
     /** The file extension of the most recently opened image. */
     private String extension;
-
     /** The allowed extensions for files that ANDIE can open. */
-    protected static String[] allowedExtensions = {"jpeg","jpg","png","gif","tiff","tif","rgb","ppm"};
+    private static final String[] allowedExtensions = ImageIO.getWriterFileSuffixes();
 
     /**
      * <p>
@@ -105,6 +110,15 @@ class EditableImage {
     }
 
     /**
+     * Check if there is an image open that does not relate to an already saved file.
+     * {@code true} if there is an image with no file path.
+     * {@code false} if there is an image with a pre-existing save file, or there is no image currently open.
+     */
+    public boolean hasLocalImage() {
+        return (imageFilename == null) && (current != null);
+    }
+
+    /**
      * <p>
      * Check if there are currently any unsaved changes to the open file.
      * </p>
@@ -116,11 +130,19 @@ class EditableImage {
     }
 
     /**
+     * Lists the extensions currently available for writing image files, as a copy of the private data field in order to prevent outside classes mutating it.
+     * @return An array containing the extensions that the current image writers can use.
+     */
+    public static String[] getAllowedExtensions(){
+        return Arrays.copyOf(allowedExtensions, allowedExtensions.length);
+    }
+
+    /**
      * Resets the temp original image after an operation, even if it was not applied,
      * because otherwise the program will continue to apply the next operation to 
      * tempOriginal, even if the file has been changed or several operations were pushed/popped.
      */
-    public void resetTempOriginal(){
+    private void resetTempOriginal(){
         tempOriginal = null;
     }
 
@@ -158,9 +180,8 @@ class EditableImage {
      * 
      * @param bi The BufferedImage to copy.
      * @return A deep copy of the input.
-     * @throws Exception If the inputted image is null, incorrectly formatted, or if an unexpected error occurs.
      */
-    private static BufferedImage deepCopy(BufferedImage bi) throws Exception {
+    private static BufferedImage deepCopy(BufferedImage bi) {
         BufferedImage result = null;
 
         ColorModel cm = bi.getColorModel();
@@ -169,6 +190,42 @@ class EditableImage {
         result = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
         
         return result;
+    }
+
+    /**
+     * <p>
+     * Change the data fields of this instace of {@code EditableImage}.
+     * Before calling this method, the supplied values need to be checked,
+     * i.e. {@code img} should not be {@code null}, {@code filename} should exist,
+     * and {@code extension} should be a valid image format.
+     * </p>
+     * 
+     * <p>
+     * This method also sets {@code unsavedChanges} to false, and calls
+     * {@code resetTempOriginal()} to ensure any previously opened images are forgotten.
+     * A new instance of {@code StackImage<Operation>} is created for the list of redo operations,
+     * and {@code deepCopy} is applied to {@code img} to make sure {@code current} and {@code original}
+     * point to two different objects.
+     * </p>
+     * 
+     * 
+     * @param img The image to be copied onto datafields {@code current} and {@code original}
+     * @param filename The name of the file being opened
+     * @param extension The file time of the current image
+     * @param ops The list of previously applied operations
+     */
+    private void setDatafields(BufferedImage img, String filename, String extension, Stack<ImageOperation> ops) {
+        this.current = img;
+        this.original = deepCopy(img);
+        this.imageFilename = filename;
+        if(filename != null) this.opsFilename = filename + ".ops";
+        else this.opsFilename = null;
+        this.extension = extension;
+        this.ops = ops;
+        this.redoOps = new Stack<ImageOperation>();
+        this.refresh(); //Redraw
+        resetTempOriginal(); //Need to reset this, otherwise the new image will think it is still the old image
+        unsavedChanges = false; //Tell the program that there are no unsaved changes
     }
     
     /**
@@ -191,7 +248,6 @@ class EditableImage {
         String imageFilenameCheck = filePath;
         String opsFilenameCheck = filePath + ".ops";
         String extensionCheck = null;
-        BufferedImage originalCheck = null;
         BufferedImage currentCheck = null;
 
         Stack<ImageOperation> opsFromFile = null;
@@ -201,8 +257,7 @@ class EditableImage {
         try {
             //Attempt to open the file and get the extension
             File imageFile = new File(imageFilenameCheck);
-            originalCheck = ImageIO.read(imageFile);
-            currentCheck = deepCopy(originalCheck);
+            currentCheck = ImageIO.read(imageFile);
             extensionCheck = imageFilenameCheck.substring(1 + imageFilenameCheck.lastIndexOf(".")).toLowerCase();
             
             //Attempt to load in the operations
@@ -243,18 +298,7 @@ class EditableImage {
         }
 
         //Only load the files in if there aren't any big issues.
-        if (originalCheck != null && currentCheck != null) {
-            this.original = originalCheck;
-            this.current = currentCheck;
-            this.extension = extensionCheck;
-            this.imageFilename = imageFilenameCheck;
-            this.opsFilename = opsFilenameCheck;
-            this.ops = opsFromFile;
-            this.redoOps = new Stack<ImageOperation>();
-            this.refresh();
-            resetTempOriginal(); //Need to reset this, otherwise the new image will think it is still the old image
-            unsavedChanges = false;
-        }
+        if (currentCheck != null) setDatafields(currentCheck, imageFilenameCheck, extensionCheck, opsFromFile);
     }
 
     /**
@@ -305,6 +349,11 @@ class EditableImage {
      * So if you save to <code>some/path/to/image.png</code>, this method will also
      * save
      * the current operations to <code>some/path/to/image.png.ops</code>.
+     * </p>
+     * 
+     * <p>
+     * The {@code AndieFileChooser} method should have already checked the imageFilename to ensure that
+     * it is sensible. This means that the filename passed to this method is not checked.
      * </p>
      * 
      * @param imageFilename The file location to save the image to.
@@ -487,6 +536,128 @@ class EditableImage {
         if(redoOps.size() == 0) UserMessage.showWarning(UserMessage.EMPTY_REDO_STACK_WARN);
         while(redoOps.size() > 0){
             redo();
+        }
+    }
+
+    /**
+     * <p>
+     * Take the current clipboard, check its data type, and
+     * apply to the current {@code EditableImage} if it matches.
+     * (Image) files copied to the clipboard can also be pasted.
+     * </p>
+     * 
+     * <p>
+     * If a list of files is pasted at the same time, the image files
+     * will be turned into a list and presented to the user to ask them
+     * which one they would like to copy into the program. Non-image files
+     * are ignored.
+     * </p>
+     */
+    public void pasteFromClipboard(){
+        try{
+            Toolkit toolkit = Toolkit.getDefaultToolkit(); 
+            Clipboard clipboard = toolkit.getSystemClipboard();
+
+            //Not a list of files or an image
+            if (!clipboard.isDataFlavorAvailable(DataFlavor.imageFlavor) && !clipboard.isDataFlavorAvailable(DataFlavor.javaFileListFlavor)) {
+                UserMessage.showWarning(UserMessage.NON_IMG_FILE_WARN);
+                return;
+            }
+            
+            Transferable transferable = clipboard.getContents(null);
+            BufferedImage img = null;
+            String extensionCheck = null;
+
+            //If it is simply an image in the clipboard (not a whole file), then copy it.
+            if (clipboard.isDataFlavorAvailable(DataFlavor.imageFlavor)) img = (BufferedImage) transferable.getTransferData(DataFlavor.imageFlavor);
+
+            //May not be an image file. There may be multiple files - should need to iterate through them to check.
+            if (clipboard.isDataFlavorAvailable(DataFlavor.javaFileListFlavor)){
+                @SuppressWarnings("unchecked") //There shouldn't be any issues here since this code can only execute if the clipboard is holding a file list
+                List<File> files = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                //Make a list of which provided files are actually images.
+                ArrayList<File> imageFiles = new ArrayList<File>();
+                for(File f : files) if (ImageIO.read(f) != null) imageFiles.add(f);
+                //Don't continue if there aren't any image files on the clipboard
+                if(imageFiles.size() == 0){
+                    UserMessage.showWarning(UserMessage.NON_IMG_FILE_WARN);
+                    return;
+                }
+                
+                File toOpen;
+                
+                if(imageFiles.size() > 1){ //There are multiple images on the clipboard
+                    //Make an array of strings
+                    String[] scrollItems = new String[imageFiles.size()];
+                    for(int f = 0; f < imageFiles.size(); f++) scrollItems[f] = imageFiles.get(f).toString();
+                    
+                    int result = UserMessage.showScroll(UserMessage.PASTE_FILES_SCROLL, scrollItems);
+                    if(result == UserMessage.CANCEL_OPTION) return;
+                    toOpen = imageFiles.get(result);
+                }else{ //There is only one image on the clipboard
+                    toOpen = imageFiles.get(0);
+                }
+
+                String filenameCheck = toOpen.getAbsolutePath();
+                img = ImageIO.read(toOpen);
+                extensionCheck = filenameCheck.substring(filenameCheck.lastIndexOf(".") + 1).toLowerCase();
+            }
+
+            if (img == null) return; //Just in case something went wrong, need to return before overwriting the data fields.
+
+            if(hasUnsavedChanges() == true){ //If there are unsaved changes, ask to save before forgetting the changes.
+                int result = UserMessage.showDialog(UserMessage.SAVE_AND_OPEN_DIALOG);
+                if(result == UserMessage.YES_OPTION) ImageAction.getTarget().getImage().save();
+                else if(result != UserMessage.NO_OPTION) return;
+            }
+            if(extensionCheck == null) extensionCheck = img.getColorModel().hasAlpha() ? "png" : "jpg"; // Default to PNG or JPG if there is no file extension known.
+
+            setDatafields(img, null, extensionCheck, new Stack<ImageOperation>());
+            
+        
+        }catch(Exception e){
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
+        }
+    }
+
+    /**
+     * <p>
+     * Copy the value of {@code current} onto the clipboard.
+     * Fails if there is no image loaded into ANDIE, otherwise the clipboard would be overwritten.
+     * </p>
+     */
+    public void copyToClipboard() {
+        if(!hasImage()) return; //make sure the current clipboard is not overwritten if there is nothing loaded in ANDIE.
+
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Clipboard clipboard = toolkit.getSystemClipboard();
+        clipboard.setContents(new TransferableImage(this.current), null);
+    }
+
+    /**
+     * <p>
+     * A private inner class that allows data to be transferred between
+     * applications. In this case, it is being used to transfer data to the clipboard.
+     * </p>
+     * 
+     * 
+     * Code adapted from here:
+     * <p>https://stackoverflow.com/questions/4552045/copy-bufferedimage-to-clipboard</p>
+     */
+    private record TransferableImage(Image i) implements Transferable {
+        /* Returns the image being stored within the class (i.e. the current image). */
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+            if (flavor.equals(DataFlavor.imageFlavor) && i != null) return i;
+            throw new UnsupportedFlavorException(flavor); //If they aren't asking for an image, throw an exception.
+        }
+        /* Returns which data flavors are available for this instance of Transferable. */
+        public DataFlavor[] getTransferDataFlavors() {
+            return new DataFlavor[]{DataFlavor.imageFlavor};
+        }
+        /* Returns whether the inputted data flavor is supported or not. */
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            if (flavor.equals(DataFlavor.imageFlavor)) return true;
+            return false;
         }
     }
 

@@ -3,6 +3,8 @@ package cosc202.andie;
 import java.util.*;
 import java.awt.event.*;
 import java.io.*;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -28,8 +30,6 @@ public class FileActions {
     
     /** A list of actions for the File menu. */
     protected ArrayList<Action> actions;
-    
-    private static String lastDirectory = null;
 
     /**
      * <p>
@@ -41,7 +41,7 @@ public class FileActions {
         actions.add(new FileOpenAction(Language.getWord("Open"), null, Language.getWord("Open_desc"), Integer.valueOf(KeyEvent.VK_O)));
         actions.add(new FileSaveAction(Language.getWord("Save"), null, Language.getWord("Save_desc"), Integer.valueOf(KeyEvent.VK_S)));
         actions.add(new FileSaveAsAction(Language.getWord("SaveAs"), null, Language.getWord("SaveAs_desc"), Integer.valueOf(KeyEvent.VK_A)));
-        actions.add(new FileExportAction(Language.getWord("Export"), null, Language.getWord("Export_desc"), Integer.valueOf(KeyEvent.VK_E))); //exports image using current instead of 
+        actions.add(new FileExportAction(Language.getWord("Export"), null, Language.getWord("Export_desc"), Integer.valueOf(KeyEvent.VK_E)));
         actions.add(new FileExitAction(Language.getWord("Exit"), null, Language.getWord("Exit_desc"), Integer.valueOf(0)));
     }
 
@@ -99,18 +99,11 @@ public class FileActions {
          */
         public void actionPerformed(ActionEvent e) {
             try {
-                AndieFileChooser fileChooser;
-                try{
-                    fileChooser = new AndieFileChooser(lastDirectory);
-                }catch (Exception ex){
-                    fileChooser = new AndieFileChooser();
-                }
-
+                AndieFileChooser fileChooser = new AndieFileChooser();
                 int result = fileChooser.showOpenDialog(target);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                     target.getImage().open(imageFilepath);
-                    lastDirectory = fileChooser.getSelectedFile().getParent();
                 }
             }catch(Exception ex){
                 UserMessage.showWarning(UserMessage.GENERIC_WARN);
@@ -157,7 +150,27 @@ public class FileActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            target.getImage().save();           
+            //If there is no image, cannot save.
+            if (!target.getImage().hasImage()) {
+                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                return;
+            }
+            //If there is an image but it only exists locally, then we need to use `save As` instead.
+            if(target.getImage().hasLocalImage()){
+                JFileChooser fileChooser = new AndieFileChooser();
+                int result = fileChooser.showSaveDialog(target);
+                try {
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
+                        target.getImage().saveAs(imageFilepath);
+                    }
+                } catch (IOException ex) {
+                    UserMessage.showWarning(UserMessage.GENERIC_WARN);
+                }
+                return;
+            }
+            
+            target.getImage().save();
         }
 
     }
@@ -203,18 +216,13 @@ public class FileActions {
                 return;
             }
 
-            JFileChooser fileChooser;
-            try {
-                fileChooser = new AndieFileChooser(lastDirectory);
-            } catch (Exception ex) {
-                fileChooser = new AndieFileChooser();
-            }
+            JFileChooser fileChooser = new AndieFileChooser();
+            
             int result = fileChooser.showSaveDialog(target);
             try{
                 if (result == JFileChooser.APPROVE_OPTION) {
                     String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                     target.getImage().saveAs(imageFilepath);
-                    lastDirectory = fileChooser.getSelectedFile().getParent();
                 }
             }catch(IOException ex){
                 UserMessage.showWarning(UserMessage.GENERIC_WARN);
@@ -264,19 +272,13 @@ public class FileActions {
                 UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
                 return;
             }
-            JFileChooser fileChooser;
-            try {
-                fileChooser = new AndieFileChooser(lastDirectory);
-            } catch (Exception ex) {
-                fileChooser = new AndieFileChooser();
-            }
+            JFileChooser fileChooser = new AndieFileChooser();
             int result = fileChooser.showSaveDialog(target);
                 
             try{
                 if(result == JFileChooser.APPROVE_OPTION){
                     String imageFilepath = fileChooser.getSelectedFile().getCanonicalPath();
                     target.getImage().export(imageFilepath);
-                    lastDirectory = fileChooser.getSelectedFile().getParent();
                 }
             }catch(IOException ex){
                 UserMessage.showWarning(UserMessage.GENERIC_WARN);
@@ -345,13 +347,18 @@ public class FileActions {
 
         /**
         * List of the file extensions that are displayed within the {@code JFileChooser} window.
+        */
+        protected static FileNameExtensionFilter fileExtensionFilter = new FileNameExtensionFilter("JPEG, PNG, GIF, ...", EditableImage.getAllowedExtensions());
+
+        /**
+         * The most recently opened directory. Defaults to {@code null}, in which case the user's default directory is used.
          */
-        protected static FileNameExtensionFilter fileExtensionFilter = new FileNameExtensionFilter("JPEG, PNG, GIF, TIFF", EditableImage.allowedExtensions);
+        private static String lastDirectory = null;
 
         /**
          * The fields to be renamed in each language.
          */
-        private static String[] stringsToRename = new String[]{"lookInLabelText", "filesOfTypeLabelText", "upFolderToolTipText", "fileNameLabelText", "homeFolderToolTipText", "newFolderToolTipText", "listViewButtonToolTipText", 
+        private static final String[] elementsToRename = new String[]{"lookInLabelText", "filesOfTypeLabelText", "upFolderToolTipText", "fileNameLabelText", "homeFolderToolTipText", "newFolderToolTipText", "listViewButtonToolTipText", 
         "detailsViewButtonToolTipText", "saveButtonText", "directoryOpenButtonText", "openButtonText","cancelButtonText", "updateButtonText", "helpButtonText", "saveButtonToolTipText", 
         "openButtonToolTipText", "directoryOpenButtonToolTipText", "cancelButtonToolTipText", "updateButtonToolTipText", "helpButtonToolTipText"};
 
@@ -359,30 +366,13 @@ public class FileActions {
          * Default constructor which calls {@code setUp()} to make sure everything is in the correct language.
          */
         public AndieFileChooser(){
-            super();
-            setUp();
-        }
-
-        /**
-         * Constructor which calls {@code setUp()} to make sure everything is in the correct language.
-         * Takes a directory and initialises the {@code JFileChooser} box at that location.
-         */
-        public AndieFileChooser(String directory){
-            super(directory);
-            setUp();
-        }
-
-        /**
-         * Sets the GUI components to display in the correct language, and sets only some
-         * file extensions to be visible in the file chooser.
-         */
-        private void setUp(){
+            super(lastDirectory);
             setFileFilter(fileExtensionFilter);
             this.setDialogTitle(Language.getWord("FileChooser.Title"));
-            for(String option: stringsToRename){
-                UIManager.put("FileChooser." + option, Language.getWord("FileChooser." + option));
-            }
-            this.updateUI();
+        }
+
+        public static String[] getElementsToRename(){
+            return Arrays.copyOf(elementsToRename, elementsToRename.length);
         }
 
         /**
@@ -403,12 +393,16 @@ public class FileActions {
             //Get the image and the desired filename
             EditableImage currImg = ImageAction.target.getImage();
             String filename;
+            String lastDirectory;
             try{
                 filename = getSelectedFile().getCanonicalPath();
+                lastDirectory = getSelectedFile().getParent();
             }catch(IOException ex){
                 UserMessage.showWarning(UserMessage.GENERIC_WARN);
                 return;
             }
+
+            AndieFileChooser.lastDirectory = lastDirectory;
 
             /// Dialog box for OPENING files
             if(getDialogType() == OPEN_DIALOG){
@@ -421,7 +415,7 @@ public class FileActions {
                 //Does the file end with one of the allowed extensions?
                 String extension = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
                 boolean allowed = false;
-                for (String ext : EditableImage.allowedExtensions) {
+                for (String ext : EditableImage.getAllowedExtensions()) {
                     if (ext.equalsIgnoreCase(extension)) {
                         allowed = true;
                         break;

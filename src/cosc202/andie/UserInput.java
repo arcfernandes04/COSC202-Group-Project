@@ -26,6 +26,21 @@ public abstract class UserInput extends ImageAction {
     /** The value that represents zero, i.e. when the filter needs to be turned off in the previewApply() method. */
     private int zeroVal;
 
+    /** The program's main Icon, which will be displayed inside JOptionPane message boxes. */
+    private static Icon icon = Andie.getIcon();
+
+    /** The JFrame to create pop up windows inside of. */
+    private static JFrame parent;
+
+    /**
+     * Set the parent component for all ColourActions instances.
+     * 
+     * @param parent The parent JFrame instance
+     */
+    public static void setParent(JFrame parent) {
+        UserInput.parent = parent;
+    }
+
     /**
      * <p>
      *      Asks user for input.
@@ -107,7 +122,7 @@ public abstract class UserInput extends ImageAction {
                 optionPanel.add(percentageSlider);
                 optionPanel.add(percentageSpinner);
 
-                int option = JOptionPane.showOptionDialog(null, optionPanel, Language.getWord("EnterValue"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+                int option = JOptionPane.showOptionDialog(UserInput.parent, optionPanel, Language.getWord("EnterValue"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, UserInput.icon, null, null);
                 
                 // Check the return value from the dialog box.
                 if (option != JOptionPane.OK_OPTION) {
@@ -139,7 +154,7 @@ public abstract class UserInput extends ImageAction {
                 SpinnerNumberModel percentageModel = new SpinnerNumberModel(val, min, max, 1);
                 JSpinner percentageSpinner = new JSpinner(percentageModel);
                 percentageSpinner.addChangeListener(new JSpinnerListener());
-                int option = JOptionPane.showOptionDialog(null, percentageSpinner, Language.getWord("EnterValue"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+                int option = JOptionPane.showOptionDialog(UserInput.parent, percentageSpinner, Language.getWord("EnterValue"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, UserInput.icon, null, null);
 
                 // Check the return value from the dialog box.
                 if (option != JOptionPane.OK_OPTION) {
