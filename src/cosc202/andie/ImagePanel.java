@@ -99,12 +99,20 @@ public class ImagePanel extends JPanel {
             public void mouseReleased(MouseEvent e) {
                 if(mouseSelectionOn) {
                     if (!beenDragged) {
-                        image.previewApply(new BrightnessContrastAdjustment(0, 0));;
+                        image.previewApply(new BrightnessContrastAdjustment(0, 0));
+                        forgetSelectedArea();
                     }
                 }
             }
         });
 
+    }
+
+    public void forgetSelectedArea() {
+        x1 = 0;
+        y1 = 0;
+        x2 = 0;
+        y2 = 0;
     }
 
     /**
