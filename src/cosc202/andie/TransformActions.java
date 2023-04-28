@@ -40,6 +40,8 @@ public class TransformActions {
                 Integer.valueOf(KeyEvent.VK_H), "90 Left"));
         actions.add(new ResizeImageAction(Language.getWord("Resize"), null, Language.getWord("Resize_desc"),
                 Integer.valueOf(KeyEvent.VK_H), true, 50, 200, 100, 100));
+        actions.add(new CropImageAction(Language.getWord("Crop"), null, Language.getWord(Language.getWord("Crop_desc")),
+                Integer.valueOf(KeyEvent.VK_H)));
     }
 
     /**
@@ -167,6 +169,35 @@ public class TransformActions {
         Object mutateImage(int input) {
             return new ResizeImage(input);
         }
+    }
+
+    public class CropImageAction extends ImageAction {
+
+        int x1, y1, x2, y2;
+
+        public CropImageAction(String name, ImageIcon icon, String desc, Integer mnemonic){
+            super(name, icon, desc, mnemonic);
+        }
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+            if(target.getImage().hasImage() == false){
+                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                return;
+            }
+
+            int[][] selectedArea = target.getSelectedArea();
+            if (selectedArea[0][0] != selectedArea[0][1] || selectedArea[1][0] != selectedArea[1][1]){
+                target.getImage().apply(new CropImage(selectedArea[0][0], selectedArea[0][1], selectedArea[1][0], selectedArea[1][1]));
+                target.repaint();
+                target.getParent().revalidate();
+                target.forgetSelectedArea();
+            }else {
+                UserMessage.showWarning(UserMessage.EMPTY_SELECTION_WARN);
+            }
+		}
+
     }
 
 }
