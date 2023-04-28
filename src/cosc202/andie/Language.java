@@ -6,9 +6,6 @@ import java.util.Properties;
 
 import javax.swing.UIManager;
 
-import cosc202.andie.FileActions.AndieFileChooser;
-
-
 /**
  * 
  * A static class that manages translations inside of ANDIE.

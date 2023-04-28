@@ -141,6 +141,12 @@ public class ColourActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
+
+            if (target.getImage().hasImage() == false) {
+                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                return;
+            }
+            
             // Determine brightness/contrast - ask the user
             int brightness = 0;
             int contrast = 0;
