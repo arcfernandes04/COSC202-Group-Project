@@ -280,7 +280,7 @@ class EditableImage {
         }catch (javax.imageio.IIOException ex) { //File doesn't exist - don't load any of the local variables to the datafields.
             UserMessage.showWarning(UserMessage.FILE_NOT_FOUND_WARN);
             return;
-        }catch(java.io.StreamCorruptedException ex) { //The operations file is incorrectly formatted. Attempt to resolve by deleting/overwriting it, otherwise return.
+        }catch(java.io.StreamCorruptedException | InvalidClassException ex) { //The operations file is incorrectly formatted. Attempt to resolve by deleting/overwriting it, otherwise return.
             int result = UserMessage.showDialog(UserMessage.DELETE_OPS_DIALOG);
             if(result == UserMessage.YES_OPTION){
                 try{
@@ -313,8 +313,9 @@ class EditableImage {
      * the current operations to <code>some/path/to/image.png.ops</code>.
      * </p>
      * 
+     * @return Whether the operation was successful.
      */
-    public void save() {
+    public boolean save() {
         if (this.opsFilename == null) {
             this.opsFilename = this.imageFilename + ".ops";
         }
@@ -330,11 +331,16 @@ class EditableImage {
 
             //Make sure the program knows that there are no unsaved changes.
             unsavedChanges = false;
-        }catch(IllegalArgumentException | NullPointerException ex){ //There is no file currently open
+        }catch (IllegalArgumentException | NullPointerException ex){ //There is no file currently open
             UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+            return false;
         } catch (Exception ex) {
-            UserMessage.showWarning(UserMessage.GENERIC_WARN);
+            UserMessage.showWarning(UserMessage.INVALID_PATH_WARN);
+            this.opsFilename = null;
+            this.imageFilename = null;
+            return false;
         }
+        return true;
     }
 
 
@@ -357,12 +363,13 @@ class EditableImage {
      * </p>
      * 
      * @param imageFilename The file location to save the image to.
+     * @return Whether the operation was successful.
      */
-    public void saveAs(String imageFilename) {
+    public boolean saveAs(String imageFilename) {
         this.extension = imageFilename.substring(imageFilename.lastIndexOf(".") + 1).toLowerCase();
         this.imageFilename = imageFilename;
         this.opsFilename = this.imageFilename + ".ops";
-        save();
+        return save();
     }
 
     /**
@@ -499,9 +506,13 @@ class EditableImage {
             return;
         }
         if(ops.size() == 0) UserMessage.showWarning(UserMessage.EMPTY_UNDO_STACK_WARN);
-        while(ops.size() > 0){
-            undo();
+
+        while(ops.size() > 0){ //Shouldn't just call undo() repeatedly here - it is very inefficient
+            redoOps.push(ops.pop());
         }
+        resetTempOriginal(); // make sure we aren't using an old version of the image
+        refresh();
+        unsavedChanges = true;
     }
 
     /**
@@ -607,13 +618,16 @@ class EditableImage {
 
             if(hasUnsavedChanges() == true){ //If there are unsaved changes, ask to save before forgetting the changes.
                 int result = UserMessage.showDialog(UserMessage.SAVE_AND_OPEN_DIALOG);
-                if(result == UserMessage.YES_OPTION) ImageAction.getTarget().getImage().save();
+                if(result == UserMessage.YES_OPTION){
+                    boolean success = FileActions.saveAction(); //Need to make sure they don't cancel! Otherwise we open the new file without saving the old
+                    if(success == false) return;
+                }
                 else if(result != UserMessage.NO_OPTION) return;
             }
             if(extensionCheck == null) extensionCheck = img.getColorModel().hasAlpha() ? "png" : "jpg"; // Default to PNG or JPG if there is no file extension known.
 
             setDatafields(img, null, extensionCheck, new Stack<ImageOperation>());
-            
+            unsavedChanges = true;
         
         }catch(Exception e){
             UserMessage.showWarning(UserMessage.GENERIC_WARN);

@@ -185,6 +185,11 @@ public class FilterActions {
          */
         public void actionPerformed(ActionEvent e) {
 
+            if (target.getImage().hasImage() == false) {
+                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                return;
+            }
+
             // Determine the radius - ask the user.
             int radius = 1;
 

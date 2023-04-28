@@ -74,6 +74,11 @@ public abstract class UserInput extends ImageAction {
     public void actionPerformed(ActionEvent e) {
         try {
 
+            if (target.getImage().hasImage() == false) {
+                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                return;
+            }
+
             // set default sizeIncrease to 100%
             int sizeIncrease = val;
 

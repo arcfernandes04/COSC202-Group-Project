@@ -21,12 +21,14 @@ import javax.swing.*;
  */
 public abstract class UserMessage {
 
-    /**
-     * The parent frame that the UserMessage instance will appear over.
-     * If left blank, the pop-up box will instead appear in the middle of the
-     * screen.
-     */
-    private static JFrame parent = Andie.getFrame();
+    /** The parent frame that the UserMessage instance will appear over.
+     * If left blank, the pop-up box will instead appear in the middle of the screen. */
+    private static JFrame PARENT = Andie.getFrame();
+    /** Take the main icon being stored in Andie.java and save this as the icon for pop-up boxes. */
+    public static final Icon ICON = Andie.getIcon();
+    /** The dimensions of the scroll pane used for displaying a scrollable selection of items */
+    private static final Dimension SCROLL_DIMENSIONS = new Dimension(400,100);
+
     /** The option that is returned if an error occurs. */
     public static final int ERROR_OPTION = -10;
     /**The result when the user choses the "yes" option for a dialog message. */
@@ -34,7 +36,7 @@ public abstract class UserMessage {
     /** The result when the user choses the "no" option for a dialog message. */
     public static final int NO_OPTION = 1;
     /** The result when the user choses the "cancel" option for a dialog message. */
-    public static final int CANCEL_OPTION = 2;
+    public static final int CANCEL_OPTION = -1;
     /** The result when the user closes the dialog message windo4w. */
     public static final int CLOSED_OPTION = 3;
 
@@ -81,8 +83,6 @@ public abstract class UserMessage {
     public static final String FATAL_LANG_WARN = "FATAL_LANG_WARN";
     /** A warning to tell the user that they have not selected an area to operate on */
     public static final String EMPTY_SELECTION_WARN = "EMPTY_SELECTION_WARN";
-    /** Take the main icon being stored in Andie.java and save this as the icon for pop-up boxes. */
-    public static final Icon icon = Andie.getIcon();
 
 
     /**
@@ -96,7 +96,7 @@ public abstract class UserMessage {
      * when asked shown the dialog for {@code UserMessage.showDialog(UserMessage.SAVE_AND_EXIT_DIALOG)}
      */
     public static int showDialog(String dialogOption){
-        return showDialog(dialogOption, UserMessage.parent);
+        return showDialog(dialogOption, UserMessage.PARENT);
     }
 
     /**
@@ -111,7 +111,7 @@ public abstract class UserMessage {
      * when asked shown the dialog for {@code UserMessage.showDialog(UserMessage.SAVE_AND_EXIT_DIALOG)}
      */
     public static int showDialog(String dialogOption, JFrame parent){
-        int result = -1;
+        int result = UserMessage.CANCEL_OPTION;
         String message = Language.getWord("DEFAULT_DIALOG");
         String title = Language.getWord("DIALOG_TITLE");
 
@@ -119,27 +119,27 @@ public abstract class UserMessage {
         if(dialogOption.equalsIgnoreCase(UserMessage.OVERWRITE_EXISTING_FILE_DIALOG)){
             message = Language.getWord(dialogOption);
             Object[] possibleValues = new Object[]{Language.getWord("OVERWRITE_OK"), Language.getWord("DEFAULT_CANCEL")};
-            result = JOptionPane.showOptionDialog(UserMessage.parent, message, title,
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, icon, possibleValues,possibleValues[1]);
+            result = JOptionPane.showOptionDialog(UserMessage.PARENT, message, title,
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, ICON, possibleValues,possibleValues[1]);
             if(result == JOptionPane.NO_OPTION) result = JOptionPane.CANCEL_OPTION;
         }//Dialog for when the user tries to exit without saving changes.
         else if(dialogOption.equalsIgnoreCase(UserMessage.SAVE_AND_EXIT_DIALOG)){
             message = Language.getWord(dialogOption);
             Object[] possibleValues = new Object[]{Language.getWord("SAVE_AND_EXIT_OK"), Language.getWord("SAVE_AND_EXIT_NO"), Language.getWord("DEFAULT_CANCEL")};
-            result = JOptionPane.showOptionDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
-            JOptionPane.QUESTION_MESSAGE, icon, possibleValues, possibleValues[0]);
+            result = JOptionPane.showOptionDialog(UserMessage.PARENT, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE, ICON, possibleValues, possibleValues[0]);
         }//Dialog for trying to open another file without saving changes.
         else if (dialogOption.equalsIgnoreCase(UserMessage.SAVE_AND_OPEN_DIALOG)) {
             message = Language.getWord(dialogOption);
             Object[] possibleValues = new Object[] {Language.getWord("SAVE_AND_OPEN_OK"), Language.getWord("SAVE_AND_OPEN_NO"), Language.getWord("DEFAULT_CANCEL")};
-            result = JOptionPane.showOptionDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, icon, possibleValues, possibleValues[0]);
+            result = JOptionPane.showOptionDialog(UserMessage.PARENT, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, ICON, possibleValues, possibleValues[0]);
         }//If the operations file is corrupted, ask if they want to delete it.
         else if (dialogOption.equalsIgnoreCase(UserMessage.DELETE_OPS_DIALOG)) {
             message = Language.getWord(dialogOption);
             Object[] possibleValues = new Object[] {Language.getWord("DELETE_OPS_OK"), Language.getWord("DEFAULT_CANCEL")};
-            result = JOptionPane.showOptionDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, icon, possibleValues, possibleValues[0]);
+            result = JOptionPane.showOptionDialog(UserMessage.PARENT, message, title, JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, ICON, possibleValues, possibleValues[0]);
             if(result == JOptionPane.NO_OPTION) result = JOptionPane.CANCEL_OPTION;
         }
         else{ //If it's not one of the expected dialog options, then that is an illegal argument.
@@ -174,16 +174,16 @@ public abstract class UserMessage {
      * {@code UserMessage.CANCEL_OPTION} is returned.
      */
     public static int showScroll(String scrollOption, String[] listItems){
-        int result = CANCEL_OPTION; //Default is the 'cancel' option
+        int result = UserMessage.CANCEL_OPTION; //Default is the 'cancel' option
         JList<String> scrollList = new JList<>(listItems); scrollList.setSelectedIndex(0); // Select the first item by default.
-        JScrollPane scrollPane = new JScrollPane(scrollList); scrollPane.setPreferredSize(new Dimension(300, 100));
+        JScrollPane scrollPane = new JScrollPane(scrollList); scrollPane.setPreferredSize(SCROLL_DIMENSIONS);
         String title = Language.getWord("SCROLL_TITLE");
 
         if(scrollOption.equalsIgnoreCase(UserMessage.PASTE_FILES_SCROLL)){
             title = Language.getWord("PASTE_FILES_TITLE");
             Object[] possibleValues = new Object[]{Language.getWord("PASTE_FILES_OK"), Language.getWord("DEFAULT_CANCEL")};
-            result = JOptionPane.showOptionDialog(UserMessage.parent, scrollPane, title, JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, UserMessage.icon, possibleValues, possibleValues[0]);
+            result = JOptionPane.showOptionDialog(UserMessage.PARENT, scrollPane, title, JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, UserMessage.ICON, possibleValues, possibleValues[0]);
             //The user hits cancels
             if(result != JOptionPane.YES_OPTION) return UserMessage.CANCEL_OPTION;
             result = scrollList.getSelectedIndex();
@@ -217,11 +217,7 @@ public abstract class UserMessage {
             title = Language.getWord("ERROR_TITLE"); //Can't have this out in the open, otherwise it creates an infinite loop
         }
 
-        // Make sure JOptionPane is in the right language
-        UIManager.put("OptionPane.cancelButtonText", Language.getWord("OptionPane.cancelButtonText"));
-        UIManager.put("OptionPane.okButtonText", Language.getWord("OptionPane.okButtonText"));
-
-        JOptionPane.showMessageDialog(parent, message, title, JOptionPane.INFORMATION_MESSAGE, icon);
+        JOptionPane.showMessageDialog(parent, message, title, JOptionPane.INFORMATION_MESSAGE, ICON);
     }
 
     /**
@@ -232,7 +228,7 @@ public abstract class UserMessage {
      * @param warning The warning message to be displayed.
      */
     public static void showWarning(String warning){
-        showWarning(warning, UserMessage.parent);
+        showWarning(warning, UserMessage.PARENT);
     }
 
 }

@@ -104,7 +104,6 @@ public class Andie {
                     UserMessage.showWarning(UserMessage.INVALID_PATH_WARN);
                 }else{
                     UserMessage.showWarning(UserMessage.GENERIC_WARN);
-                    System.out.println(e);
                 }
             }
         });
@@ -119,12 +118,7 @@ public class Andie {
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e){
-                if (ImageAction.getTarget().getImage().hasUnsavedChanges() == false) System.exit(0); // If there aren't unsaved changes, just exit as usual.
-
-                int result = UserMessage.showDialog(UserMessage.SAVE_AND_EXIT_DIALOG); //Does the user want to save before exiting?
-                if (result == UserMessage.YES_OPTION) ImageAction.getTarget().getImage().save(); //Yes, save the changes
-                else if (result == UserMessage.CANCEL_OPTION || result == UserMessage.CLOSED_OPTION) return; //Cancel or closed, do not save or exit.
-                System.exit(0); //Exit
+                FileActions.exitAction();
             }
         });
 
