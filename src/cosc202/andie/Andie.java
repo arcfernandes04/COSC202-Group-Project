@@ -10,6 +10,8 @@ import javax.swing.*;
 
 import javax.imageio.*;
 
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
+
 /**
  * <p>
  * Main class for A Non-Destructive Image Editor (ANDIE).
@@ -42,7 +44,7 @@ public class Andie {
     /**
      * ANDIE's main icon used throughout the program.
      */
-    private static Icon icon;
+    private static ImageIcon icon;
 
     /**
      * How much to scale the program's icon by.
@@ -52,8 +54,16 @@ public class Andie {
     /**
      * An accessor for ANDIE's icon data field.
      */
-    public static Icon getIcon(){
+    public static ImageIcon getIcon(){
         return Andie.icon;
+    }
+
+    /**
+     * An accessor for the main window frame - useful for any pop up windows which need to access 
+     * this data to know where to place themselves on the screen.
+     */
+    public static JFrame getFrame(){
+        return frame;
     }
 
     /**
@@ -80,6 +90,10 @@ public class Andie {
      * @throws Exception if something goes wrong.
      */
     private static void createAndShowGUI() throws Exception {
+
+        // FlatLaf is open source licensed under the Apache 2.0 License
+        // https://github.com/JFormDesigner/FlatLaf/blob/main/LICENSE
+        FlatMacLightLaf.setup();
 
         // We need to catch exceptions that are thrown in other threads
         // Easiest way to do this is by setting the default UncaughtExceptionHandler
@@ -114,10 +128,6 @@ public class Andie {
             }
         });
 
-        // Set the parent frame for classes which create pop up windows.
-        UserMessage.setParent(frame);
-        UserInput.setParent(frame);
-        ColourActions.setParent(frame);
         //Initialise all of the language data by retrieving it from the appropriate properties file.
         Language.setup();
 
