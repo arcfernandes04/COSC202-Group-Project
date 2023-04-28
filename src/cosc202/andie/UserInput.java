@@ -30,7 +30,7 @@ public abstract class UserInput extends ImageAction {
     private static Icon icon = Andie.getIcon();
 
     /** The JFrame to create pop up windows inside of. */
-    private static JFrame parent;
+    private static JFrame parent = Andie.getFrame();
 
     /**
      * Set the parent component for all ColourActions instances.

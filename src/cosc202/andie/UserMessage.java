@@ -26,7 +26,9 @@ public abstract class UserMessage {
      * If left blank, the pop-up box will instead appear in the middle of the
      * screen.
      */
-    private static JFrame parent;
+    private static JFrame parent = Andie.getFrame();
+    /** The option that is returned if an error occurs. */
+    public static final int ERROR_OPTION = -10;
     /**The result when the user choses the "yes" option for a dialog message. */
     public static final int YES_OPTION = 0;
     /** The result when the user choses the "no" option for a dialog message. */
@@ -84,15 +86,6 @@ public abstract class UserMessage {
 
 
     /**
-     * Set the parent component for all UserMessage windows.
-     * 
-     * @param parent The parent JFrame instance
-     */
-    public static void setParent(JFrame parent) {
-        UserMessage.parent = parent;
-    }
-
-    /**
      * <p>
      * Show the user a dialog window, asking them to choose between different options.
      * </p>
@@ -127,26 +120,26 @@ public abstract class UserMessage {
             message = Language.getWord(dialogOption);
             Object[] possibleValues = new Object[]{Language.getWord("OVERWRITE_OK"), Language.getWord("DEFAULT_CANCEL")};
             result = JOptionPane.showOptionDialog(UserMessage.parent, message, title,
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,possibleValues,possibleValues[1]);
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, icon, possibleValues,possibleValues[1]);
             if(result == JOptionPane.NO_OPTION) result = JOptionPane.CANCEL_OPTION;
         }//Dialog for when the user tries to exit without saving changes.
         else if(dialogOption.equalsIgnoreCase(UserMessage.SAVE_AND_EXIT_DIALOG)){
             message = Language.getWord(dialogOption);
             Object[] possibleValues = new Object[]{Language.getWord("SAVE_AND_EXIT_OK"), Language.getWord("SAVE_AND_EXIT_NO"), Language.getWord("DEFAULT_CANCEL")};
             result = JOptionPane.showOptionDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null, possibleValues, possibleValues[0]);
+            JOptionPane.QUESTION_MESSAGE, icon, possibleValues, possibleValues[0]);
         }//Dialog for trying to open another file without saving changes.
         else if (dialogOption.equalsIgnoreCase(UserMessage.SAVE_AND_OPEN_DIALOG)) {
             message = Language.getWord(dialogOption);
             Object[] possibleValues = new Object[] {Language.getWord("SAVE_AND_OPEN_OK"), Language.getWord("SAVE_AND_OPEN_NO"), Language.getWord("DEFAULT_CANCEL")};
             result = JOptionPane.showOptionDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, possibleValues, possibleValues[0]);
+                    JOptionPane.QUESTION_MESSAGE, icon, possibleValues, possibleValues[0]);
         }//If the operations file is corrupted, ask if they want to delete it.
         else if (dialogOption.equalsIgnoreCase(UserMessage.DELETE_OPS_DIALOG)) {
             message = Language.getWord(dialogOption);
             Object[] possibleValues = new Object[] {Language.getWord("DELETE_OPS_OK"), Language.getWord("DEFAULT_CANCEL")};
             result = JOptionPane.showOptionDialog(UserMessage.parent, message, title, JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, possibleValues, possibleValues[0]);
+                    JOptionPane.QUESTION_MESSAGE, icon, possibleValues, possibleValues[0]);
             if(result == JOptionPane.NO_OPTION) result = JOptionPane.CANCEL_OPTION;
         }
         else{ //If it's not one of the expected dialog options, then that is an illegal argument.
@@ -228,7 +221,7 @@ public abstract class UserMessage {
         UIManager.put("OptionPane.cancelButtonText", Language.getWord("OptionPane.cancelButtonText"));
         UIManager.put("OptionPane.okButtonText", Language.getWord("OptionPane.okButtonText"));
 
-        JOptionPane.showMessageDialog(parent, message, title, JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(parent, message, title, JOptionPane.INFORMATION_MESSAGE, icon);
     }
 
     /**
