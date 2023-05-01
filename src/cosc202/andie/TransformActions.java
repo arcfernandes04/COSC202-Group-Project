@@ -46,7 +46,7 @@ public class TransformActions {
 
     /**
      * <p>
-     * Create a menu contianing the list of Transform actions.
+     * Create a menu containing the list of Transform actions.
      * </p>
      * 
      * @return The Transform menu UI element.

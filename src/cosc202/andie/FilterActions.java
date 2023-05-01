@@ -178,7 +178,7 @@ public class FilterActions {
          * 
          * <p>
          * This method is called whenever the MedianFilterAction is triggered.
-         * It prompts the user for a filter radius, then applys an appropriately sized {@link MedianFilter}.
+         * It prompts the user for a filter radius, then applies an appropriately sized {@link MedianFilter}.
          * </p>
          * 
          * @param e The event triggering this callback.

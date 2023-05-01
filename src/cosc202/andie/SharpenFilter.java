@@ -8,7 +8,7 @@ import java.awt.image.*;
  * </p>
  * 
  * <p>
- * A Sharpen filter enchances the differences between neighbouring values, 
+ * A Sharpen filter enhances the differences between neighbouring values, 
  * and can be implemented by convolution with the kernel.
  * </p>
  * 

@@ -43,21 +43,52 @@ public class AndieConvolveOp implements BufferedImageOp{
     }
 
     /**
+     * <p>
      * Performs a convolution on a {@code BufferedImage}, outputting the results to the given destination {@code BufferedImage}.
+     * </p>
      * 
      * @param src The {@code BufferedImage} to filter.
      * @param dst The destination for the filtered {@code BufferedImage}.
+     * 
      * @return The filtered {@code BufferedImage}.
+     * 
      * @throws NullPointerException if {@code src} is null.
      * @throws IllegalArgumentException if {@code src} equals {@code dst}.
+
      */
     public BufferedImage filter(BufferedImage src, BufferedImage dst){
         if(src == null) throw new NullPointerException("src image is null");
         if(src == dst) throw new IllegalArgumentException("src image cannot be the same as the dst image");
 
+        return filter(src, dst, 0, 0, src.getWidth(), src.getHeight());
+    }
+
+
+    /***
+     * <p>
+     * Performs a convolution on a {@code BufferedImage} across a given selection of pixels.
+     * </p>
+     * 
+     * 
+     * @param src The {@code BufferedImage} to filter.
+     * @param dst The destination for the filtered {@code BufferedImage}.
+     * @param startX The X position at the start of the selection (inclusive).
+     * @param startY The Y position at the start of the selection (inclusive).
+     * @param endX The X position at the end of the selection (exclusive).
+     * @param endY The Y position at the end of the selection (exclusive).
+     * 
+     * @return The filtered {@code BufferedImage}.
+     * 
+     * @throws NullPointerException if {@code src} is null.
+     * @throws IllegalArgumentException if {@code src} equals {@code dst}.
+     */
+    public BufferedImage filter(BufferedImage src, BufferedImage dst, int startX, int startY, int endX, int endY){
+        if(src == null) throw new NullPointerException("src image is null");
+        if(src == dst) throw new IllegalArgumentException("src image cannot be the same as the dst image");
+
         // Get image information
         int height = src.getHeight();
-        int width = src.getWidth();
+        int width = src.getWidth();        
         boolean alpha = src.getColorModel().hasAlpha();
 
         // Create arrays for the pixel value inputs and outputs
@@ -67,7 +98,7 @@ public class AndieConvolveOp implements BufferedImageOp{
         // Get pixel values from src and put into srcPixels array
         src.getRGB(0, 0, width, height, srcPixels, 0, width);
 
-        convolve(srcPixels, dstPixels, width, height, alpha);
+        convolve(srcPixels, dstPixels, startX, startY, endX, endY, width, height, alpha);
         
         // Set dst pixel values from dstPixels array
         dst.setRGB(0, 0, width, height, dstPixels, 0, width);
@@ -82,11 +113,13 @@ public class AndieConvolveOp implements BufferedImageOp{
      * 
      * @param srcPixels The pixels of the source image.
      * @param dstPixels The destination to output the convolve computation.
-     * @param width Width of the source image.
-     * @param height Height of the source image.
+     * @param startX X lower bound on selection (inclusive).
+     * @param startY Y lowe bound on selection (inclusive)
+     * @param endX X upper bound on selection (exclusive).
+     * @param endY Y upper bound on selection (exclusive).
      * @param hasAlpha True if the image has an alpha channel; false otherwise.
      */
-    private void convolve(int[] srcPixels, int[] dstPixels, int width, int height, boolean hasAlpha){
+    private void convolve(int[] srcPixels, int[] dstPixels, int startX, int startY, int endX, int endY, int width, int height, boolean hasAlpha){
         float[] matrix = kernel.getKernelData(null);
 
         int kWidth = kernel.getWidth();
@@ -97,6 +130,12 @@ public class AndieConvolveOp implements BufferedImageOp{
 
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
+                if(y < startY || y > endY || x < startX || x > endX){
+                    dstPixels[imgPos] = srcPixels[imgPos];
+                    imgPos++;
+                    continue;
+                }
+
                 float a = 0, r = 0, g = 0, b = 0;
 
                 // Index for the matrix array
@@ -130,41 +169,30 @@ public class AndieConvolveOp implements BufferedImageOp{
                 }
 
                 Color dstColor;
-                int inta, intr, intg, intb;
+
+                int intr = (int) Math.round(r);
+                int intg = (int) Math.round(g);
+                int intb = (int) Math.round(b);
+
+                // Handling values out of range
+                if(intr > 255) intr = 255;
+                if(intr < 0) intr = 0;
+                if(intg > 255) intg = 255;
+                if(intg < 0) intg = 0;
+                if(intb > 255) intb = 255;
+                if(intb < 0) intb = 0;  
 
                 
                 if(hasAlpha){
-                    inta = (int) Math.round(a);
-                    intr = (int) Math.round(r);
-                    intg = (int) Math.round(g);
-                    intb = (int) Math.round(b);
+                    int inta = (int) Math.round(a);
 
                     // Handling values out of range
-                    if(intr > 255) intr = 255;
-                    if(intr < 0) intr = 0;                    
-                    if(intg > 255) intg = 255;
-                    if(intg < 0) intg = 0;
-                    if(intb > 255) intb = 255;
-                    if(intb < 0) intb = 0;                    
                     if(inta > 255) inta = 255;
                     if(inta < 0) inta = 0;
 
                     dstColor = new Color(intr, intg, intb, inta);
-                }else{
-                    intr = (int) Math.round(r);
-                    intg = (int) Math.round(g);
-                    intb = (int) Math.round(b);
-
-                    // Handling values out of range
-                    if(intr > 255) intr = 255;
-                    if(intr < 0) intr = 0;                    
-                    if(intg > 255) intg = 255;
-                    if(intg < 0) intg = 0;
-                    if(intb > 255) intb = 255;
-                    if(intb < 0) intb = 0; 
-
-                    dstColor = new Color(intr, intg, intb);
-                } 
+                }else dstColor = new Color(intr, intg, intb);
+                 
 
                 dstPixels[imgPos] = dstColor.getRGB();
                 imgPos++;
@@ -224,7 +252,7 @@ public class AndieConvolveOp implements BufferedImageOp{
      * </p>
      * 
      * @param srcPt The {@code Point2D} representing the point in the source image.
-     * @param dstPt Thee {@code Point2D} to store the result in.
+     * @param dstPt The {@code Point2D} to store the result in.
      * @return The {@code Point2D} of the destination point.
      * 
      */
