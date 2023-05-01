@@ -161,7 +161,7 @@ class EditableImage {
      * 
      * <p>
      * This method makes a cloned copy of a BufferedImage.
-     * This requires knoweldge of some details about the internals of the BufferedImage,
+     * This requires knowledge of some details about the internals of the BufferedImage,
      * but essentially comes down to making a new BufferedImage made up of copies of
      * the internal parts of the input.
      * </p>
@@ -194,7 +194,7 @@ class EditableImage {
 
     /**
      * <p>
-     * Change the data fields of this instace of {@code EditableImage}.
+     * Change the data fields of this instance of {@code EditableImage}.
      * Before calling this method, the supplied values need to be checked,
      * i.e. {@code img} should not be {@code null}, {@code filename} should exist,
      * and {@code extension} should be a valid image format.

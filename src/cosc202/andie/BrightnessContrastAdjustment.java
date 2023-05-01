@@ -69,7 +69,7 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
      * </p>
      * 
      * <p>
-     * The adjustments are applied to the red, gree, and blue values using a 
+     * The adjustments are applied to the red, green, and blue values using a 
      * simple model that uses the brightness and contrast percentage changes, 
      * and the current value of the pixel.
      * 

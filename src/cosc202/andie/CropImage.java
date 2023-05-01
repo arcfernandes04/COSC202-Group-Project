@@ -6,7 +6,7 @@ import java.awt.image.*;
 
 /**
  * <p>
- * ImageOperation to crip an image.
+ * ImageOperation to crop an image.
  * </p>
  * 
  * <p>
