@@ -38,8 +38,8 @@ public class TransformActions {
                 Integer.valueOf(KeyEvent.VK_H), 90));
         actions.add(new RotateImageAction(Language.getWord("Rotate90Left"), null, Language.getWord("Rotate90Left_desc"),
                 Integer.valueOf(KeyEvent.VK_H), 270));
-        actions.add(new RotateImageActionInput(Language.getWord("Rotate"), null, Language.getWord("Rotate_desc"),
-                Integer.valueOf(KeyEvent.VK_H), true,0, 360, 0, 0));
+        actions.add(new RotateImageActionInput(Language.getWord("CustomRotation"), null, Language.getWord("Rotate_desc"),
+                Integer.valueOf(KeyEvent.VK_H), true,-180, 180, 0, 0));
         actions.add(new ResizeImageAction(Language.getWord("Resize"), null, Language.getWord("Resize_desc"),
                 Integer.valueOf(KeyEvent.VK_H), true, 50, 200, 100, 100));
         actions.add(new CropImageAction(Language.getWord("Crop"), null, Language.getWord(Language.getWord("Crop_desc")),
@@ -55,10 +55,17 @@ public class TransformActions {
      */
     public JMenu createMenu() {
         JMenu transformMenu = new JMenu(Language.getWord("Transform"));
+        JMenu rotateMenu = new JMenu(Language.getWord("Rotate"));
 
         for (Action action : actions) {
-            transformMenu.add(new JMenuItem(action));
+            if (action instanceof RotateImageAction || action instanceof RotateImageActionInput) {
+                rotateMenu.add(new JMenuItem(action));
+            } else {
+                transformMenu.add(new JMenuItem(action));
+            }
         }
+
+        transformMenu.add(rotateMenu);
 
         return transformMenu;
     }
