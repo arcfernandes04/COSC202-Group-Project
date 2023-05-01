@@ -33,11 +33,13 @@ public class TransformActions {
         actions.add(new FlipImageAction(Language.getWord("FlipVertical"), null, Language.getWord("FlipVertical_desc"),
                 Integer.valueOf(KeyEvent.VK_H), "vertical"));
         actions.add(new RotateImageAction(Language.getWord("Rotate180"), null, Language.getWord("Rotate180_desc"),
-                Integer.valueOf(KeyEvent.VK_H), "180"));
+                Integer.valueOf(KeyEvent.VK_H), 180));
         actions.add(new RotateImageAction(Language.getWord("Rotate90Right"), null, Language.getWord("Rotate90Right_desc"),
-                Integer.valueOf(KeyEvent.VK_H), "90 Right"));
+                Integer.valueOf(KeyEvent.VK_H), 90));
         actions.add(new RotateImageAction(Language.getWord("Rotate90Left"), null, Language.getWord("Rotate90Left_desc"),
-                Integer.valueOf(KeyEvent.VK_H), "90 Left"));
+                Integer.valueOf(KeyEvent.VK_H), 270));
+        actions.add(new RotateImageActionInput(Language.getWord("Rotate"), null, Language.getWord("Rotate_desc"),
+                Integer.valueOf(KeyEvent.VK_H), true,0, 360, 0, 0));
         actions.add(new ResizeImageAction(Language.getWord("Resize"), null, Language.getWord("Resize_desc"),
                 Integer.valueOf(KeyEvent.VK_H), true, 50, 200, 100, 100));
         actions.add(new CropImageAction(Language.getWord("Crop"), null, Language.getWord(Language.getWord("Crop_desc")),
@@ -109,7 +111,7 @@ public class TransformActions {
 
     public class RotateImageAction extends ImageAction {
 
-        private String rotation;
+        private int rotation;
 
         /**
          * <p>
@@ -122,7 +124,7 @@ public class TransformActions {
          * @param mnemonic A mnemonic key to use as a shortcut (ignored if null).
          * @param rotation The direction and degree of rotation.
          */
-        RotateImageAction(String name, ImageIcon icon, String desc, Integer mnemonic, String rotation) {
+        RotateImageAction(String name, ImageIcon icon, String desc, Integer mnemonic, int rotation) {
             super(name, icon, desc, mnemonic);
             this.rotation = rotation;
         }
@@ -144,6 +146,32 @@ public class TransformActions {
             target.getImage().apply(new RotateImage(rotation));
             target.repaint();
             target.getParent().revalidate();
+        }
+    }
+
+    public class RotateImageActionInput extends UserInput {
+
+        private int rotation;
+
+        /**
+         * <p>
+         * Create a new rotate-image action.
+         * </p>
+         * 
+         * @param name     The name of the action (ignored if null).
+         * @param icon     An icon to use to represent the action (ignored if null).
+         * @param desc     A brief description of the action (ignored if null).
+         * @param mnemonic A mnemonic key to use as a shortcut (ignored if null).
+         * @param rotation The direction and degree of rotation.
+         */
+        RotateImageActionInput(String name, ImageIcon icon, String desc, Integer mnemonic,
+                            boolean slider, int min, int max, int val, int zeroVal) {
+            super(name, icon, desc, mnemonic, slider, min, max, val, zeroVal);
+        }
+
+        @Override
+        Object mutateImage(int input) {
+            return new RotateImage(input);
         }
     }
 
