@@ -470,6 +470,14 @@ class EditableImage {
             if(result != null){ //Only count this as a valid operation if it returns non-null value.
                 current = result;
             }
+            if (op instanceof RotateImage) {
+                try {
+                    RotateImage r = (RotateImage) op;
+                    refresh(r.getRotation()); // add rotation to total
+                } catch(Exception e) {
+                    System.out.println(e);
+                }
+            }
         }catch(Exception ex){ //Do not want to show the warning here, otherwise the user could be spammed.
             //UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
@@ -700,10 +708,10 @@ class EditableImage {
      * </p>
      * 
      */
-    private void refresh() {
+    private void refresh(int additionalRotation) {
         try {
             BufferedImage result = deepCopy(original);
-            int totalRotation = 0;
+            int totalRotation = additionalRotation;
             for (ImageOperation op : ops) {
                 // apply all operation that are not rotations or flips
                 if (op instanceof RotateImage == false && op instanceof FlipImage == false) {
@@ -740,9 +748,14 @@ class EditableImage {
                 current = result;
             }
     
+    
         } catch (Exception ex) { //There could be no operations in the file, so using refresh would throw an error. Don't want to alert the user since this isn't a problem.
             return;
         }
+    }
+
+    public void refresh() {
+        refresh(0);
     }
 
 }
