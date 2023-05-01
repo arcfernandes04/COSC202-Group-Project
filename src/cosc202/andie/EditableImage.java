@@ -440,6 +440,7 @@ class EditableImage {
                 ops.add(op);
                 unsavedChanges = true;
             }
+            refresh();
         }catch(NullPointerException ex){ // If there is a NullPointerException, then we have a null image
             UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         }catch(java.awt.image.RasterFormatException ex){ // The image's data is in an incorrect format.
@@ -702,12 +703,43 @@ class EditableImage {
     private void refresh() {
         try {
             BufferedImage result = deepCopy(original);
+            int totalRotation = 0;
             for (ImageOperation op : ops) {
-                result = op.apply(result);
+                // apply all operation that are not rotations or flips
+                if (op instanceof RotateImage == false && op instanceof FlipImage == false) {
+                    result = op.apply(result);
+                }
+                else {
+                    // add all rotations together
+                    if (op instanceof RotateImage) {
+                        try {
+                            RotateImage r = (RotateImage) op;
+                            totalRotation = totalRotation%360;
+                            totalRotation += r.getRotation(); // add rotation to total
+                        } catch(Exception e) {
+                            System.out.println(e);
+                        }
+                    } else {
+                        // flip an image and rotate if required
+                        try {
+                            FlipImage f = (FlipImage) op;
+                            FlipImage flip = new FlipImage(f.getDirection(), true);
+                            totalRotation += ((90-totalRotation%360))*2;
+                            result = flip.apply(result);
+                        } catch(Exception e) {
+                            System.out.println(e);
+                        }
+                    }
+                }
             }
+            // apply total rotation
+            RotateImage rotate = new RotateImage(totalRotation);
+            result = rotate.apply(result);
+    
             if (result != null) { //Only store the result on the 'current' data field if it returns successfully.
                 current = result;
             }
+    
         } catch (Exception ex) { //There could be no operations in the file, so using refresh would throw an error. Don't want to alert the user since this isn't a problem.
             return;
         }

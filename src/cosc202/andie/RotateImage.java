@@ -1,7 +1,9 @@
 package cosc202.andie;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.*;
-
 
 /**
  * <p>
@@ -9,7 +11,7 @@ import java.awt.image.*;
  * </p>
  * 
  * <p>
- * Images will be rotated either vertically or horizontally based on the rotation data-field.
+ * Images will be rotated clockwise by the amount specified by the rotation datafield.
  * </p>
  * 
  * <p>
@@ -21,14 +23,14 @@ import java.awt.image.*;
  */
 public class RotateImage implements ImageOperation, java.io.Serializable {
 
-    private String rotation;
+    private int rotation;
 
     /**
      * <p>
      * Create a new RotateImage operation.
      * </p>
      */
-    RotateImage(String rotation) {
+    RotateImage(int rotation) {
         this.rotation = rotation;
     }
 
@@ -38,7 +40,7 @@ public class RotateImage implements ImageOperation, java.io.Serializable {
      * </p>
      * 
      * <p>
-     * The image is rotated by swapping pixels either vertically or horizontally.
+     * The image is rotated using AffineTransform.
      * </p>
      * 
      * @param input The image to be rotated
@@ -47,69 +49,35 @@ public class RotateImage implements ImageOperation, java.io.Serializable {
     public BufferedImage apply(BufferedImage input) throws IllegalArgumentException, Exception {
         BufferedImage newImage = null;
         try{
-            if (this.rotation.toLowerCase().equals("180")) {
-                for (int y = 0; y < input.getHeight(); ++y) {
-                    for (int x = 0; x < input.getWidth()/2; ++x) {
+            double rads = Math.toRadians(this. rotation);
+            int width = (int) Math.floor(input.getWidth() * Math.abs(Math.cos(rads)) + input.getHeight() * Math.abs(Math.sin(rads)));
+            int height = (int) Math.floor(input.getHeight() * Math.abs(Math.cos(rads)) + input.getWidth() * Math.abs(Math.sin(rads)));
 
-                        //first pixel
-                        int argb = input.getRGB(x, y);
+            BufferedImage rotatedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = rotatedImage.createGraphics();
+            AffineTransform at = new AffineTransform();
+            at.translate((width - input.getWidth()) / 2, (height - input.getHeight()) / 2);
 
-                        // opposite pixel
-                        int xOpposite = input.getWidth() - (x + 1);
-                        int yOpposite = input.getHeight() - (y + 1);
-                        int argbOpposite = input.getRGB(xOpposite, yOpposite);
+            
+            Color transparent = new Color(255, 0,0, 0);
 
-                        //swap pixels
-                        input.setRGB(x, y, argbOpposite);
-                        input.setRGB(xOpposite, yOpposite, argb);
-                    }
-                }
-                if (input.getWidth()%2 != 0){
-                    int x = input.getWidth()/2;
-                    for (int y = 0; y < input.getHeight()/2; ++y){
+            at.rotate(Math.toRadians(this.rotation), input.getWidth()/2, input.getHeight()/2);
+            g.setTransform(at);
+            g.drawImage(input, 0, 0, null);
+            g.setColor(transparent);
+            g.drawRect(0, 0, width - 1, height - 1);
+            g.dispose();
 
-                        //first pixel
-                        int argb = input.getRGB(x, y);
+            return rotatedImage;
 
-                        //opposite pixel
-                        int yOpposite = input.getHeight() - (y + 1);
-                        int argbOpposite = input.getRGB(x, yOpposite);
-                        
-                        //swap pixels
-                        input.setRGB(x, y, argbOpposite);
-                        input.setRGB(x, yOpposite, argb);
-                    }
-                }
-                return input;
-            }
-            else if (this.rotation.toLowerCase().equals("90 right") || this.rotation.toLowerCase().equals("90 left")) {
-                newImage = new BufferedImage(input.getHeight(), input.getWidth(), 2);
-                for (int y = 0; y < input.getHeight(); ++y) {
-                    for (int x = 0; x < input.getWidth(); ++x) {
-
-                        //top left
-                        int argb = input.getRGB(x, y);
-
-                        //swap pixels
-                        if(this.rotation.toLowerCase().equals("90 right")){
-                            newImage.setRGB((input.getHeight() - (y + 1)), x, argb);
-                        }
-                        else{
-                            newImage.setRGB(y, (input.getWidth() - (x + 1)), argb);
-                        }
-                        
-                    }
-                }
-                return newImage;
-            }
-
-            else {
-                throw new IllegalArgumentException("Rotation provided in EditActions.java is invalid");
-            }
-        }catch(NullPointerException ex){
+        } catch(NullPointerException ex) {
             UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         }
         return newImage;
+    }
+
+    public int getRotation() {
+        return this.rotation;
     }
     
 }
