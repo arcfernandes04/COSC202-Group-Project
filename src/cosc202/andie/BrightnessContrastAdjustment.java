@@ -1,5 +1,6 @@
 package cosc202.andie;
 
+import java.awt.Point;
 import java.awt.image.*;
 
 /**
@@ -40,13 +41,13 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
         this.contrast = contrast;
     }
 
-    public BrightnessContrastAdjustment(int brightness, int contrast, int x1, int y1, int x2, int y2) {
+    public BrightnessContrastAdjustment(int brightness, int contrast, Point p1, Point p2) {
         this.brightness = brightness;
         this.contrast = contrast;
-        this.x1 = Math.min(x1, x2);
-        this.x2 = Math.max(x1, x2);
-        this.y1 = Math.min(y1, y2);
-        this.y2 = Math.max(y1, y2);
+        this.x1 = (int) p1.getX();
+        this.x2 = (int) p2.getX();
+        this.y1 = (int) p1.getY();
+        this.y2 = (int) p2.getY();
     }
 
     /**

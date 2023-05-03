@@ -2,6 +2,7 @@ package cosc202.andie;
 
 import java.util.*;
 import java.io.*;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -10,6 +11,9 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.*;
 import javax.imageio.*;
+
+import cosc202.andie.draw.DrawPanel;
+
 
 /**
  * <p>
@@ -37,7 +41,7 @@ import javax.imageio.*;
  * @author Steven Mills
  * @version 1.0
  */
-class EditableImage {
+public class EditableImage {
 
     /** The original image. This should never be altered by ANDIE. */
     private BufferedImage original;
@@ -84,18 +88,9 @@ class EditableImage {
      * </p>
      * 
      * @author Corban Surtees
-     * @throws Exception Raised if an unexpected error occurs.
      */
-    public int[] getImageDimensions() {
-        int[] dimensions = new int[2];
-        try {
-            dimensions[0] = current.getWidth();
-            dimensions[1] = current.getHeight();
-        }
-        catch (Exception e){
-            UserMessage.showWarning(UserMessage.GENERIC_WARN);
-        }
-        return dimensions;
+    public Dimension getDimensions() {
+        return new Dimension(current.getWidth(), current.getHeight());
     }
 
     /**
@@ -226,6 +221,8 @@ class EditableImage {
         this.refresh(); //Redraw
         resetTempOriginal(); //Need to reset this, otherwise the new image will think it is still the old image
         unsavedChanges = false; //Tell the program that there are no unsaved changes
+        //Check that the currently selected colours account for the transparency of the current image.
+        DrawPanel.setTransparencyEnabled(this.current.getColorModel().hasAlpha());
     }
     
     /**
@@ -429,6 +426,7 @@ class EditableImage {
      */
     public void apply(ImageOperation op) {
         try{
+            if(op == null) return;
             refresh();
             if (this.tempOriginal == null){
                 this.tempOriginal = deepCopy(current);
@@ -463,6 +461,7 @@ class EditableImage {
      */
     public void previewApply(ImageOperation op) {
         try {
+            if(op == null) return;
             if (this.tempOriginal == null){
                 this.tempOriginal = deepCopy(current);
             }
@@ -639,7 +638,7 @@ class EditableImage {
             unsavedChanges = true;
         
         }catch(Exception e){
-            UserMessage.showWarning(UserMessage.GENERIC_WARN);
+            UserMessage.showWarning(UserMessage.FILE_NOT_FOUND_WARN);
         }
     }
 
