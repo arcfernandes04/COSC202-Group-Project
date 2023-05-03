@@ -1,8 +1,10 @@
 package cosc202.andie;
 
-import java.awt.Dimension;
-
 import javax.swing.*;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
+
+import java.awt.Color;
+import java.awt.Dimension;
 
 /**
  * <p>
@@ -194,6 +196,29 @@ public abstract class UserMessage {
         return result;
     }
 
+    /**
+     * <p>
+     * Asks the user to select a colour.
+     * </p>
+     * 
+     * @param original The colour to be displayed when the colour chooser is initially opened.
+     * @param hasAlpha Whether or not the user should be able to select transparency.
+     * @return
+     */
+    public static Color showColourChooser(Color original, boolean hasAlpha){
+        String title = Language.getWord("PICK_COLOUR_TITLE");
+        JColorChooser chooser = new JColorChooser(original);
+        AbstractColorChooserPanel panel = chooser.getChooserPanels()[1];
+        panel.setColorTransparencySelectionEnabled(hasAlpha);
+
+        Object[] possibleValues = new Object[]{Language.getWord("PICK_COLOUR_OK"), Language.getWord("DEFAULT_CANCEL")};
+        int result = JOptionPane.showOptionDialog(UserMessage.PARENT, panel, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE, UserMessage.ICON, possibleValues, possibleValues[0]);
+        //The user hits cancels
+        if(result != JOptionPane.YES_OPTION) return original;
+        //Otherwise, return the current selection
+        return chooser.getColor();
+    }
 
     /**
      * <p>

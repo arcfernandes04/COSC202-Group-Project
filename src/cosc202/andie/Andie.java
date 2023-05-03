@@ -10,6 +10,8 @@ import javax.swing.*;
 
 import javax.imageio.*;
 
+import cosc202.andie.draw.*;
+
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 
 /**
@@ -36,10 +38,21 @@ public class Andie {
      */
     private static JFrame frame;
 
+
+    /**
+     * The ImagePanel that displays the image.
+     */
+    private static ImagePanel imagePanel;
+
     /**
      * The JMenuBar that holds all of the user actions for the program.
      */
     private static JMenuBar menuBar;
+
+    /**
+     * The JPanel displayed at the bottom of the screen, holding information such as colour selection and current tool.
+     */
+    private static DrawPanel drawPanel;
 
     /**
      * ANDIE's main icon used throughout the program.
@@ -64,6 +77,14 @@ public class Andie {
      */
     public static JFrame getFrame(){
         return frame;
+    }
+
+    public static ImagePanel getImagePanel(){
+        return imagePanel;
+    }
+
+    public static DrawPanel getDrawPanel(){
+        return drawPanel;
     }
 
     /**
@@ -126,7 +147,7 @@ public class Andie {
         Language.setup();
 
         // The main content area is an ImagePanel
-        ImagePanel imagePanel = new ImagePanel();
+        imagePanel = new ImagePanel();
         ImageAction.setTarget(imagePanel);
         JScrollPane scrollPane = new JScrollPane(imagePanel);
         frame.add(scrollPane, BorderLayout.CENTER);
@@ -134,7 +155,9 @@ public class Andie {
         // Add the menu bar to hold all of the different user actions.
         menuBar = new JMenuBar();
         frame.setJMenuBar(menuBar);
-        drawMenuBar();
+        redrawMenuBar();
+
+        redrawDrawPanel();
 
         frame.pack();
         frame.setVisible(true);
@@ -146,7 +169,9 @@ public class Andie {
      * Called again by {@code redrawMenuBar()} in order to refresh the menu bar when the language changes.
      * </p>
      */
-    public static void drawMenuBar(){
+    public static void redrawMenuBar(){
+
+        menuBar.removeAll();
         
         // File menus are pretty standard, so things that usually go in File menus go here.
         FileActions fileActions = new FileActions();
@@ -172,22 +197,31 @@ public class Andie {
         ColourActions colourActions = new ColourActions();
         menuBar.add(colourActions.createMenu());
 
+        // Changing languages
         LanguageActions languageActions = new LanguageActions();
         menuBar.add(languageActions.createMenu());
+
+        menuBar.repaint();
+        menuBar.revalidate();
+    }
+
+    public static void redrawDrawPanel(){
+        if(drawPanel != null) frame.remove(drawPanel);
+        drawPanel = new DrawPanel();
+        frame.add(drawPanel, BorderLayout.SOUTH);
     }
 
     /**
      * <p>
-     * Redraws all of the items inside the JMenuBar. Calls {@code drawMenuBar()}.
+     * Redraws all of the items inside the JMenuBar and lowerPanel. Calls {@code drawMenuBar()} and {@code drawLowerPanel()}.
      * </p>
      * 
      * This function is called when the language is changed and the buttons need to be redrawn in the correct language.
      */
-    public static void redrawMenuBar(){
-        menuBar.removeAll();
-        drawMenuBar();
-        menuBar.repaint();
-        menuBar.revalidate();        
+    public static void redrawPanels(){
+        redrawMenuBar();
+        
+        redrawDrawPanel();
     }
 
     /**

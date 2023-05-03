@@ -1,6 +1,7 @@
 package cosc202.andie;
 
 import java.util.*;
+import java.awt.Point;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -222,15 +223,18 @@ public class TransformActions {
                 return;
             }
 
-            int[][] selectedArea = target.getSelectedArea();
-            if (selectedArea[0][0] != selectedArea[0][1] || selectedArea[1][0] != selectedArea[1][1]){
-                target.getImage().apply(new CropImage(selectedArea[0][0], selectedArea[0][1], selectedArea[1][0], selectedArea[1][1]));
-                target.repaint();
-                target.getParent().revalidate();
-                target.forgetSelectedArea();
-            }else {
+            if(target.getSelection().isEmpty()){
                 UserMessage.showWarning(UserMessage.EMPTY_SELECTION_WARN);
+                return;
             }
+
+            Point[] corners = target.getSelection().getCorners();
+
+            target.getImage().apply(new CropImage(corners[0], corners[1]));
+            target.getSelection().reset();
+
+            target.repaint();
+            target.getParent().revalidate();
 		}
 
     }

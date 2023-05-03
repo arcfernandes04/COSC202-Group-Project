@@ -35,12 +35,17 @@ public abstract class Language
     }
 
     /**
-     * Update the GUI elements managed by the UIManager; i.e. {@code OptionPane}
+     * Update the GUI elements managed by the UIManager; i.e. {@code OptionPane} and {@code JColorChooser}
      * (used by {@code UserMessage}) and {@code JFileChooser} (extended by {@code AndieFileChooser}).
      */
     private static void updateUIManager(){
         UIManager.put("OptionPane.cancelButtonText", Language.getWord("OptionPane.cancelButtonText"));
         UIManager.put("OptionPane.okButtonText", Language.getWord("OptionPane.okButtonText"));
+        UIManager.put("ColorChooser.hsvHueText", Language.getWord("ColorChooser.hsvHueText"));
+        UIManager.put("ColorChooser.hsvSaturationText", Language.getWord("ColorChooser.hsvSaturationText"));
+        UIManager.put("ColorChooser.hsvValueText", Language.getWord("ColorChooser.hsvValueText"));
+        UIManager.put("ColorChooser.hsvTransparencyText", Language.getWord("ColorChooser.hsvTransparencyText"));
+
         for (String option : AndieFileChooser.getElementsToRename()) {
             UIManager.put("FileChooser." + option, Language.getWord("FileChooser." + option));
         }
@@ -96,7 +101,7 @@ public abstract class Language
             // Make sure JOptionPane and AndieFileChooser is in the right language
             updateUIManager();
             //redraw everything to be in the right language.
-            Andie.redrawMenuBar();
+            Andie.redrawPanels();
         }catch(IOException ex){
             recover(); //if it fails, attempt to recover, or find a more systemic problem.
         }

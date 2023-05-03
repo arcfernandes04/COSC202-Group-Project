@@ -1,6 +1,7 @@
 package cosc202.andie;
 
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.image.*;
 
 
@@ -29,11 +30,11 @@ public class CropImage implements ImageOperation, java.io.Serializable {
      * Create a new FlipImage operation.
      * </p>
      */
-    CropImage(int x1, int y1, int x2, int y2) {
-        this.x1 = x1;
-        this.y1 = y1;
-        this.x2 = x2;
-        this.y2 = y2;
+    CropImage(Point p1, Point p2) {
+        this.x1 = (int) p1.getX();
+        this.y1 = (int) p1.getY();
+        this.x2 = (int) p2.getX();
+        this.y2 = (int) p2.getY();
     }
 
     /**
