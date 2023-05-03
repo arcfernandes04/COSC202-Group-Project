@@ -100,12 +100,15 @@ public class Selection {
      * @param y The y oordinate to validate
      * @return A valid point on the image of the inputted values
      */
-    private Point validPoint(int x, int y){
+    private Point validPoint(int x, int y, double scale){
+        x = (int) (x / scale);
+        y = (int) (y / scale);
+        if(scale < 1) scale = 1 / scale; //Need to find inverse of 'scale' if it's less than one.
         Dimension size = target.getImage().getDimensions();
         if (x < 0) x = 0;
-        else if (x >= size.width) x = size.width - 1;
+        else if (x >= size.width*scale) x = (int) (size.width*scale - 1);
         if (y < 0) y = 0;
-        else if (y >= size.height) y = size.height - 1;
+        else if (y >= size.height*scale) y = (int) (size.height*scale - 1);
         return new Point(x, y);
     }
 
@@ -116,13 +119,13 @@ public class Selection {
      * 
      * @param e The event that triggered this.
      */
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent e, double scale) {
         if (target.getImage().hasImage() == false) return;
 
         mouseSelectionOn = true;
         beenDragged = false;
-        p1 = validPoint(e.getX(), e.getY());
-        p2 = validPoint(e.getX(), e.getY());
+        p1 = validPoint(e.getX(), e.getY(), scale);
+        p2 = validPoint(e.getX(), e.getY(), scale);
         if(DrawPanel.getTool() == DrawPanel.BRUSH) points.add(p1);
     }
 
@@ -133,12 +136,12 @@ public class Selection {
      * 
      * @param e The event that triggered this.
      */
-    public void mouseDragged(MouseEvent e) {
+    public void mouseDragged(MouseEvent e, double scale) {
         if (target.getImage().hasImage() == false) return;
         if (mouseSelectionOn == false) return;
 
         beenDragged = true;
-        p2 = validPoint(e.getX(), e.getY());
+        p2 = validPoint(e.getX(), e.getY(), scale);
         points.add(p2);
 
         target.getImage().previewApply(getOperation());

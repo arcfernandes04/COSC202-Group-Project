@@ -64,12 +64,12 @@ public class ImagePanel extends JPanel {
 
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                selection.mousePressed(e);
+                selection.mousePressed(e, scale);
             }
         });
         addMouseMotionListener(new MouseAdapter() {
             public void mouseDragged(MouseEvent e) {
-                selection.mouseDragged(e);
+                selection.mouseDragged(e, scale);
             }
         });
         addMouseListener(new MouseAdapter() {
