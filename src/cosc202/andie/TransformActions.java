@@ -30,21 +30,21 @@ public class TransformActions {
     public TransformActions() {
         actions = new ArrayList<Action>();
         actions.add(new FlipImageAction(Language.getWord("FlipHorizontal"), null, Language.getWord("FlipHorizontal_desc"),
-                Integer.valueOf(KeyEvent.VK_H), "horizontal"));
+                Integer.valueOf(KeyEvent.VK_F1), "horizontal"));
         actions.add(new FlipImageAction(Language.getWord("FlipVertical"), null, Language.getWord("FlipVertical_desc"),
-                Integer.valueOf(KeyEvent.VK_H), "vertical"));
+                Integer.valueOf(KeyEvent.VK_F2), "vertical"));
         actions.add(new RotateImageAction(Language.getWord("Rotate180"), null, Language.getWord("Rotate180_desc"),
-                Integer.valueOf(KeyEvent.VK_H), 180));
+                Integer.valueOf(KeyEvent.VK_F5), 180));
         actions.add(new RotateImageAction(Language.getWord("Rotate90Right"), null, Language.getWord("Rotate90Right_desc"),
-                Integer.valueOf(KeyEvent.VK_H), 90));
+                Integer.valueOf(KeyEvent.VK_F5), 90));
         actions.add(new RotateImageAction(Language.getWord("Rotate90Left"), null, Language.getWord("Rotate90Left_desc"),
-                Integer.valueOf(KeyEvent.VK_H), 270));
+                Integer.valueOf(KeyEvent.VK_F5), 270));
         actions.add(new RotateImageActionInput(Language.getWord("CustomRotation"), null, Language.getWord("Rotate_desc"),
-                Integer.valueOf(KeyEvent.VK_H), true,-180, 180, 0, 0));
+                Integer.valueOf(KeyEvent.VK_F5), true,-180, 180, 0, 0));
         actions.add(new ResizeImageAction(Language.getWord("Resize"), null, Language.getWord("Resize_desc"),
-                Integer.valueOf(KeyEvent.VK_H), true, 50, 200, 100, 100));
+                Integer.valueOf(KeyEvent.VK_F3), true, 50, 200, 100, 100));
         actions.add(new CropImageAction(Language.getWord("Crop"), null, Language.getWord(Language.getWord("Crop_desc")),
-                Integer.valueOf(KeyEvent.VK_H)));
+                Integer.valueOf(KeyEvent.VK_F4)));
     }
 
     /**
@@ -60,9 +60,9 @@ public class TransformActions {
 
         for (Action action : actions) {
             if (action instanceof RotateImageAction || action instanceof RotateImageActionInput) {
-                rotateMenu.add(new JMenuItem(action));
+                rotateMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK));
             } else {
-                transformMenu.add(new JMenuItem(action));
+                transformMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK));
             }
         }
 

@@ -43,7 +43,7 @@ public class ColourActions {
      */
     public ColourActions() {
         actions = new ArrayList<Action>();
-        actions.add(new ConvertToGreyAction(Language.getWord("Greyscale"), null, Language.getWord("Greyscale_desc"), Integer.valueOf(KeyEvent.VK_G)));
+        actions.add(new ConvertToGreyAction(Language.getWord("Greyscale"), null, Language.getWord("Greyscale_desc"), Integer.valueOf((KeyEvent.VK_G))));
         actions.add(new BrightnessContrastAction(Language.getWord("BrightnessContrast"), null, Language.getWord("BrightnessContrast_desc"), Integer.valueOf(KeyEvent.VK_B)));
     }
 
@@ -58,7 +58,7 @@ public class ColourActions {
         JMenu fileMenu = new JMenu(Language.getWord("Colour"));
 
         for(Action action: actions) {
-            fileMenu.add(new JMenuItem(action));
+            fileMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK));
         }
 
         return fileMenu;
