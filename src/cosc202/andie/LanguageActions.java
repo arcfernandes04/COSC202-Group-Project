@@ -18,9 +18,9 @@ public class LanguageActions {
      */
     public LanguageActions() {
         actions = new ArrayList<Action>();
-        actions.add(new engLang(Language.getWord("eng"), null, Language.getWord("eng_desc"), Integer.valueOf(0))); // button that changes language to english
-        actions.add(new maoLang(Language.getWord("mao"), null, Language.getWord("mao_desc"), Integer.valueOf(0))); // button that changes language to maori
-        actions.add(new afrLang(Language.getWord("afr"), null, Language.getWord("afr_desc"), Integer.valueOf(0))); // button that changes language to afrikaans
+        actions.add(new engLang(Language.getWord("eng"), null, Language.getWord("eng_desc"), Integer.valueOf(KeyEvent.VK_F7))); // button that changes language to english
+        actions.add(new maoLang(Language.getWord("mao"), null, Language.getWord("mao_desc"), Integer.valueOf(KeyEvent.VK_F8))); // button that changes language to maori
+        actions.add(new afrLang(Language.getWord("afr"), null, Language.getWord("afr_desc"), Integer.valueOf(KeyEvent.VK_F9))); // button that changes language to afrikaans
     }
     /**
      * <p>

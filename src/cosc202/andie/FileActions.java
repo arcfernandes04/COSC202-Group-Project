@@ -42,7 +42,7 @@ public class FileActions {
         actions.add(new FileSaveAction(Language.getWord("Save"), null, Language.getWord("Save_desc"), Integer.valueOf(KeyEvent.VK_S)));
         actions.add(new FileSaveAsAction(Language.getWord("SaveAs"), null, Language.getWord("SaveAs_desc"), Integer.valueOf(KeyEvent.VK_A)));
         actions.add(new FileExportAction(Language.getWord("Export"), null, Language.getWord("Export_desc"), Integer.valueOf(KeyEvent.VK_E)));
-        actions.add(new FileExitAction(Language.getWord("Exit"), null, Language.getWord("Exit_desc"), Integer.valueOf(0)));
+        actions.add(new FileExitAction(Language.getWord("Exit"), null, Language.getWord("Exit_desc"), Integer.valueOf(KeyEvent.VK_ESCAPE)));
     }
 
     /**
@@ -56,7 +56,7 @@ public class FileActions {
         JMenu fileMenu = new JMenu(Language.getWord("File"));
 
         for(Action action: actions) {
-            fileMenu.add(new JMenuItem(action));
+            fileMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK)); //SHIFT_DOWN_MASK for shift
         }
 
         return fileMenu;

@@ -2,9 +2,12 @@ package cosc202.andie.draw;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.KeyStroke;
 
 import cosc202.andie.*;
 
@@ -42,9 +45,9 @@ public class ToolActions extends JMenuBar {
         setBorderPainted(false);
         menu = new JMenu();
         this.add(menu);
-        menu.add(new ToolOption(DrawPanel.SELECTION));
-        menu.add(new ToolOption(DrawPanel.SHAPE));
-        menu.add(new ToolOption(DrawPanel.BRUSH));
+        menu.add(new ToolOption(DrawPanel.SELECTION)).setAccelerator(KeyStroke.getKeyStroke((Integer) Integer.valueOf(KeyEvent.VK_1), InputEvent.CTRL_DOWN_MASK));
+        menu.add(new ToolOption(DrawPanel.SHAPE)).setAccelerator(KeyStroke.getKeyStroke((Integer) Integer.valueOf(KeyEvent.VK_2), InputEvent.CTRL_DOWN_MASK));
+        menu.add(new ToolOption(DrawPanel.BRUSH)).setAccelerator(KeyStroke.getKeyStroke((Integer) Integer.valueOf(KeyEvent.VK_3), InputEvent.CTRL_DOWN_MASK));
     }
 
     /**

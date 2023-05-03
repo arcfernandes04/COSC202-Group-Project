@@ -34,9 +34,9 @@ public class FilterActions {
     public FilterActions() {
         actions = new ArrayList<Action>();
         actions.add(new MeanFilterAction(Language.getWord("Mean"), null, Language.getWord("Mean_desc"), Integer.valueOf(KeyEvent.VK_M), true, 1, 10, 1, 0));
-        actions.add(new SharpenFilterAction(Language.getWord("Sharpen"), null, Language.getWord("Sharpen_desc"), Integer.valueOf(KeyEvent.VK_S)));
-        actions.add(new GaussianBlurFilterAction(Language.getWord("Gaussian"), null, Language.getWord("Gaussian_desc"), Integer.valueOf(KeyEvent.VK_G), true, 1, 10, 1, 0));
-        actions.add(new MedianFilterAction(Language.getWord("Median"), null, Language.getWord("Median_desc"), Integer.valueOf(KeyEvent.VK_E)));
+        actions.add(new SharpenFilterAction(Language.getWord("Sharpen"), null, Language.getWord("Sharpen_desc"), Integer.valueOf(KeyEvent.VK_N)));
+        actions.add(new GaussianBlurFilterAction(Language.getWord("Gaussian"), null, Language.getWord("Gaussian_desc"), Integer.valueOf(KeyEvent.VK_I), true, 1, 10, 1, 0));
+        actions.add(new MedianFilterAction(Language.getWord("Median"), null, Language.getWord("Median_desc"), Integer.valueOf(KeyEvent.VK_L)));
     }
 
     /**
@@ -50,7 +50,7 @@ public class FilterActions {
         JMenu fileMenu = new JMenu(Language.getWord("Filter"));
 
         for(Action action: actions) {
-            fileMenu.add(new JMenuItem(action));
+            fileMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK));
         }
 
         return fileMenu;

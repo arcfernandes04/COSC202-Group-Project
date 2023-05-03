@@ -34,9 +34,9 @@ public class ViewActions {
      */
     public ViewActions() {
         actions = new ArrayList<Action>();
-        actions.add(new ZoomInAction(Language.getWord("ZoomIn"), null, Language.getWord("ZoomIn_desc"), Integer.valueOf(KeyEvent.VK_PLUS)));
-        actions.add(new ZoomOutAction(Language.getWord("ZoomOut"), null, Language.getWord("ZoomOut_desc"), Integer.valueOf(KeyEvent.VK_MINUS)));
-        actions.add(new ZoomFullAction(Language.getWord("ZoomFull"), null, Language.getWord("ZoomFull_desc"), Integer.valueOf(KeyEvent.VK_1)));
+        actions.add(new ZoomInAction(Language.getWord("ZoomIn"), null, Language.getWord("ZoomIn_desc"), Integer.valueOf(KeyEvent.VK_ADD)));
+        actions.add(new ZoomOutAction(Language.getWord("ZoomOut"), null, Language.getWord("ZoomOut_desc"), Integer.valueOf(KeyEvent.VK_SUBTRACT)));
+        actions.add(new ZoomFullAction(Language.getWord("ZoomFull"), null, Language.getWord("ZoomFull_desc"), Integer.valueOf(KeyEvent.VK_0)));
     }
 
     /**
@@ -50,7 +50,7 @@ public class ViewActions {
         JMenu viewMenu = new JMenu(Language.getWord("View"));
 
         for (Action action: actions) {
-            viewMenu.add(new JMenuItem(action));
+            viewMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK));
         }
 
         return viewMenu;
