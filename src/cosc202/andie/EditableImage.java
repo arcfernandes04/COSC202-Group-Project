@@ -2,7 +2,9 @@ package cosc202.andie;
 
 import java.util.*;
 import java.io.*;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -385,6 +387,14 @@ public class EditableImage {
     public void export(String imageFilename) {
         try{
             String extensionCheck = imageFilename.substring(imageFilename.lastIndexOf(".") + 1).toLowerCase();
+            BufferedImage img = current;
+
+            if (extensionCheck.equals("jpg") || extensionCheck.equals("jpeg")) {
+                img = new BufferedImage(current.getWidth(), current.getHeight(), BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = img.createGraphics();
+                g.drawImage(current, 0, 0, Color.WHITE, null);
+                g.dispose();
+            }
             ImageIO.write(current, extensionCheck, new File(imageFilename));
         } catch (IllegalArgumentException | NullPointerException ex) {
             UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
@@ -651,9 +661,11 @@ public class EditableImage {
     public void copyToClipboard() {
         if(!hasImage()) return; //make sure the current clipboard is not overwritten if there is nothing loaded in ANDIE.
 
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        Clipboard clipboard = toolkit.getSystemClipboard();
-        clipboard.setContents(new TransferableImage(this.current), null);
+        try{
+            Toolkit toolkit = Toolkit.getDefaultToolkit();
+            Clipboard clipboard = toolkit.getSystemClipboard();
+            clipboard.setContents(new TransferableImage(this.current), null);
+        }catch(Exception e){} //An exception occurring here isn't a problem; it's just debugging info.
     }
 
     /**
