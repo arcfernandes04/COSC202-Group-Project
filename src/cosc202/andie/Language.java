@@ -135,6 +135,7 @@ public abstract class Language
             Language.prop = getProperties(directory + "lang_en.properties");
             UserMessage.showWarning(UserMessage.MISSING_LANG_WARN);
         } catch (Exception e) { //if english isn't there, the languages are screwed and we need to just exit.
+            System.out.println(e);
             UserMessage.showWarning(UserMessage.FATAL_LANG_WARN);
             System.exit(1);
         }

@@ -28,6 +28,8 @@ import java.awt.image.*;
 
 public class AndieConvolveOp implements BufferedImageOp{
     private Kernel kernel;
+    private boolean offset;
+    private int midVal = 127;
 
 
     /** 
@@ -39,7 +41,21 @@ public class AndieConvolveOp implements BufferedImageOp{
      * @see Kernel
      */
     AndieConvolveOp(Kernel kernel){
+        this(kernel, false);
+    }
+
+    /** 
+     * <p>
+     * Construct AndieConvolveOp with a given kernel.
+     * </p>
+     * 
+     * @param kernel The given {@code kernel}.
+     * @param offset Whether the pixel values should be offset. 
+     * @see Kernel
+     */
+    AndieConvolveOp(Kernel kernel, boolean offset){
         this.kernel = kernel;
+        this.offset = offset;
     }
 
     /**
@@ -90,7 +106,7 @@ public class AndieConvolveOp implements BufferedImageOp{
         int height = src.getHeight();
         int width = src.getWidth();        
         boolean alpha = src.getColorModel().hasAlpha();
-
+        
         // Create arrays for the pixel value inputs and outputs
         int[] srcPixels = new int[height*width];
         int[] dstPixels = new int[height*width];
@@ -174,21 +190,32 @@ public class AndieConvolveOp implements BufferedImageOp{
                 int intg = (int) Math.round(g);
                 int intb = (int) Math.round(b);
 
-                // Handling values out of range
+                // Handling offset
+                if(offset){ 
+                    intr += midVal;
+                    intg += midVal;
+                    intb += midVal;
+                    
+                }     
+                // Handling values out of range           
                 if(intr > 255) intr = 255;
                 if(intr < 0) intr = 0;
                 if(intg > 255) intg = 255;
                 if(intg < 0) intg = 0;
                 if(intb > 255) intb = 255;
                 if(intb < 0) intb = 0;  
-
+                
                 
                 if(hasAlpha){
                     int inta = (int) Math.round(a);
-
+                    
+                    // Handling offset
+                    if(offset) inta += midVal;
+                  
                     // Handling values out of range
                     if(inta > 255) inta = 255;
                     if(inta < 0) inta = 0;
+                    
 
                     dstColor = new Color(intr, intg, intb, inta);
                 }else dstColor = new Color(intr, intg, intb);
