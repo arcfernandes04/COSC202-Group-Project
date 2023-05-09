@@ -395,7 +395,7 @@ public class EditableImage {
                 g.drawImage(current, 0, 0, Color.WHITE, null);
                 g.dispose();
             }
-            ImageIO.write(current, extensionCheck, new File(imageFilename));
+            ImageIO.write(img, extensionCheck, new File(imageFilename));
         } catch (IllegalArgumentException | NullPointerException ex) {
             UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         } catch (Exception ex){
