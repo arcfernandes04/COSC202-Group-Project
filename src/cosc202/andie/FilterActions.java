@@ -1,6 +1,8 @@
 package cosc202.andie;
 
 import java.util.*;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -26,6 +28,13 @@ public class FilterActions {
     
     /** A list of actions for the Filter menu. */
     protected ArrayList<Action> actions;
+
+    /** The program's main icon, which will be displayed inside JOptionPane dialog messages. */
+    private static Icon icon = Andie.getIcon();
+
+    /** The JFrame to create pop up windows inside of. */
+    private static JFrame parent = Andie.getFrame();
+
     /**
      * <p>
      * Create a set of Filter menu actions.
@@ -37,11 +46,13 @@ public class FilterActions {
         actions.add(new SharpenFilterAction(Language.getWord("Sharpen"), null, Language.getWord("Sharpen_desc"), Integer.valueOf(KeyEvent.VK_N)));
         actions.add(new GaussianBlurFilterAction(Language.getWord("Gaussian"), null, Language.getWord("Gaussian_desc"), Integer.valueOf(KeyEvent.VK_I), true, 1, 10, 1, 0));
         actions.add(new MedianFilterAction(Language.getWord("Median"), null, Language.getWord("Median_desc"), Integer.valueOf(KeyEvent.VK_L)));
+        actions.add(new EmbossFilterAction(Language.getWord("Emboss"), null, Language.getWord("Emboss_desc"), Integer.valueOf(KeyEvent.VK_O)));
+        actions.add(new SobelFilterAction(Language.getWord("Sobel"), null, Language.getWord("Sobel_desc"), Integer.valueOf(KeyEvent.VK_S)));
     }
 
     /**
      * <p>
-     * Create a menu contianing the list of Filter actions.
+     * Create a menu containing the list of Filter actions.
      * </p>
      * 
      * @return The filter menu UI element.
@@ -114,7 +125,7 @@ public class FilterActions {
         
         /**
          * <p>
-         * Callback for when the convert-to-grey action is triggered.
+         * Callback for when the sharpen-filter action is triggered.
          * </p>
          * 
          * <p>
@@ -131,9 +142,25 @@ public class FilterActions {
         }
     }
 
-
+    /**
+     * <p>
+     * Action to blur an image with a gaussian filter.
+     * </p>
+     * 
+     * @see GaussianBlurFilter
+     */
     public class GaussianBlurFilterAction extends UserInput {
 
+        /**
+         * <p>
+         * Create a new gaussian-filter action.
+         * </p>
+         * 
+         * @param name The name of the action (ignored if null).
+         * @param icon An icon to use to represent the action (ignored if null).
+         * @param desc A brief description of the action  (ignored if null).
+         * @param mnemonic A mnemonic key to use as a shortcut  (ignored if null).
+         */
         GaussianBlurFilterAction(String name, ImageIcon icon, String desc, Integer mnemonic,
                                     boolean slider, int min, int max, int val, int zeroVal) {
             super(name, icon, desc, mnemonic, slider, min, max, val, zeroVal);
@@ -143,9 +170,6 @@ public class FilterActions {
         Object mutateImage(int input) {
             return new GaussianBlurFilter(input);
         }
-
-        
-
     }
 
     /**
@@ -211,5 +235,220 @@ public class FilterActions {
             target.getParent().revalidate();
         }
     
+    }
+
+    /**
+     * <p>
+     * Action to emboss an image.
+     * </p>
+     * 
+     * @see EmbossFilter
+     */
+    public class EmbossFilterAction extends ImageAction{
+
+        /**
+         * <p>
+         * Creates a new emboss filter action.
+         * </p>
+         * 
+         * @param name The name of the action (ignored if null).
+         * @param icon An icon to use to represent the action (ignored if null).
+         * @param desc A brief description of the action  (ignored if null).
+         * @param mnemonic A mnemonic key to use as a shortcut  (ignored if null).
+         */
+        EmbossFilterAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+            super(name, icon, desc, mnemonic);
+        }
+
+        /**
+         * <p>
+         * Callback for when the emboss filter action is triggered.
+         * </p>
+         * 
+         * <p>
+         * This method is called whenever the EmbossFilterAction is triggered. 
+         * It prompts the user for a direction to emboss, then applies an {@link EmbossFilter} with the appropriate direction. 
+         * </p>
+         * 
+         * @param e The event triggering this callback.
+         */
+        public void actionPerformed(ActionEvent e){
+            if (target.getImage().hasImage() == false) {
+                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                return;
+            }  
+
+            // Creating the menu
+            String[] embossOptions = {
+                Language.getWord("None"), 
+                Language.getWord("Emboss_E"), 
+                Language.getWord("Emboss_NE"), 
+                Language.getWord("Emboss_N"), 
+                Language.getWord("Emboss_NW"),
+                Language.getWord("Emboss_W"),
+                Language.getWord("Emboss_SW"),
+                Language.getWord("Emboss_S"),
+                Language.getWord("Emboss_SE")
+            };
+
+            JComboBox cbEmboss = new JComboBox(embossOptions);
+            JLabel labelEmboss = new JLabel(Language.getWord("Emboss_type"));
+
+            JPanel embossPanel = new JPanel(new GridLayout(2, 1));
+            embossPanel.add(labelEmboss);
+            embossPanel.add(cbEmboss);
+
+            /*
+             * Listener for the emboss combo box. 
+             * The direction of emboss depends on combo box selection.
+             */
+            class EmbossComboBoxListener implements ActionListener{
+                public void actionPerformed(ActionEvent e){
+                    JComboBox cb = (JComboBox)e.getSource();
+                    String embossChoice = (String) cb.getSelectedItem();
+
+                    try{
+                        if(embossChoice.equals(embossOptions[0])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.NONE));
+                        else if(embossChoice.equals(embossOptions[1])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.EAST));
+                        else if(embossChoice.equals(embossOptions[2])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.NORTH_EAST));
+                        else if(embossChoice.equals(embossOptions[3])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.NORTH));
+                        else if(embossChoice.equals(embossOptions[4])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.NORTH_WEST));
+                        else if(embossChoice.equals(embossOptions[5])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.WEST));
+                        else if(embossChoice.equals(embossOptions[6])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.SOUTH_WEST));
+                        else if(embossChoice.equals(embossOptions[7])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.SOUTH));
+                        else if(embossChoice.equals(embossOptions[8])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.SOUTH_EAST));
+
+                    }catch(Exception ex){
+                        ex.printStackTrace();
+                    }
+
+                    target.repaint();
+                    target.getParent().revalidate();
+                }
+            }
+
+            cbEmboss.addActionListener(new EmbossComboBoxListener());
+
+            int option = JOptionPane.showOptionDialog(FilterActions.parent, embossPanel, Language.getWord("Emboss"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, FilterActions.icon, null, null);
+
+            // Check return value from the dialog box
+            if(option != JOptionPane.OK_OPTION){
+                target.getImage().previewApply(new EmbossFilter(EmbossFilter.NONE));
+            }else{
+                // Determining which direction to emboss
+                String embossChoice = (String) cbEmboss.getSelectedItem();
+
+                if(embossChoice.equals(embossOptions[0])) return;
+                else if(embossChoice.equals(embossOptions[1])) target.getImage().apply(new EmbossFilter(EmbossFilter.EAST));
+                else if(embossChoice.equals(embossOptions[2])) target.getImage().apply(new EmbossFilter(EmbossFilter.NORTH_EAST));
+                else if(embossChoice.equals(embossOptions[3])) target.getImage().apply(new EmbossFilter(EmbossFilter.NORTH));
+                else if(embossChoice.equals(embossOptions[4])) target.getImage().apply(new EmbossFilter(EmbossFilter.NORTH_WEST));
+                else if(embossChoice.equals(embossOptions[5])) target.getImage().apply(new EmbossFilter(EmbossFilter.WEST));
+                else if(embossChoice.equals(embossOptions[6])) target.getImage().apply(new EmbossFilter(EmbossFilter.SOUTH_WEST));
+                else if(embossChoice.equals(embossOptions[7])) target.getImage().apply(new EmbossFilter(EmbossFilter.SOUTH));
+                else if(embossChoice.equals(embossOptions[8])) target.getImage().apply(new EmbossFilter(EmbossFilter.SOUTH_EAST));
+
+            }
+            
+            target.repaint();
+            target.getParent().revalidate();
+        }
+    }
+
+    /**
+     * <p>
+     * Action to apply a Sobel filter to an image.
+     * </p>
+     * 
+     * @see SobelFilter
+     */
+    public class SobelFilterAction extends ImageAction {
+         /**
+         * <p>
+         * Creates a new Sobel filter action.
+         * </p>
+         * 
+         * @param name The name of the action (ignored if null).
+         * @param icon An icon to use to represent the action (ignored if null).
+         * @param desc A brief description of the action  (ignored if null).
+         * @param mnemonic A mnemonic key to use as a shortcut  (ignored if null).
+         */
+        public SobelFilterAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+            super(name, icon, desc, mnemonic);
+        }
+
+         /**
+         * <p>
+         * Callback for when the Sobel filter action is triggered.
+         * </p>
+         * 
+         * <p>
+         * This method is called whenever the SobelFilterAction is triggered. 
+         * It prompts the user for a direction, then applies a {@link SobelFilter} with the appropriate direction. 
+         * </p>
+         * 
+         * @param e The event triggering this callback.
+         */
+        public void actionPerformed(ActionEvent e) {
+            if (target.getImage().hasImage() == false) {
+                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                return;
+            }  
+
+            // Creating the menu
+            String[] sobelOptions = {
+                Language.getWord("None"), 
+                Language.getWord("Sobel_H"), 
+                Language.getWord("Sobel_V"), 
+            };
+
+            JComboBox cbSobel = new JComboBox(sobelOptions);
+            JLabel labelSobel = new JLabel(Language.getWord("Sobel_type"));
+
+            JPanel sobelPanel = new JPanel(new GridLayout(2, 1));
+            sobelPanel.add(labelSobel);
+            sobelPanel.add(cbSobel);
+
+            /*
+             * Listener for the sobel combo box. 
+             * The direction of sobel depends on combo box selection.
+             */
+            class SobelComboBoxListener implements ActionListener{
+                public void actionPerformed(ActionEvent e){
+                    JComboBox cb = (JComboBox)e.getSource();
+                    String sobelChoice = (String) cb.getSelectedItem();
+
+                    try{
+                        if(sobelChoice.equals(sobelOptions[0])) target.getImage().previewApply(new SobelFilter(SobelFilter.NONE));
+                        else if(sobelChoice.equals(sobelOptions[1])) target.getImage().previewApply(new SobelFilter(SobelFilter.HORIZONTAL));
+                        else if(sobelChoice.equals(sobelOptions[2])) target.getImage().previewApply(new SobelFilter(SobelFilter.VERTICAL));
+                    }catch(Exception ex){
+                        ex.printStackTrace();
+                    }
+
+                    target.repaint();
+                    target.getParent().revalidate();
+                }
+            }
+
+            cbSobel.addActionListener(new SobelComboBoxListener());
+
+            int option = JOptionPane.showOptionDialog(FilterActions.parent, sobelPanel, Language.getWord("Sobel"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, FilterActions.icon, null, null);
+
+            // Check return value from the dialog box
+            if(option != JOptionPane.OK_OPTION){
+                target.getImage().previewApply(new EmbossFilter(SobelFilter.NONE));
+            }else{
+                // Determining which direction to emboss
+                String sobelChoice = (String) cbSobel.getSelectedItem();
+
+                if(sobelChoice.equals(sobelOptions[0])) return;
+                else if(sobelChoice.equals(sobelOptions[1])) target.getImage().apply(new SobelFilter(SobelFilter.HORIZONTAL));
+                else if(sobelChoice.equals(sobelOptions[2])) target.getImage().apply(new SobelFilter(SobelFilter.VERTICAL));
+            }
+            
+            target.repaint();
+            target.getParent().revalidate();
+        }
     }
 }

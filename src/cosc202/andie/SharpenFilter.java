@@ -20,7 +20,7 @@ public class SharpenFilter implements ImageOperation, java.io.Serializable {
 
     /**
      * <p>
-     * Construct a Median filter
+     * Construct a Sharpen filter
      * </p>
      */
     SharpenFilter(){
@@ -28,7 +28,7 @@ public class SharpenFilter implements ImageOperation, java.io.Serializable {
 
     /**
      * <p>
-     * Apply a Median filter to an image
+     * Apply a Sharpen filter to an image
      * </p>
      * 
      * <p>

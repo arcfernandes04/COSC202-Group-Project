@@ -441,6 +441,7 @@ public class EditableImage {
             if (this.tempOriginal == null){
                 this.tempOriginal = deepCopy(current);
             }
+
             BufferedImage result = op.apply(tempOriginal);
             resetTempOriginal(); //Need to reset this, otherwise the new image will think it is still the old image
             if(result != null){ //Only count this as a valid operation if it returns non-null value.
@@ -482,11 +483,22 @@ public class EditableImage {
             if (op instanceof RotateImage) {
                 try {
                     RotateImage r = (RotateImage) op;
-                    refresh(r.getRotation()); // add rotation to total
+                    refresh(r.getRotation(), null); // add rotation to total
                 } catch(Exception e) {
                     System.out.println(e);
                 }
             }
+                // If op is an instance of a filter using convolution, refresh filters differently
+                if (op instanceof EmbossFilter || op instanceof GaussianBlurFilter || op instanceof SobelFilter || op instanceof MeanFilter) {
+                    try {
+                        refresh(0, op);
+                    } catch(Exception e) {
+                        System.out.println(e);
+                    }
+                }
+            
+
+
         }catch(Exception ex){ //Do not want to show the warning here, otherwise the user could be spammed.
             //UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
@@ -719,14 +731,19 @@ public class EditableImage {
      * </p>
      * 
      */
-    private void refresh(int additionalRotation) {
+    public void refresh() {
+        refresh(0, null);
+    }
+
+    
+    private void refresh(int additionalRotation, ImageOperation convolveOp){
         try {
             BufferedImage result = deepCopy(original);
             int totalRotation = additionalRotation;
             for (ImageOperation op : ops) {
                 // apply all operation that are not rotations or flips
                 if (op instanceof RotateImage == false && op instanceof FlipImage == false) {
-                    result = op.apply(result);
+                    result = op.apply(result); 
                 }
                 else {
                     // add all rotations together
@@ -751,6 +768,9 @@ public class EditableImage {
                     }
                 }
             }
+            // convolve 
+            if(convolveOp != null) result = convolveOp.apply(result);
+
             // apply total rotation
             RotateImage rotate = new RotateImage(totalRotation);
             result = rotate.apply(result);
@@ -765,8 +785,5 @@ public class EditableImage {
         }
     }
 
-    public void refresh() {
-        refresh(0);
-    }
 
 }
