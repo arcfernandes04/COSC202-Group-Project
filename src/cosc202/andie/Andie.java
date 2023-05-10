@@ -79,12 +79,32 @@ public class Andie {
         return frame;
     }
 
+    /**
+     * Accessor for the current {@code ImagePanel} instance.
+     * 
+     * @return The current {@code ImagePanel} being used.
+     */
     public static ImagePanel getImagePanel(){
         return imagePanel;
     }
 
+    /**
+     * Accessor for the current {@code DrawPanel} instance.
+     * 
+     * @return The current {@code DrawPanel} being used.
+     */
     public static DrawPanel getDrawPanel(){
         return drawPanel;
+    }
+
+    /**
+     * Tells this class to update all of the preferences it stores
+     */
+    public static void updatePreferences(){
+        Preferences.setPreference("Frame_width", Integer.toString(frame.getWidth()));
+        Preferences.setPreference("Frame_height", Integer.toString(frame.getHeight()));
+        Preferences.setPreference("initial_x", Integer.toString(frame.getX()));
+        Preferences.setPreference("initial_y", Integer.toString(frame.getY()));
     }
 
     /**
@@ -135,6 +155,17 @@ public class Andie {
         frame.setIconImage(image);
         icon = new ImageIcon(image.getScaledInstance((int)(image.getWidth() * ICON_SCALE_FACTOR), (int)(image.getHeight() * ICON_SCALE_FACTOR), 0));
 
+        //Load preferences relating to the frame
+        try{
+            int x = Integer.parseInt(Preferences.getPreference("initial_x"));
+            int y = Integer.parseInt(Preferences.getPreference("initial_y"));
+            frame.setLocation(x, y);
+            int width = Integer.parseInt(Preferences.getPreference("Frame_width"));
+            int height = Integer.parseInt(Preferences.getPreference("Frame_height"));
+            frame.setPreferredSize(new Dimension(width, height));
+        }catch(NumberFormatException e){}
+
+
         //Add an event listener that checks when the frame is closed.
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
@@ -142,9 +173,6 @@ public class Andie {
                 FileActions.exitAction();
             }
         });
-
-        //Initialise all of the language data by retrieving it from the appropriate properties file.
-        Language.setup();
 
         // The main content area is an ImagePanel
         imagePanel = new ImagePanel();
@@ -205,6 +233,11 @@ public class Andie {
         menuBar.revalidate();
     }
 
+    /**
+     * <p>
+     * Delete the old instance of {@code DrawPanel} and create a new one.
+     * </p>
+     */
     public static void redrawDrawPanel(){
         if(drawPanel != null) frame.remove(drawPanel);
         drawPanel = new DrawPanel();

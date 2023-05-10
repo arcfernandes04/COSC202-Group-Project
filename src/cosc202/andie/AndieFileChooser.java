@@ -26,7 +26,7 @@ public class AndieFileChooser extends JFileChooser{
     /**
      * The most recently opened directory. Defaults to {@code null}, in which case the user's default directory is used.
      */
-    private static String lastDirectory = null;
+    private static String lastDirectory = Preferences.getPreference("lastDirectory");
 
     /**
      * Whether or not the most recent attempt to select a file path was successful;
@@ -70,6 +70,15 @@ public class AndieFileChooser extends JFileChooser{
      */
     public static String[] getElementsToRename(){
         return Arrays.copyOf(elementsToRename, elementsToRename.length);
+    }
+
+    /**
+     * Tells the {@code AndieFileChooser} to update the 'lastDirectory' preference in the config file, by
+     * calling the {@code Preferences} static class.
+     */
+    public static void updatePreferences(){
+        if (lastDirectory == null) lastDirectory = "null"; //Need to stringify, otherwise it can't be put in config file.
+        Preferences.setPreference("lastDirectory", lastDirectory);
     }
 
     /**
