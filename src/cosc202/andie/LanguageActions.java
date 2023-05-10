@@ -50,7 +50,7 @@ public class LanguageActions {
 
         public void actionPerformed(ActionEvent e)
         {
-            Language.setLang("en");
+            Language.setLanguage("en");
         }
     }
 
@@ -65,7 +65,7 @@ public class LanguageActions {
 
         public void actionPerformed(ActionEvent e)
         {
-            Language.setLang("mi");
+            Language.setLanguage("mi");
         }
     }
 
@@ -80,7 +80,7 @@ public class LanguageActions {
 
         public void actionPerformed(ActionEvent e)
         {
-            Language.setLang("af");
+            Language.setLanguage("af");
         }
     }
 }

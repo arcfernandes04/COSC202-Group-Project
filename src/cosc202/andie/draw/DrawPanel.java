@@ -76,6 +76,36 @@ public class DrawPanel extends JPanel {
     private FillActions fillActions;
     /** The menu option which enables selection of different brush sizes. */
     private BrushActions brushActions;
+
+    /**
+     * <p>
+     * Instantiate all of the variables by looking at the config file,
+     * using the Preferences class to access them.
+     * </p>
+     * 
+     * Default values are used if the values cannot be resolved.
+     */
+    static {
+        try{
+            toolType = Preferences.getPreference("tool_type");
+            shapeType = Preferences.getPreference("shape_type");
+            fillType = Preferences.getPreference("fill_type");
+
+            int pri = Integer.parseInt(Preferences.getPreference("colour_primary"));
+            primaryColour = new Color(pri, true);
+            int sec = Integer.parseInt(Preferences.getPreference("colour_secondary"));
+            secondaryColour = new Color(sec, true);
+            int stroke = Integer.parseInt(Preferences.getPreference("brush_size"));
+            strokeSize = stroke;
+        }catch(NumberFormatException e){}
+
+        if(toolType == null) toolType = SELECTION;
+        if(shapeType == null) shapeType = RECTANGLE;
+        if(fillType == null) fillType = BORDER_ONLY;
+        if(primaryColour == null) primaryColour = Color.BLACK;
+        if(secondaryColour == null) secondaryColour = Color.BLACK;
+        if(strokeSize < 2 || strokeSize > 20) strokeSize = 2;
+    }
     
     /**
      * Construct a new instance of {@code DrawPanel}, instantiating the
@@ -186,6 +216,23 @@ public class DrawPanel extends JPanel {
 
     /**
      * <p>
+     * Tell the {@code Preferences} class to update
+     * its values, based on the current tools
+     * selected by the user.
+     * </p>
+     */
+    public static void updatePreferences(){
+        Preferences.setPreference("tool_type", toolType);
+        Preferences.setPreference("shape_type", shapeType);
+        Preferences.setPreference("fill_type", fillType);
+
+        Preferences.setPreference("colour_primary", Integer.toString(primaryColour.getRGB()));
+        Preferences.setPreference("colour_secondary", Integer.toString(secondaryColour.getRGB()));
+        Preferences.setPreference("brush_size", Integer.toString(strokeSize));
+    }
+
+    /**
+     * <p>
      * Tell each of the {@code DrawPanel} elements to update themselves,
      * as the current selection of options has changed.
      * </p>
@@ -230,6 +277,7 @@ public class DrawPanel extends JPanel {
         // Otherwise, transparency is not enabled and we need to make sure that it is not present in the data fields.
         if (primaryColour.getAlpha() != 255) primaryColour = new Color(primaryColour.getRGB(), false);
         if (secondaryColour.getAlpha() != 255) secondaryColour = new Color(secondaryColour.getRGB(), false);
+
         currentInstance.colourPanel.primaryPreview.setBackground(primaryColour);
         currentInstance.colourPanel.secondaryPreview.setBackground(secondaryColour);
     }
@@ -309,6 +357,7 @@ public class DrawPanel extends JPanel {
 
             add(primaryPreview); add(primaryButton); add(secondaryPreview); add(secondaryButton);
         }
+
     }
 
 }

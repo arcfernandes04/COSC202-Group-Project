@@ -203,7 +203,7 @@ public abstract class UserMessage {
      * 
      * @param original The colour to be displayed when the colour chooser is initially opened.
      * @param hasAlpha Whether or not the user should be able to select transparency.
-     * @return
+     * @return The selected colour, or if none was selected, the original.
      */
     public static Color showColourChooser(Color original, boolean hasAlpha){
         String title = Language.getWord("PICK_COLOUR_TITLE");

@@ -5,6 +5,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import cosc202.andie.draw.DrawPanel;
+
 /**
  * <p>
  * Actions provided by the File menu.
@@ -368,6 +370,10 @@ public class FileActions {
      * </p>
      */
     public static void exitAction(){
+        Andie.updatePreferences();
+        DrawPanel.updatePreferences();
+        AndieFileChooser.updatePreferences();
+
         if(ImageAction.getTarget().getImage().hasUnsavedChanges() == false) System.exit(0); //If there aren't unsaved changes, just exit as usual.
 
         int result = UserMessage.showDialog(UserMessage.SAVE_AND_EXIT_DIALOG); //Show the user a pop-up dialog to ask if they want to save.
