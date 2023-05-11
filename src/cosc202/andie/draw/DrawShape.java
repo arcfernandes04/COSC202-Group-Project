@@ -101,16 +101,16 @@ public class DrawShape implements ImageOperation, java.io.Serializable {
                 return output;
             }
             
-            if(fillType == DrawPanel.FILL_ONLY || fillType == DrawPanel.FILL_AND_BORDER){
-                if (fillType == DrawPanel.FILL_AND_BORDER) g.setColor(secondary); //Only use secondary if we have both fill and border being drawn
-                if (shapeType == DrawPanel.RECTANGLE) g.fillRect(x1, y1, x2 - x1, y2 - y1);
-                else if (shapeType == DrawPanel.OVAL) g.fillOval(x1, y1, x2 - x1, y2 - y1);
+            if(fillType.equals(DrawPanel.FILL_ONLY) || fillType.equals(DrawPanel.FILL_AND_BORDER)){
+                if (fillType.equals(DrawPanel.FILL_AND_BORDER)) g.setColor(secondary); //Only use secondary if we have both fill and border being drawn
+                if (shapeType.equals(DrawPanel.RECTANGLE)) g.fillRect(x1, y1, x2 - x1, y2 - y1);
+                else if (shapeType.equals(DrawPanel.OVAL)) g.fillOval(x1, y1, x2 - x1, y2 - y1);
             }
 
-            if(fillType == DrawPanel.FILL_AND_BORDER || fillType == DrawPanel.BORDER_ONLY){
+            if(fillType.equals(DrawPanel.FILL_AND_BORDER) || fillType.equals(DrawPanel.BORDER_ONLY)){
                 g.setColor(primary);
-                if (shapeType == DrawPanel.RECTANGLE) g.drawRect(x1, y1, x2 - x1, y2 - y1);
-                else if (shapeType == DrawPanel.OVAL) g.drawOval(x1, y1, x2 - x1, y2 - y1);
+                if (shapeType.equals(DrawPanel.RECTANGLE)) g.drawRect(x1, y1, x2 - x1, y2 - y1);
+                else if (shapeType.equals(DrawPanel.OVAL)) g.drawOval(x1, y1, x2 - x1, y2 - y1);
             }
 
             g.dispose();

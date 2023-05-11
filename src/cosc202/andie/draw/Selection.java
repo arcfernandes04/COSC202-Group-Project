@@ -87,7 +87,7 @@ public class Selection {
      * there is no selection or a different tool is being used.
      */
     public boolean isEmpty(){
-        return p1.equals(EMPTY_POINT) && p2.equals(EMPTY_POINT) || DrawPanel.getTool() != DrawPanel.SELECTION;
+        return p1.equals(EMPTY_POINT) && p2.equals(EMPTY_POINT) || !DrawPanel.getTool().equals(DrawPanel.SELECTION);
     }
 
     /**
@@ -126,7 +126,7 @@ public class Selection {
         beenDragged = false;
         p1 = validPoint(e.getX(), e.getY(), scale);
         p2 = validPoint(e.getX(), e.getY(), scale);
-        if(DrawPanel.getTool() == DrawPanel.BRUSH) points.add(p1);
+        if(DrawPanel.getTool().equals(DrawPanel.BRUSH)) points.add(p1);
     }
 
     /**
@@ -158,7 +158,7 @@ public class Selection {
         EditableImage img = target.getImage();
         if (img.hasImage() == false) return;
         
-        if (DrawPanel.getTool() == DrawPanel.SELECTION){
+        if (DrawPanel.getTool().equals(DrawPanel.SELECTION)){
             if (mouseSelectionOn == false || beenDragged == true) return;            
             img.previewApply(new BrightnessContrastAdjustment(0, 0));
         }
@@ -179,12 +179,12 @@ public class Selection {
      */
     private ImageOperation getOperation(){
         Point[] corners = getCorners();
-        if (DrawPanel.getTool() == DrawPanel.SELECTION) return new BrightnessContrastAdjustment(25, 0, corners[0], corners[1]);
+        if (DrawPanel.getTool().equals(DrawPanel.SELECTION)) return new BrightnessContrastAdjustment(25, 0, corners[0], corners[1]);
 
-        if (DrawPanel.getTool() == DrawPanel.BRUSH) return new DrawBrush(DrawPanel.getStrokeSize(), points, DrawPanel.getPrimary());
+        if (DrawPanel.getTool().equals(DrawPanel.BRUSH)) return new DrawBrush(DrawPanel.getStrokeSize(), points, DrawPanel.getPrimary());
 
         //Lines are a special case of "shape"; their corners need to be p1 and p2, not the top-left and bottom-right corners.
-        if (DrawPanel.getShapeType() == DrawPanel.LINE) corners = new Point[] {p1, p2};
+        if (DrawPanel.getShapeType().equals(DrawPanel.LINE)) corners = new Point[] {p1, p2};
         
         return new DrawShape(DrawPanel.getShapeType(), DrawPanel.getFillType(), DrawPanel.getStrokeSize(), corners[0], corners[1], DrawPanel.getPrimary(), DrawPanel.getSecondary());
     }
