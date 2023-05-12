@@ -250,13 +250,13 @@ public class DrawPanel extends JPanel {
         brushActions.update();
 
         //The brush size option should not be visible in "selection" mode
-        if(toolType == SELECTION) brushActions.setVisible(false);
+        if(toolType.equals(SELECTION)) brushActions.setVisible(false);
         else brushActions.setVisible(true);
 
-        if(toolType == SHAPE){ //Make sure the shape and fill options are visible when using the "shape" mode
+        if(toolType.equals(SHAPE)){ //Make sure the shape and fill options are visible when using the "shape" mode
             shapeActions.setVisible(true);
             fillActions.setVisible(true);
-            if(shapeType == LINE) fillActions.setVisible(false);
+            if(shapeType.equals(LINE)) fillActions.setVisible(false);
         }
         else{ //Don't want to see these options outside of "shape" mode.
             shapeActions.setVisible(false);
