@@ -1,4 +1,7 @@
-package cosc202.andie;
+package cosc202.andie.settings;
+
+import cosc202.andie.Language;
+import cosc202.andie.ImageAction;
 
 import java.util.*;
 import java.awt.event.*;
