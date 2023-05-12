@@ -10,9 +10,10 @@ import javax.swing.*;
 
 import javax.imageio.*;
 
-import cosc202.andie.draw.*;
+import cosc202.andie.draw.DrawPanel;
+import cosc202.andie.settings.SettingsActions;
+import cosc202.andie.settings.ThemeActions;
 
-import com.formdev.flatlaf.themes.FlatMacLightLaf;
 
 /**
  * <p>
@@ -132,9 +133,8 @@ public class Andie {
      */
     private static void createAndShowGUI() throws Exception {
 
-        // FlatLaf is open source licensed under the Apache 2.0 License
-        // https://github.com/JFormDesigner/FlatLaf/blob/main/LICENSE
-        FlatMacLightLaf.setup();
+        // Need to set up the themes so that the correct one is taken from the preferences file.
+        ThemeActions.setup();
 
         // We need to catch exceptions that are thrown in other threads
         // Easiest way to do this is by setting the default UncaughtExceptionHandler
@@ -200,6 +200,10 @@ public class Andie {
     public static void redrawMenuBar(){
 
         menuBar.removeAll();
+
+        // Changing languages
+        SettingsActions settingsActions = new SettingsActions();
+        menuBar.add(settingsActions.createMenu());
         
         // File menus are pretty standard, so things that usually go in File menus go here.
         FileActions fileActions = new FileActions();
@@ -225,10 +229,6 @@ public class Andie {
         ColourActions colourActions = new ColourActions();
         menuBar.add(colourActions.createMenu());
 
-        // Changing languages
-        LanguageActions languageActions = new LanguageActions();
-        menuBar.add(languageActions.createMenu());
-
         menuBar.repaint();
         menuBar.revalidate();
     }
@@ -253,7 +253,6 @@ public class Andie {
      */
     public static void redrawPanels(){
         redrawMenuBar();
-        
         redrawDrawPanel();
     }
 
