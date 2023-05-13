@@ -55,6 +55,8 @@ public class Andie {
      */
     private static DrawPanel drawPanel;
 
+    private static Toolbar toolbar;
+
     /**
      * ANDIE's main icon used throughout the program.
      */
@@ -187,6 +189,8 @@ public class Andie {
 
         redrawDrawPanel();
 
+        redrawToolbar();
+
         frame.pack();
         frame.setVisible(true);
     }
@@ -246,6 +250,19 @@ public class Andie {
 
     /**
      * <p>
+     * Delete the old instance of {@code Toolbar} and create a new one.
+     * </p>
+     */
+    public static void redrawToolbar() {
+        if (toolbar != null) frame.remove(toolbar);
+        // Add a toolbar to hold essential/common actions.
+        toolbar = new Toolbar();
+        // Sets the area where the toolbar is placed.
+        frame.add(toolbar, BorderLayout.PAGE_START);
+    }
+
+    /**
+     * <p>
      * Redraws all of the items inside the JMenuBar and lowerPanel. Calls {@code drawMenuBar()} and {@code drawLowerPanel()}.
      * </p>
      * 
@@ -254,6 +271,7 @@ public class Andie {
     public static void redrawPanels(){
         redrawMenuBar();
         redrawDrawPanel();
+        redrawToolbar();
     }
 
     /**
