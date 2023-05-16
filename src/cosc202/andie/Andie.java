@@ -101,6 +101,30 @@ public class Andie {
     }
 
     /**
+     * <p>
+     * Attempt to update ANDIE's logo when the theme is changed,
+     * or the program is initially opened.
+     * </p>
+     * 
+     * <p>
+     * If the logo fails to be found, then no logo is used,
+     * or the previous one is reused if applicable.
+     * </p>
+     */
+    public static void updateIcon(){
+        ImageIcon previousIcon = icon;
+        try {
+            String logoPath = "/resources/icons/logo/" + ThemeActions.getThemeName() + ".png";
+            BufferedImage image = ImageIO.read(Andie.class.getResource(logoPath));
+            frame.setIconImage(image);
+            icon = new ImageIcon(image.getScaledInstance((int) (image.getWidth() * ICON_SCALE_FACTOR), (int) (image.getHeight() * ICON_SCALE_FACTOR), 0));
+        } catch (Exception e) {
+            // If something goes wrong, will need to just continue without the logo - or the previous one if applicable
+            icon = previousIcon;
+        }
+    }
+
+    /**
      * Tells this class to update all of the preferences it stores
      */
     public static void updatePreferences(){
@@ -153,9 +177,7 @@ public class Andie {
 
         // Set up the main GUI frame
         frame = new JFrame("ANDIE");
-        BufferedImage image = ImageIO.read(Andie.class.getClassLoader().getResource("icon.png"));
-        frame.setIconImage(image);
-        icon = new ImageIcon(image.getScaledInstance((int)(image.getWidth() * ICON_SCALE_FACTOR), (int)(image.getHeight() * ICON_SCALE_FACTOR), 0));
+        updateIcon();
 
         //Load preferences relating to the frame
         try{

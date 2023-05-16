@@ -37,7 +37,9 @@ public class ThemeActions {
     /** A list of actions for the File menu. */
     private static ArrayList<Action> actions;
     /** The theme currently being used in ANDIE. */
-    private static LookAndFeel globalTheme;
+    private static FlatLaf globalTheme;
+    /** The name of the theme currently being used. */
+    private static String themeName;
 
     /**
      * <p>
@@ -55,11 +57,15 @@ public class ThemeActions {
             ThemeOption themeOption = (ThemeOption) option;
             if(themeOption.getThemeName().equals(themeFromFile)){
                 ThemeActions.globalTheme = themeOption.theme;
+                ThemeActions.themeName = themeOption.id;
                 break;
             }
         }
         //This is the default value for themes.
-        if (ThemeActions.globalTheme == null) ThemeActions.globalTheme = new FlatMacLightLaf();
+        if (ThemeActions.globalTheme == null){
+            ThemeActions.globalTheme = new FlatMacLightLaf();
+            ThemeActions.themeName = "theme_light_rounded";
+        }
         
         FlatLaf.setup(ThemeActions.globalTheme);
     }
@@ -87,15 +93,15 @@ public class ThemeActions {
      */
     private static void createActions(){
         actions = new ArrayList<Action>();
-        actions.add(new ThemeOption(Language.getWord("theme_light_rounded"), null, Language.getWord("theme_light_rounded_desc"), 0, new FlatMacLightLaf()));
-        actions.add(new ThemeOption(Language.getWord("theme_light_basic"), null, Language.getWord("theme_light_basic_desc"), 0, new FlatLightLaf()));
-        actions.add(new ThemeOption(Language.getWord("theme_light_orange"), null, Language.getWord("theme_light_orange_desc"), 0, new FlatArcOrangeIJTheme()));
-        actions.add(new ThemeOption(Language.getWord("theme_light_cyan"), null, Language.getWord("theme_light_cyan_desc"), 0, new FlatCyanLightIJTheme()));
+        actions.add(new ThemeOption("theme_light_rounded", Language.getWord("theme_light_rounded"), null, Language.getWord("theme_light_rounded_desc"), 0, new FlatMacLightLaf()));
+        actions.add(new ThemeOption("theme_light_basic", Language.getWord("theme_light_basic"), null, Language.getWord("theme_light_basic_desc"), 0, new FlatLightLaf()));
+        actions.add(new ThemeOption("theme_light_orange", Language.getWord("theme_light_orange"), null, Language.getWord("theme_light_orange_desc"), 0, new FlatArcOrangeIJTheme()));
+        actions.add(new ThemeOption("theme_light_cyan", Language.getWord("theme_light_cyan"), null, Language.getWord("theme_light_cyan_desc"), 0, new FlatCyanLightIJTheme()));
 
-        actions.add(new ThemeOption(Language.getWord("theme_dark_rounded"), null, Language.getWord("theme_dark_rounded_desc"), 0, new FlatMacDarkLaf()));
-        actions.add(new ThemeOption(Language.getWord("theme_dark_basic"), null, Language.getWord("theme_dark_basic_desc"), 0, new FlatDarkLaf()));
-        actions.add(new ThemeOption(Language.getWord("theme_dark_purple"), null, Language.getWord("theme_dark_purple_desc"), 0, new FlatDarkPurpleIJTheme()));
-        actions.add(new ThemeOption(Language.getWord("theme_dark_contrast"), null, Language.getWord("theme_dark_contrast_desc"), 0, new FlatHighContrastIJTheme()));
+        actions.add(new ThemeOption("theme_dark_rounded", Language.getWord("theme_dark_rounded"), null, Language.getWord("theme_dark_rounded_desc"), 0, new FlatMacDarkLaf()));
+        actions.add(new ThemeOption("theme_dark_basic", Language.getWord("theme_dark_basic"), null, Language.getWord("theme_dark_basic_desc"), 0, new FlatDarkLaf()));
+        actions.add(new ThemeOption("theme_dark_purple", Language.getWord("theme_dark_purple"), null, Language.getWord("theme_dark_purple_desc"), 0, new FlatDarkPurpleIJTheme()));
+        actions.add(new ThemeOption("theme_dark_contrast", Language.getWord("theme_dark_contrast"), null, Language.getWord("theme_dark_contrast_desc"), 0, new FlatHighContrastIJTheme()));
     }
 
     /**
@@ -117,6 +123,28 @@ public class ThemeActions {
 
     /**
      * <p>
+     * Whether or not ANDIE is in dark mode or light mode.
+     * </p>
+     * 
+     * @return True for dark mode, false for light mode.
+     */
+    public static boolean isDark() {
+        return globalTheme.isDark();
+    }
+
+    /**
+     * <p>
+     * Get the name of the currently used theme.
+     * </p>
+     * 
+     * @return The theme name as it is used in ANDIE.
+     */
+    public static String getThemeName(){
+        return themeName;
+    }
+
+    /**
+     * <p>
      * Inner class representing a theme option.
      * </p>
      * 
@@ -125,6 +153,7 @@ public class ThemeActions {
 
         /** The theme this instance represents */
         private FlatLaf theme;
+        private String id;
         /**
          * 
          * @param name The name of the theme, adjusted to the correct language
@@ -133,9 +162,10 @@ public class ThemeActions {
          * @param mnemonic The key binding to invoke this option
          * @param theme The theme this instance holds
          */
-        ThemeOption(String name, ImageIcon icon, String desc, Integer mnemonic, FlatLaf theme) {
+        ThemeOption(String id, String name, ImageIcon icon, String desc, Integer mnemonic, FlatLaf theme) {
             super(name, icon, desc, mnemonic);
             this.theme = theme;
+            this.id = id;
         }
 
         /**
@@ -157,9 +187,12 @@ public class ThemeActions {
          */
         public void actionPerformed(ActionEvent e) {
             ThemeActions.globalTheme = this.theme;
+            ThemeActions.themeName = this.id;
             FlatLaf.setup(ThemeActions.globalTheme);
             SwingUtilities.updateComponentTreeUI(Andie.getFrame());
             Preferences.setPreference("theme", ThemeActions.globalTheme.getClass().toString());
+            Andie.redrawToolbar();
+            Andie.updateIcon();
         }
     }
 }
