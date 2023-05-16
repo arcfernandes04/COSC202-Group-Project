@@ -7,6 +7,8 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.*;
 
+import cosc202.andie.settings.ThemeActions;
+
 /**
  * <p>
  * A toolbar containing essential/common actions.
@@ -34,31 +36,33 @@ public class Toolbar extends JPanel {
         setLayout(new BorderLayout());
         add(toolbar, BorderLayout.WEST);
 
-        // Create the action objects
-        Action saveAction = new SaveAction();
-        Action saveAsAction = new SaveAsAction();
-        Action openAction = new OpenAction();
-        Action undoAction = new UndoAction();
-        Action redoAction = new RedoAction();
-        Action zoomInAction = new ZoomInAction();
-        Action zoomOutAction = new ZoomOutAction();
+        //Try to get all the toolbar icons
+        String directory = "/resources/icons/";
+        if(ThemeActions.isDark()) directory += "light/";
+        else directory += "dark/";
 
-        // Create the buttons and attach corresponding actions
-        JButton button = null;
-        button = new JButton(saveAction);
-        toolbar.add(button);
-        button = new JButton(saveAsAction);
-        toolbar.add(button);
-        button = new JButton(openAction);
-        toolbar.add(button);
-        button = new JButton(undoAction);
-        toolbar.add(button);
-        button = new JButton(redoAction);
-        toolbar.add(button);
-        button = new JButton(zoomInAction);
-        toolbar.add(button);
-        button = new JButton(zoomOutAction);
-        toolbar.add(button);
+        try{
+            // Load in the icons
+            ImageIcon openIcon = new ImageIcon(Toolbar.class.getResource(directory + "open_icon.png"));
+            ImageIcon saveIcon = new ImageIcon(Toolbar.class.getResource(directory + "save_icon.png"));
+            ImageIcon saveAsIcon = new ImageIcon(Toolbar.class.getResource(directory + "save_as_icon.png"));
+            ImageIcon undoIcon = new ImageIcon(Toolbar.class.getResource(directory + "undo_icon.png"));
+            ImageIcon redoIcon = new ImageIcon(Toolbar.class.getResource(directory + "redo_icon.png"));
+            ImageIcon zoomInIcon = new ImageIcon(Toolbar.class.getResource(directory + "zoom_in_icon.png"));
+            ImageIcon zoomOutIcon = new ImageIcon(Toolbar.class.getResource(directory + "zoom_out_icon.png"));
+
+            // Create the action objects
+            // Create the buttons and attach corresponding actions
+            toolbar.add(new JButton(new OpenAction(openIcon)));
+            toolbar.add(new JButton(new SaveAction(saveIcon)));
+            toolbar.add(new JButton(new SaveAsAction(saveAsIcon)));
+            toolbar.add(new JButton(new UndoAction(undoIcon)));
+            toolbar.add(new JButton(new RedoAction(redoIcon)));
+            toolbar.add(new JButton(new ZoomInAction(zoomInIcon)));
+            toolbar.add(new JButton(new ZoomOutAction(zoomOutIcon)));
+        }catch(Exception e){
+            //If an error occurs, just continue without building the toolbar
+        }
     }
 
     /**
@@ -75,11 +79,10 @@ public class Toolbar extends JPanel {
          * Create a new save action.
          * </p>
          */
-        public SaveAction() {
-            super("", new ImageIcon("src/save_icon.png"));
+        public SaveAction(ImageIcon icon) {
+            super("", icon);
             putValue(Action.SHORT_DESCRIPTION, Language.getWord("Save"));
             // Resize the icon to a more appropriate size
-            ImageIcon icon = (ImageIcon) getValue(Action.SMALL_ICON);
             Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             ImageIcon resizedIcon = new ImageIcon(img);
             putValue(Action.SMALL_ICON, resizedIcon);
@@ -117,11 +120,10 @@ public class Toolbar extends JPanel {
          * Create a new save as action.
          * </p>
          */
-        public SaveAsAction() {
-            super("", new ImageIcon("src/save_as_icon.png"));
+        public SaveAsAction(ImageIcon icon) {
+            super("", icon);
             putValue(Action.SHORT_DESCRIPTION, Language.getWord("SaveAs"));
             // Resize the icon to a more appropriate size
-            ImageIcon icon = (ImageIcon) getValue(Action.SMALL_ICON);
             Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             ImageIcon resizedIcon = new ImageIcon(img);
             putValue(Action.SMALL_ICON, resizedIcon);
@@ -159,11 +161,10 @@ public class Toolbar extends JPanel {
          * Create a new file-open action.
          * </p>
          */
-        public OpenAction() {
-            super("", new ImageIcon("src/open_icon.png"));
+        public OpenAction(ImageIcon icon) {
+            super("", icon);
             putValue(Action.SHORT_DESCRIPTION, Language.getWord("Open"));
             // Resize the icon to a more appropriate size
-            ImageIcon icon = (ImageIcon) getValue(Action.SMALL_ICON);
             Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             ImageIcon resizedIcon = new ImageIcon(img);
             putValue(Action.SMALL_ICON, resizedIcon);
@@ -201,11 +202,10 @@ public class Toolbar extends JPanel {
          * Create a new undo action.
          * </p>
          */
-        public UndoAction() {
-            super("", new ImageIcon("src/undo_icon.png"));
+        public UndoAction(ImageIcon icon) {
+            super("", icon);
             putValue(Action.SHORT_DESCRIPTION, Language.getWord("Undo"));
             // Resize the icon to a more appropriate size
-            ImageIcon icon = (ImageIcon) getValue(Action.SMALL_ICON);
             Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             ImageIcon resizedIcon = new ImageIcon(img);
             putValue(Action.SMALL_ICON, resizedIcon);
@@ -243,11 +243,10 @@ public class Toolbar extends JPanel {
          * Create a new redo action.
          * </p>
          */
-        public RedoAction() {
-            super("", new ImageIcon("src/redo_icon.png"));
+        public RedoAction(ImageIcon icon) {
+            super("", icon);
             putValue(Action.SHORT_DESCRIPTION, Language.getWord("Redo"));
             // Resize the icon to a more appropriate size
-            ImageIcon icon = (ImageIcon) getValue(Action.SMALL_ICON);
             Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             ImageIcon resizedIcon = new ImageIcon(img);
             putValue(Action.SMALL_ICON, resizedIcon);
@@ -283,11 +282,10 @@ public class Toolbar extends JPanel {
          * Create a new zoom in action.
          * </p>
          */
-        public ZoomInAction() {
-            super("", new ImageIcon("src/zoom_in_icon.png"));
+        public ZoomInAction(ImageIcon icon) {
+            super("", icon);
             putValue(Action.SHORT_DESCRIPTION, Language.getWord("ZoomIn"));
             // Resize the icon to a more appropriate size
-            ImageIcon icon = (ImageIcon) getValue(Action.SMALL_ICON);
             Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             ImageIcon resizedIcon = new ImageIcon(img);
             putValue(Action.SMALL_ICON, resizedIcon);
@@ -323,11 +321,10 @@ public class Toolbar extends JPanel {
          * Create a new zoom out action.
          * </p>
          */
-        public ZoomOutAction() {
-            super("", new ImageIcon("src/zoom_out_icon.png"));
+        public ZoomOutAction(ImageIcon icon) {
+            super("", icon);
             putValue(Action.SHORT_DESCRIPTION, Language.getWord("ZoomOut"));
             // Resize the icon to a more appropriate size
-            ImageIcon icon = (ImageIcon) getValue(Action.SMALL_ICON);
             Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             ImageIcon resizedIcon = new ImageIcon(img);
             putValue(Action.SMALL_ICON, resizedIcon);
