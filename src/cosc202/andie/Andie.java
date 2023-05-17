@@ -178,17 +178,6 @@ public class Andie {
         frame = new JFrame("ANDIE");
         updateIcon();
 
-        //Load preferences relating to the frame
-        try{
-            int x = Integer.parseInt(Preferences.getPreference("initial_x"));
-            int y = Integer.parseInt(Preferences.getPreference("initial_y"));
-            frame.setLocation(x, y);
-            int width = Integer.parseInt(Preferences.getPreference("Frame_width"));
-            int height = Integer.parseInt(Preferences.getPreference("Frame_height"));
-            frame.setPreferredSize(new Dimension(width, height));
-        }catch(NumberFormatException e){}
-
-
         //Add an event listener that checks when the frame is closed.
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
@@ -202,6 +191,24 @@ public class Andie {
         ImageAction.setTarget(imagePanel);
         JScrollPane scrollPane = new JScrollPane(imagePanel);
         frame.add(scrollPane, BorderLayout.CENTER);
+
+        //Load preferences relating to the frame
+        try{
+            int x = Integer.parseInt(Preferences.getPreference("initial_x"));
+            int y = Integer.parseInt(Preferences.getPreference("initial_y"));
+            frame.setLocation(x, y);
+            int width = Integer.parseInt(Preferences.getPreference("Frame_width"));
+            int height = Integer.parseInt(Preferences.getPreference("Frame_height"));
+            frame.setPreferredSize(new Dimension(width, height));
+        }catch(NumberFormatException e){
+            Dimension paneSize = imagePanel.getPreferredSize();
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            int x = (int) ((screenSize.getWidth() - paneSize.getWidth()) / 2);
+            int y = (int) ((screenSize.getHeight() - paneSize.getHeight()) / 2);
+
+            frame.setLocation(x, y);
+            frame.setPreferredSize(paneSize);
+        }
 
         // Add the menu bar to hold all of the different user actions.
         menuBar = new JMenuBar();

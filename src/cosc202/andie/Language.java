@@ -35,7 +35,7 @@ public abstract class Language
             Language.prop = Preferences.getProperties("lang_" + language + ".properties");
             // Make sure JOptionPane and AndieFileChooser is in the right language
             updateUIManager();
-        } catch (IOException ex) {
+        } catch (IOException | NullPointerException ex) {
             recover(DEFAULT_LANG); //if it fails, attempt to recover, or find a more systemic problem.
         }
     }
@@ -94,7 +94,7 @@ public abstract class Language
             updateUIManager();
             //redraw everything to be in the right language.
             Andie.redrawPanels();
-        }catch(IOException ex){
+        }catch(IOException | NullPointerException ex){
             recover(previous_lang); //if it fails, attempt to recover, or find a more systemic problem.
         }
     }
