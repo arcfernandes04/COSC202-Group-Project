@@ -112,15 +112,14 @@ public class Andie {
      * </p>
      */
     public static void updateIcon(){
-        ImageIcon previousIcon = icon;
         try {
+            if(icon == null) icon = new ImageIcon();
             String logoPath = "/resources/icons/logo/" + ThemeActions.getThemeName() + ".png";
             BufferedImage image = ImageIO.read(Andie.class.getResource(logoPath));
             frame.setIconImage(image);
-            icon = new ImageIcon(image.getScaledInstance((int) (image.getWidth() * ICON_SCALE_FACTOR), (int) (image.getHeight() * ICON_SCALE_FACTOR), 0));
+            icon.setImage(image.getScaledInstance((int) (image.getWidth() * ICON_SCALE_FACTOR), (int) (image.getHeight() * ICON_SCALE_FACTOR), 0));
         } catch (Exception e) {
-            // If something goes wrong, will need to just continue without the logo - or the previous one if applicable
-            icon = previousIcon;
+            // If something goes wrong, will either continue without the logo, or keep using the previous one.
         }
     }
 
