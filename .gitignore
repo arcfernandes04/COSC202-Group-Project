@@ -1,6 +1,3 @@
 # ignore generated artefacts
 bin
 doc
-
-# Ignore a few random files
-src/resources/config.properties

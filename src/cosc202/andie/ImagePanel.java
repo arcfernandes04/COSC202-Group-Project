@@ -150,13 +150,7 @@ public class ImagePanel extends JPanel {
      */
     @Override
     public Dimension getPreferredSize() {
-        try{
-            int width = Integer.parseInt(Preferences.getPreference("ImagePanel_width"));
-            int height = Integer.parseInt(Preferences.getPreference("ImagePanel_height"));
-            return new Dimension(width, height);
-        }catch(NumberFormatException e){
-            return new Dimension(600, 600);
-        }
+        return new Dimension(600, 600);
     }
 
     /**
