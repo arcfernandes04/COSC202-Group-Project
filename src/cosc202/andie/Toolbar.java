@@ -5,9 +5,11 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
+
 import javax.swing.*;
 
 import cosc202.andie.settings.ThemeActions;
+
 
 /**
  * <p>
@@ -22,6 +24,8 @@ import cosc202.andie.settings.ThemeActions;
  * @version 1.0
  */
 public class Toolbar extends JPanel {
+    /** The JFrame to create pop up windows inside of. */
+    private static JFrame parent = Andie.getFrame();
 
     /**
      * <p>
@@ -50,6 +54,7 @@ public class Toolbar extends JPanel {
             ImageIcon redoIcon = new ImageIcon(Toolbar.class.getResource(directory + "redo_icon.png"));
             ImageIcon zoomInIcon = new ImageIcon(Toolbar.class.getResource(directory + "zoom_in_icon.png"));
             ImageIcon zoomOutIcon = new ImageIcon(Toolbar.class.getResource(directory + "zoom_out_icon.png"));
+            ImageIcon macroIcon = new ImageIcon(Toolbar.class.getResource(directory + "macro_icon.png"));
 
             // Create the action objects
             // Create the buttons and attach corresponding actions
@@ -60,6 +65,7 @@ public class Toolbar extends JPanel {
             toolbar.add(new JButton(new RedoAction(redoIcon)));
             toolbar.add(new JButton(new ZoomInAction(zoomInIcon)));
             toolbar.add(new JButton(new ZoomOutAction(zoomOutIcon)));
+            toolbar.add(new JButton(new MacroMenuAction(macroIcon)));
         }catch(Exception e){
             //If an error occurs, just continue without building the toolbar
         }
@@ -345,6 +351,47 @@ public class Toolbar extends JPanel {
         public void actionPerformed(ActionEvent e) {
             ViewActions.ZoomOutAction zoomOut = new ViewActions().new ZoomOutAction(Language.getWord("ZoomOut"), null, Language.getWord("ZoomOut_desc"), Integer.valueOf(KeyEvent.VK_MINUS));
             zoomOut.actionPerformed(e);
+        }
+    }
+
+    /**
+     * <p>
+     * Action that displays the macro menu.
+     * </p>
+     */
+    private class MacroMenuAction extends AbstractAction{
+
+        /**
+         * <p>
+         * Create a new macro menu action.
+         * </p>
+         */
+        public MacroMenuAction(ImageIcon icon){
+            super("", icon);
+            putValue(Action.SHORT_DESCRIPTION, Language.getWord("macro"));
+        }
+
+        /**
+         * <p>
+         * Callback for when the macro menu action is triggered
+         * </p>
+         * 
+         * <p>
+         * This method is called whenever the macro menu action is triggered. 
+         * It opens the dialog menu for macro options.
+         * </p>
+         * 
+         * @param e The event triggering this callback. 
+         */
+        public void actionPerformed(ActionEvent e){
+            if (ImageAction.getTarget().getImage().hasImage() == false) {
+                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                return;
+            }
+
+            if(!MacroDialog.isDisplayed()){
+                MacroDialog.showDialog(parent);
+            }
         }
     }
 }

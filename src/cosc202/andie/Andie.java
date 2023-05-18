@@ -287,6 +287,8 @@ public class Andie {
         toolbar = new Toolbar();
         // Sets the area where the toolbar is placed.
         frame.add(toolbar, BorderLayout.PAGE_START);
+        // Refresh the macro dialog (if open)
+        if(MacroDialog.isDisplayed()) MacroDialog.update();
     }
 
     /**
