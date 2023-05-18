@@ -55,6 +55,13 @@ public abstract class UserMessage {
     /** The scroll pane option for when the user tries to paste multiple image files into ANDIE.
      * The user is asked which file they would like to open from a list of available images.*/
     public static final String PASTE_FILES_SCROLL = "PASTE_FILES_DIALOG";
+    /** A dialog option asking the user whether they would like to continue with the selected process
+     * (and stop recording) or cancel as there is a recording in process. */
+    public static final String RECORDING_END_DIALOG = "RECORDING_END_DIALOG";
+    /** A dialog option asking the user whether they would like to continue with the selected process
+     * (and continue recording) or cancel as there is a recording in process. */
+    public static final String RECORDING_CONTINUE_DIALOG = "RECORDING_CONTINUE_DIALOG";
+
 
 
     /** A generic warning to tell the user that an error has occurred. */
@@ -71,6 +78,8 @@ public abstract class UserMessage {
     public static final String NULL_FILE_WARN = "NULL_FILE_WARN";
     /** A warning to tell the user that the file the program can only open image files. */
     public static final String NON_IMG_FILE_WARN = "NON_IMG_FILE_WARN";
+    /** A warning to tell the user that the file must be an ops file. */
+    public static final String NON_OPS_FILE_WARN = "NON_OPS_FILE_WARN";
     /** A warning to tell the user that a fatal error has occurred. */
     public static final String FATAL_ERROR_WARN = "FATAL_ERROR_WARN";
     /** A warning to tell the user that the desired file was not found. */
@@ -85,6 +94,10 @@ public abstract class UserMessage {
     public static final String FATAL_LANG_WARN = "FATAL_LANG_WARN";
     /** A warning to tell the user that they have not selected an area to operate on */
     public static final String EMPTY_SELECTION_WARN = "EMPTY_SELECTION_WARN";
+    /** A warning to tell the user that the selected ops file cannot be read */
+    public static final String UNREADABLE_OPS_FILE_WARN = "UNREADABLE_OPS_FILE_WARN";
+    /** A warning to tell the user that the selected ops file is outdated and so cannot be applied */
+    public static final String OUTDATED_OPS_FILE_WARN = "OUTDATED_OPS_FILE_WARN";
 
 
     /**
@@ -140,6 +153,12 @@ public abstract class UserMessage {
         else if (dialogOption.equalsIgnoreCase(UserMessage.DELETE_OPS_DIALOG)) {
             message = Language.getWord(dialogOption);
             Object[] possibleValues = new Object[] {Language.getWord("DELETE_OPS_OK"), Language.getWord("DEFAULT_CANCEL")};
+            result = JOptionPane.showOptionDialog(UserMessage.PARENT, message, title, JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, ICON, possibleValues, possibleValues[0]);
+            if(result == JOptionPane.NO_OPTION) result = JOptionPane.CANCEL_OPTION;
+        }else if(dialogOption.equalsIgnoreCase(UserMessage.RECORDING_END_DIALOG) || dialogOption.equalsIgnoreCase(UserMessage.RECORDING_CONTINUE_DIALOG)){
+            message = Language.getWord(dialogOption);
+            Object[] possibleValues = new Object[] {Language.getWord("RECORDING_OK"), Language.getWord("DEFAULT_CANCEL")};
             result = JOptionPane.showOptionDialog(UserMessage.PARENT, message, title, JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE, ICON, possibleValues, possibleValues[0]);
             if(result == JOptionPane.NO_OPTION) result = JOptionPane.CANCEL_OPTION;

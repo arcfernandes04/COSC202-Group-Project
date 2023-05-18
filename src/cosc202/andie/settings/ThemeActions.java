@@ -191,8 +191,8 @@ public class ThemeActions {
             FlatLaf.setup(ThemeActions.globalTheme);
             SwingUtilities.updateComponentTreeUI(Andie.getFrame());
             Preferences.setPreference("theme", ThemeActions.globalTheme.getClass().toString());
-            Andie.redrawToolbar();
             Andie.updateIcon();
+            Andie.redrawToolbar();
         }
     }
 }

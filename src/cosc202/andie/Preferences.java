@@ -56,6 +56,8 @@ public abstract class Preferences{
             prop.load(inputStream); //open the properties file
             inputStream.close();
             if(prop.isEmpty()) prop.setProperty("language", "en");
+            
+            prop.setProperty("macroDirectory", getAppDataPath() + "/saved-macros/");
         } catch (NullPointerException | IOException ex) {
             //There is an issue with the config file, so we need to just make a blank version.
             prop = new Properties();
@@ -140,6 +142,9 @@ public abstract class Preferences{
             }
             //Make sure that the directory exists.
             Files.createDirectories(Paths.get(targetDir));
+
+            // Make sure that the saved macro directory exists
+            Files.createDirectories(Paths.get(targetDir + "/saved-macros/"));
 
             return targetDir;
         }catch(IOException e){

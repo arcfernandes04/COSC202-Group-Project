@@ -65,6 +65,12 @@ public class EditableImage {
     private String extension;
     /** The allowed extensions for files that ANDIE can open. */
     private static final String[] allowedExtensions = ImageIO.getWriterFileSuffixes();
+    /** The extension used for ANDIE's operation files */
+    private static final String opsExtension = "ops";
+    /** The sequence of operations to be recorded to a file.  */
+    private Stack<ImageOperation> macroOps;
+    /** Whether macro recording is active. */
+    private boolean recording = false;
 
     /**
      * <p>
@@ -132,6 +138,14 @@ public class EditableImage {
      */
     public static String[] getAllowedExtensions(){
         return Arrays.copyOf(allowedExtensions, allowedExtensions.length);
+    }
+
+    /**
+     * Gets the extension that ANDIE uses for operation files.
+     * @return
+     */
+    public static String getOpsExtension(){
+        return opsExtension;
     }
 
     /**
@@ -215,7 +229,7 @@ public class EditableImage {
         this.current = img;
         this.original = deepCopy(img);
         this.imageFilename = filename;
-        if(filename != null) this.opsFilename = filename + ".ops";
+        if(filename != null) this.opsFilename = filename + "." + opsExtension;
         else this.opsFilename = null;
         this.extension = extension;
         this.ops = ops;
@@ -245,7 +259,7 @@ public class EditableImage {
 
         //Variables that we want to ensure are not null before making the datafields point to them
         String imageFilenameCheck = filePath;
-        String opsFilenameCheck = filePath + ".ops";
+        String opsFilenameCheck = filePath + "." + opsExtension;
         String extensionCheck = null;
         BufferedImage currentCheck = null;
 
@@ -316,7 +330,7 @@ public class EditableImage {
      */
     public boolean save() {
         if (this.opsFilename == null) {
-            this.opsFilename = this.imageFilename + ".ops";
+            this.opsFilename = this.imageFilename + "." + opsExtension;
         }
         try{
             // Write image file based on file extension
@@ -367,7 +381,7 @@ public class EditableImage {
     public boolean saveAs(String imageFilename) {
         this.extension = imageFilename.substring(imageFilename.lastIndexOf(".") + 1).toLowerCase();
         this.imageFilename = imageFilename;
-        this.opsFilename = this.imageFilename + ".ops";
+        this.opsFilename = this.imageFilename + "." + opsExtension;
         return save();
     }
 
@@ -411,20 +425,38 @@ public class EditableImage {
      * @return The inputted imageFilename with the appropriate extension. If imageFilename did not
      * have any extension, or it had an illegal extension (one that ANDIE cannot process), then an
      * appropriate extension is added.
-     * @author Joshua Carter
      */
     public String makeSensible(String imageFilename) {
-        int lastDotIndex = imageFilename.lastIndexOf(".");
-        // If there isn't an extension, use the one from the current file.
-        if (lastDotIndex == -1) return imageFilename + "." + this.extension;
-        
-        // If there is an extension, check what it is and if it's allowed or not.
-        String extensionCheck = imageFilename.substring(lastDotIndex + 1).toLowerCase();
-        for (String ext : allowedExtensions) {
-            if (ext.equalsIgnoreCase(extensionCheck)) return imageFilename; // If it's in the list of allowed extensions, then that's fine - return it.
+        // If the filename has an allowed extension, return
+        for(String ext : getAllowedExtensions()){
+            if(imageFilename.toLowerCase().endsWith("." + ext.toLowerCase())) return imageFilename;
         }
-        //Otherwise, it doesn't have an allowed extension so add the current one.
-        return imageFilename.substring(0, lastDotIndex + 1).toLowerCase() + this.extension;
+        
+        // If it ends ith a random full stop, add the extension
+        if(imageFilename.endsWith(".")) return imageFilename + this.extension;
+        
+        // Otherwise, add both the . and the extension
+        else return imageFilename + "." + this.extension;
+  }
+
+    /**
+     * <p>
+     * Ensures that the extension on the operation file is appropriate.
+     * </p>
+     * 
+     * @param opsFileName
+     * @return A version of the opsFileName that has the correct extension.
+     */
+    public static String makeOpsSensible(String opsFileName){
+        // If the filename has an allowed extension, return
+        if(opsFileName.toLowerCase().endsWith("." + opsExtension.toLowerCase())) return opsFileName;
+        
+        // If it ends ith a random full stop, add the extension
+        if(opsFileName.endsWith(".")) return opsFileName + opsExtension;
+
+        // Otherwise, add both the . and the extension
+        else return opsFileName + "." + opsExtension;
+
     }
 
     /**
@@ -447,6 +479,7 @@ public class EditableImage {
             if(result != null){ //Only count this as a valid operation if it returns non-null value.
                 current = result;
                 ops.add(op);
+                if(isRecording()) macroOps.add(op);
                 unsavedChanges = true;
             }
             refresh();
@@ -503,7 +536,74 @@ public class EditableImage {
             //UserMessage.showWarning(UserMessage.GENERIC_WARN);
         }
     }
+
+    /**
+     * <p>
+     * Apply operations from an existing operation file to the current image.
+     * </p>
+     * 
+     * @param opsFilePath The location of the ops file to apply
+     */
+    public void applyOpsFile(String opsFilePath) {
         
+        String opsFilenameCheck = opsFilePath;
+
+        Stack<ImageOperation> opsFromFile = null;
+        FileInputStream fileIn = null;
+        ObjectInputStream objIn = null;
+
+        try{
+            //Attempt to load in the operations
+            fileIn = new FileInputStream(opsFilenameCheck);
+            objIn = new ObjectInputStream(fileIn);
+
+            @SuppressWarnings("unchecked")
+            Stack<ImageOperation> opsTemp = (Stack<ImageOperation>) objIn.readObject();
+            opsFromFile = opsTemp;
+            objIn.close();
+            fileIn.close();
+
+            //Only load the files in if there aren't any big issues.
+            if (!opsFromFile.isEmpty()) {
+                for (ImageOperation op : opsFromFile) {
+                    apply(op);
+                }
+            }
+            refresh();
+        }catch(java.io.StreamCorruptedException ex) { // Something is wrong with the ops file, it can't be read
+            UserMessage.showWarning(UserMessage.UNREADABLE_OPS_FILE_WARN);
+        }catch(InvalidClassException ex){
+            UserMessage.showWarning(UserMessage.OUTDATED_OPS_FILE_WARN);
+        }catch(Exception ex){
+            UserMessage.showWarning(UserMessage.GENERIC_WARN);
+        }
+    }
+    
+    /**
+     * Save the current {@code macroOps} to a file.
+     * 
+     * @param macroOpsFileName The file location to save the ops file to.
+     * @return Whether the operation was successful
+     */
+    public boolean saveToOpsFile(String macroOpsFileName){
+        try{
+            FileOutputStream fileOut = new FileOutputStream(macroOpsFileName);
+            ObjectOutputStream objOut = new ObjectOutputStream(fileOut);
+
+            objOut.writeObject(this.macroOps);
+            objOut.close();
+            fileOut.close();
+        }catch (NullPointerException ex){
+            UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+            return false;
+        } catch (Exception ex) {
+            UserMessage.showWarning(UserMessage.INVALID_PATH_WARN);
+            this.opsFilename = null;
+            this.imageFilename = null;
+            return false;
+        }
+        return true;
+    }
 
     /**
      * <p>
@@ -518,6 +618,7 @@ public class EditableImage {
         try{
             resetTempOriginal(); // make sure we aren't using an old version of the image
             redoOps.push(ops.pop());
+            if(isRecording()) macroOps.pop();
             refresh();
             unsavedChanges = true;
         }catch(EmptyStackException ex){
@@ -539,6 +640,7 @@ public class EditableImage {
 
         while(ops.size() > 0){ //Shouldn't just call undo() repeatedly here - it is very inefficient
             redoOps.push(ops.pop());
+            if(isRecording()) macroOps.pop();
         }
         resetTempOriginal(); // make sure we aren't using an old version of the image
         refresh();
@@ -558,6 +660,7 @@ public class EditableImage {
         try{
             resetTempOriginal(); //make sure we aren't using an old version of the image
             apply(redoOps.pop());
+
             unsavedChanges = true;
         }catch(EmptyStackException ex){
             UserMessage.showWarning(UserMessage.EMPTY_REDO_STACK_WARN);
@@ -785,5 +888,23 @@ public class EditableImage {
         }
     }
 
+        /**
+     * Get whether ANDIE is currently in the macro recording state.
+     * 
+     * @return True if ANDIE is in the macro recording state
+     */
+    public boolean isRecording(){
+        return recording;
+    }
+
+    /**
+     * Change the current recording state
+     * 
+     * @param recording Whether to set ANDIE in the recording state. 
+     */
+    public void setRecording(boolean recording){
+        this.recording = recording;
+        if(recording) macroOps = new Stack<ImageOperation>();
+    }
 
 }

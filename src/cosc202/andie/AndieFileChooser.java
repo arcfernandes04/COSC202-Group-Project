@@ -42,13 +42,40 @@ public class AndieFileChooser extends JFileChooser{
     "detailsViewButtonToolTipText", "saveButtonText", "directoryOpenButtonText", "openButtonText","cancelButtonText", "updateButtonText", "helpButtonText", "saveButtonToolTipText", 
     "openButtonToolTipText", "directoryOpenButtonToolTipText", "cancelButtonToolTipText", "updateButtonToolTipText", "helpButtonToolTipText"};
 
+    /** 
+     * Whether or not the current file chooser instance is for ops files.
+     */
+    private boolean forOps;
+
+    private static String macroDirectory = Preferences.getPreference("macroDirectory");
+
+
     /**
      * Default constructor that creates a new file chooser, starting from the most recently visited directory -
      * or the home directory if a recent directory cannot be located.
      */
     public AndieFileChooser(){
         super(lastDirectory);
+        this.forOps = false;
         setFileFilter(fileExtensionFilter);
+        this.setDialogTitle(Language.getWord("FileChooser.Title"));
+    }
+
+    /**
+     * Creates a new file chooser that is for ops files rather than image files.
+     */
+    public AndieFileChooser(boolean forOps){
+        super(lastDirectory);
+        this.forOps = forOps;
+
+        if(forOps){
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("OPS", EditableImage.getOpsExtension());
+            setFileFilter(filter);
+            setCurrentDirectory(new File(macroDirectory));
+        }else {
+            setFileFilter(fileExtensionFilter);
+        }
+
         this.setDialogTitle(Language.getWord("FileChooser.Title"));
     }
 
@@ -118,6 +145,12 @@ public class AndieFileChooser extends JFileChooser{
 
         success = false;
 
+        // If the current instance is for ops, not images
+        if(this.forOps){
+            approveOpsSelection();
+            return;
+        }
+
         //Get the image and the desired filename
         EditableImage currImg = ImageAction.target.getImage();
         String filename;
@@ -182,6 +215,55 @@ public class AndieFileChooser extends JFileChooser{
             setSelectedFile(new File(sensibleFilename));
             
             // If the file exists, ask if they want to overwrite.
+            if(getSelectedFile().exists()){
+                int result = UserMessage.showDialog(UserMessage.OVERWRITE_EXISTING_FILE_DIALOG);
+                if(result != UserMessage.YES_OPTION) return; //If they didn't say yes, then they don't want to overwrite it.
+            }
+        }
+
+        success = true;
+        super.approveSelection();
+    }
+
+    /**
+     * <p>
+     * Adapted from {@code approveSelection} to be specific to ops files. 
+     * This version also does not update the {@code lastDirectory} field.
+     * </p>
+     */
+    public void approveOpsSelection(){
+        // Get the image and desired fileName
+        String fileName;
+
+        try{
+            fileName = getSelectedFile().getCanonicalPath();
+        }catch(IOException ex){
+            UserMessage.showWarning(UserMessage.INVALID_PATH_WARN);
+            return;
+        }
+
+
+        // Dialog for opening files
+        if(getDialogType() == OPEN_DIALOG){
+            // If file doesn't exist, warn
+            if(!getSelectedFile().exists()){
+                UserMessage.showWarning(UserMessage.FILE_NOT_FOUND_WARN);
+                return;
+            }
+
+            // Check extension is valid (i.e. is .ops)
+            String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+            if(!extension.equalsIgnoreCase(EditableImage.getOpsExtension())){
+                UserMessage.showWarning(UserMessage.NON_OPS_FILE_WARN);
+                return;
+            }
+
+        // Dialog for saving files
+        }else if(getDialogType() == SAVE_DIALOG){
+            String sensibleFileName = EditableImage.makeOpsSensible(fileName);
+
+            setSelectedFile(new File(sensibleFileName));
+
             if(getSelectedFile().exists()){
                 int result = UserMessage.showDialog(UserMessage.OVERWRITE_EXISTING_FILE_DIALOG);
                 if(result != UserMessage.YES_OPTION) return; //If they didn't say yes, then they don't want to overwrite it.
