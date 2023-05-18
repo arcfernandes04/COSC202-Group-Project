@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.CloseAction;
 
 import cosc202.andie.settings.ThemeActions;
 
@@ -82,6 +83,19 @@ public abstract class MacroDialog extends JDialog{
      */
     public static void update(){
         if(isDisplayed()){
+            // Updating text components
+            dialog.setTitle(Language.getWord("macro"));
+            
+            applyLabel.setText(Language.getWord("macro_select_label"));
+            recordLabel.setText(Language.getWord("macro_record_label"));
+
+            if(ImageAction.getTarget().getImage().isRecording()) recordBtn.setText(Language.getWord("macro_record_stop"));
+            else recordBtn.setText(Language.getWord("macro_record_start"));
+
+            closeBtn.setText(Language.getWord("close"));
+            applyBtn.setText(Language.getWord("macro_apply"));
+
+            // Updating other components
             getBtnIcon();
 
             Image img = btnIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
