@@ -62,6 +62,7 @@ public abstract class Preferences{
             //There is an issue with the config file, so we need to just make a blank version.
             prop = new Properties();
             prop.setProperty("language", "en");
+            prop.setProperty("macroDirectory", getAppDataPath() + "/saved-macros/");
         }
     }
 
