@@ -23,6 +23,7 @@ import cosc202.andie.*;
  */
 public class ShapeActions extends JMenuBar {
 
+    /** The menu holding the shape options for the GUI. */
     private JMenu menu;
     
     /**

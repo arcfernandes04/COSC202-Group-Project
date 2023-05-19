@@ -61,7 +61,7 @@ public class EmbossFilter implements ImageOperation, java.io.Serializable {
      * image.
      * </p>
      * 
-     * @param image The image to apply the Emboss effect to.
+     * @param input The image to apply the Emboss effect to.
      * @return The image with the Emboss effect applied.
      * @throws Exception Raised if an unexpected {@code Exception} occurs.
      */

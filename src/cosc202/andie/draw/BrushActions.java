@@ -26,6 +26,7 @@ import cosc202.andie.Language;
  */
 public class BrushActions extends JMenuBar {
 
+    /** The menu holding the brush options for the GUI. */
     private JMenu menu;
 
     /**

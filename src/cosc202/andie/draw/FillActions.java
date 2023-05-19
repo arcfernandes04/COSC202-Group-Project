@@ -23,6 +23,7 @@ import cosc202.andie.*;
  */
 public class FillActions extends JMenuBar {
 
+    /** The menu holding the fill options for the GUI. */
     private JMenu menu;
 
     /**
