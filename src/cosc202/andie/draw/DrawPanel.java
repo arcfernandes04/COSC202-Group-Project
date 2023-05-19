@@ -172,7 +172,7 @@ public class DrawPanel extends JPanel {
     /**
      * Sets the user's brush/stroke size, and reflects
      * this in the {@code DrawPanel} elements.
-     * @param shapeType The stroke size to be used.
+     * @param strokeSize The stroke size to be used.
      */
     public static void setStrokeSize(int strokeSize){
         DrawPanel.strokeSize = strokeSize;
@@ -191,7 +191,7 @@ public class DrawPanel extends JPanel {
     /**
      * Sets the user's fill polcy, and reflects
      * this in the {@code DrawPanel} elements.
-     * @param shapeType The fill policy to use.
+     * @param fillType The fill policy to use.
      */
     public static void setFillType(String fillType){
         DrawPanel.fillType = fillType;

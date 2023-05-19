@@ -500,8 +500,6 @@ public class EditableImage {
      * 
      * @author Corban Surtees
      * @param op The operation to apply.
-     * @throws NullFileException If no file is currently open, this {@code Exception} is raised.
-     * @throws Exception Raised if an unexpected error occurs.
      */
     public void previewApply(ImageOperation op) {
         try {

@@ -84,7 +84,7 @@ public abstract class Preferences{
 
     /**
      * Retrieve the value associated with a key, or null if the key cannot be found in the file.
-     * @param preference The key
+     * @param key The key
      * @return The value corresponding to the key, or null if there is no corresponding value.
      */
     public static String getPreference(String key){

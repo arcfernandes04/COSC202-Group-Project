@@ -27,6 +27,7 @@ import cosc202.andie.*;
  */
 public class ToolActions extends JMenuBar {
 
+    /** The menu holding the tool options for the GUI. */
     private JMenu menu;
 
     /**

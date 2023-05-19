@@ -54,7 +54,7 @@ public class SobelFilter implements ImageOperation, java.io.Serializable {
      * There is no size to this filter as it is applied to the whole image.
      * </p>
      * 
-     * @param image The image to apply the Sobel filter to filter to.
+     * @param input The image to apply the Sobel filter to filter to.
      * @return The image with the Sobel filter applied to it.
      * @throws Exception Raised if an unexpected {@code Exception} occurs.
      */
