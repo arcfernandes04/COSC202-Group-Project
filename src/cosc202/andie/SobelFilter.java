@@ -1,5 +1,6 @@
 package cosc202.andie;
 
+import java.awt.Point;
 import java.awt.image.*;
 
 /**
@@ -19,6 +20,13 @@ public class SobelFilter implements ImageOperation, java.io.Serializable {
     public static final int NONE = 0, HORIZONTAL = 1, VERTICAL = 2;
 
     private int direction;
+
+    /**
+     * <p>
+     * The coordinates of the corners of the selected area. If there is no selected area, these will be equal to -1.
+     * </p>
+     */
+    private int x1, y1, x2, y2 = -1;
 
     private float[] horizontal = {-1/2, 0, 1/2, -1, 0, 1, -1/2, 0, 1/2};
     private float[] vertical = {-1/2, -1, -1/2, 0, 0, 0, 1/2, 1, 1/2};
@@ -42,6 +50,23 @@ public class SobelFilter implements ImageOperation, java.io.Serializable {
      */
     public SobelFilter(int direction){
         this.direction = direction;
+    }
+
+    /**
+     * <p>
+     * Construct a new SobelFilter to apply from p1 to p2.
+     * </p>
+     * 
+     * @param direction The direction of Sobel to apply. 
+     * @param p1 The point at the top corner of the selection
+     * @param p2 The point at the bottom corner of the selection
+     */
+    public SobelFilter(int direction, Point p1, Point p2){
+        this.direction = direction;
+        this.x1 = (int) p1.getX();
+        this.x2 = (int) p2.getX();
+        this.y1 = (int) p1.getY();
+        this.y2 = (int) p2.getY();
     }
 
     /**
@@ -71,7 +96,8 @@ public class SobelFilter implements ImageOperation, java.io.Serializable {
             Kernel kernel = new Kernel(3, 3, array);
             AndieConvolveOp convOp = new AndieConvolveOp(kernel, true);
             output = new BufferedImage(input.getColorModel(), input.copyData(null), input.isAlphaPremultiplied(), null);
-            convOp.filter(input, output);
+            if (x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1) convOp.filter(input, output, x1, y1, x2, y2);
+            else convOp.filter(input, output);
         } catch (Exception ex) {
             UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         }

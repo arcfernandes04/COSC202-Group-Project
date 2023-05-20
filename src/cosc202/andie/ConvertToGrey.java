@@ -1,5 +1,6 @@
 package cosc202.andie;
 
+import java.awt.Point;
 import java.awt.image.*;
 
 /**
@@ -21,14 +22,31 @@ import java.awt.image.*;
  * @version 1.0
  */
 public class ConvertToGrey implements ImageOperation, java.io.Serializable {
+    /**
+     * <p>
+     * The coordinates of the corners of the selected area. If there is no selected area, these will be equal to zero.
+     * </p>
+     */
+    private int x1, x2, y1, y2 = -1;
 
     /**
      * <p>
      * Create a new CovertToGrey operation.
      * </p>
      */
-    ConvertToGrey() {
+    ConvertToGrey() {}
 
+    /**
+     * Create a new ConvertToGrey operation to be applied from p1 to p2
+     * 
+     * @param p1 The point at the top corner of the selection
+     * @param p2 The point at the bottom corner of the selection
+     */
+    ConvertToGrey(Point p1, Point p2){
+        this.x1 = (int) p1.getX();
+        this.x2 = (int) p2.getX();
+        this.y1 = (int) p1.getY();
+        this.y2 = (int) p2.getY();
     }
 
     /**
@@ -56,9 +74,17 @@ public class ConvertToGrey implements ImageOperation, java.io.Serializable {
                     int g = (argb & 0x0000FF00) >> 8;
                     int b = (argb & 0x000000FF);
 
-                    int grey = (int) Math.round(0.3*r + 0.6*g + 0.1*b);
+                    if(x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1){ // i.e. there is a selected area
+                        if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
+                            int grey = (int) Math.round(0.3*r + 0.6*g + 0.1*b);
+                            argb = (a << 24) | (grey << 16) | (grey << 8) | grey;
+                        }
 
-                    argb = (a << 24) | (grey << 16) | (grey << 8) | grey;
+                    }else{ // i.e. there is no selected area
+                        int grey = (int) Math.round(0.3*r + 0.6*g + 0.1*b);
+                        argb = (a << 24) | (grey << 16) | (grey << 8) | grey;
+                    }
+
                     input.setRGB(x, y, argb);
                 }
             }

@@ -310,8 +310,6 @@ public class EditActions {
          */
         public void actionPerformed(ActionEvent e) {
             target.getImage().copyToClipboard();
-            target.repaint();
-            target.getParent().revalidate();
         }
     }
 

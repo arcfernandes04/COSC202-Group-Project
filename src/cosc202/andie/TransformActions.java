@@ -159,8 +159,6 @@ public class TransformActions {
 
     public class RotateImageActionInput extends UserInput {
 
-        private int rotation;
-
         /**
          * <p>
          * Create a new rotate-image action.

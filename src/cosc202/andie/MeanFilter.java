@@ -1,5 +1,6 @@
 package cosc202.andie;
 
+import java.awt.Point;
 import java.awt.image.*;
 import java.util.*;
 
@@ -30,6 +31,14 @@ public class MeanFilter implements ImageOperation, java.io.Serializable {
 
     /**
      * <p>
+     * The coordinates of the corners of the selected area. If there is no selected area, these will be equal to -1.
+     * </p>
+     */
+    private int x1, x2, y1, y2 = -1;
+
+
+    /**
+     * <p>
      * Construct a Mean filter with the given size.
      * </p>
      * 
@@ -43,6 +52,29 @@ public class MeanFilter implements ImageOperation, java.io.Serializable {
      */
     MeanFilter(int radius) {
         this.radius = radius;    
+    }
+
+    /**
+     * <p>
+     * Construct a Mean filter with the given size to be applied from p1 to p2
+     * </p>
+     * 
+     * <p>
+     * The size of the filter is the 'radius' of the convolution kernel used.
+     * A size of 1 is a 3x3 filter, 2 is 5x5, and so on.
+     * Larger filters give a stronger blurring effect.
+     * </p>
+     * 
+     * @param radius The radius of the newly constructed MeanFilter
+     * @param p1 The point at the top corner of the selection
+     * @param p2 The point at the bottom corner of the selection
+     */
+    MeanFilter(int radius, Point p1, Point p2) {
+        this.radius = radius;   
+        this.x1 = (int) p1.getX();
+        this.x2 = (int) p2.getX();
+        this.y1 = (int) p1.getY();
+        this.y2 = (int) p2.getY(); 
     }
 
     /**
@@ -86,7 +118,8 @@ public class MeanFilter implements ImageOperation, java.io.Serializable {
             Kernel kernel = new Kernel(2*radius+1, 2*radius+1, array);
             AndieConvolveOp convOp = new AndieConvolveOp(kernel);
             output = new BufferedImage(input.getColorModel(), input.copyData(null), input.isAlphaPremultiplied(), null);
-            convOp.filter(input, output);
+            if (x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1) convOp.filter(input, output, x1, y1, x2, y2);
+            else convOp.filter(input, output);
 
         }catch(NullPointerException ex){
             UserMessage.showWarning(UserMessage.NULL_FILE_WARN);

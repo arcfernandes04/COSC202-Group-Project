@@ -66,5 +66,9 @@ public class ResizeImage implements ImageOperation, java.io.Serializable {
 
         return resizedBufferedImage;
     }
+
+    public double getResizeScale() {
+        return this.sizePercentageIncrease/100.0;
+    }
     
 }

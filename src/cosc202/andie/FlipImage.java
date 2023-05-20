@@ -33,7 +33,7 @@ public class FlipImage implements ImageOperation, java.io.Serializable {
         this.direction = direction;
     }
 
-    FlipImage(String direction, boolean rotation) {
+    FlipImage(String direction, boolean opposite) {
         this.direction = direction;
         this.opposite = opposite;
     }

@@ -131,6 +131,7 @@ public abstract class UserInput extends ImageAction {
                 // Check the return value from the dialog box.
                 if (option != JOptionPane.OK_OPTION) {
                     target.getImage().previewApply((ImageOperation)mutateImage(zeroVal));
+                    Andie.getImagePanel().getSelection().reset();
                     target.repaint();
                     target.getParent().revalidate();
                     return;
@@ -164,6 +165,7 @@ public abstract class UserInput extends ImageAction {
                 if (option != JOptionPane.OK_OPTION) {
                     sizeIncrease = val;
                     target.getImage().previewApply((ImageOperation)mutateImage(zeroVal));
+                    Andie.getImagePanel().getSelection().reset();
                     return;
                 } else {
                     sizeIncrease = percentageModel.getNumber().intValue();

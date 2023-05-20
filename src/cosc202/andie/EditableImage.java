@@ -2,10 +2,12 @@ package cosc202.andie;
 
 import java.util.*;
 import java.io.*;
+import java.lang.annotation.Target;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -14,6 +16,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.*;
 import javax.imageio.*;
 
+import cosc202.andie.draw.DrawBrush;
 import cosc202.andie.draw.DrawPanel;
 
 
@@ -63,6 +66,10 @@ public class EditableImage {
     private boolean unsavedChanges;
     /** The file extension of the most recently opened image. */
     private String extension;
+    /** The scale that the image has been resized by */
+    private double resizedScale = 1.0;
+    private int rotation;
+    private double resizeTesting = 1.0;
     /** The allowed extensions for files that ANDIE can open. */
     private static final String[] allowedExtensions = ImageIO.getWriterFileSuffixes();
     /** The extension used for ANDIE's operation files */
@@ -99,6 +106,25 @@ public class EditableImage {
      */
     public Dimension getDimensions() {
         return new Dimension(current.getWidth(), current.getHeight());
+    }
+    
+    /**
+     * <p>
+     *  Returns the current image dimensions.
+     * </p>
+     * 
+     * @author Corban Surtees
+     */
+    public Dimension getOriginalDimensions() {
+        return new Dimension(original.getWidth(), original.getHeight());
+    }
+
+    public double getResizeScale() {
+        return this.resizedScale;
+    }
+
+    public double getResizeScaleTesting() {
+        return this.resizeTesting;
     }
 
     /**
@@ -483,6 +509,7 @@ public class EditableImage {
                 unsavedChanges = true;
             }
             refresh();
+            Andie.getImagePanel().getSelection().reset(); // Not in refresh because may we want to keep the selection through previewApply
         }catch(NullPointerException ex){ // If there is a NullPointerException, then we have a null image
             UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
         }catch(java.awt.image.RasterFormatException ex){ // The image's data is in an incorrect format.
@@ -511,22 +538,11 @@ public class EditableImage {
             if(result != null){ //Only count this as a valid operation if it returns non-null value.
                 current = result;
             }
-            if (op instanceof RotateImage) {
-                try {
-                    RotateImage r = (RotateImage) op;
-                    refresh(r.getRotation(), null); // add rotation to total
-                } catch(Exception e) {
-                    System.out.println(e);
-                }
+            
+            // If op is an instance of a filter using convolution, refresh filters differently
+            if (op instanceof EmbossFilter || op instanceof GaussianBlurFilter || op instanceof SobelFilter || op instanceof MeanFilter || op instanceof DrawBrush) {
+                refresh(0, op);
             }
-                // If op is an instance of a filter using convolution, refresh filters differently
-                if (op instanceof EmbossFilter || op instanceof GaussianBlurFilter || op instanceof SobelFilter || op instanceof MeanFilter) {
-                    try {
-                        refresh(0, op);
-                    } catch(Exception e) {
-                        System.out.println(e);
-                    }
-                }
             
 
 
@@ -839,33 +855,55 @@ public class EditableImage {
     
     private void refresh(int additionalRotation, ImageOperation convolveOp){
         try {
+            this.rotation = 0;
+            this.resizedScale = 1.0;
+            this.resizeTesting = 1.0;
+            double resizeByAtEnd = 1.0;
             BufferedImage result = deepCopy(original);
             int totalRotation = additionalRotation;
             for (ImageOperation op : ops) {
                 // apply all operation that are not rotations or flips
-                if (op instanceof RotateImage == false && op instanceof FlipImage == false) {
-                    result = op.apply(result); 
-                }
-                else {
-                    // add all rotations together
+                if (op instanceof ResizeImage) {
+                    ResizeImage r = (ResizeImage) op;
+                    resizeByAtEnd *= r.getResizeScale();
+                    this.resizeTesting *= r.getResizeScale();
+                } 
+                else if (op instanceof FlipImage) {
+
+                    int d = 90*(Math.round((this.rotation%360+45)/90));
+                    d = this.rotation + d;
+
+
+                    RotateImage manscape = new RotateImage(-d);
+                    result = manscape.apply(result);
+
+                    result = op.apply(result);
+
+                    manscape = new RotateImage(d);
+                    result = manscape.apply(result);
+                } else {
+                    result = op.apply(result);
                     if (op instanceof RotateImage) {
-                        try {
-                            RotateImage r = (RotateImage) op;
-                            totalRotation = totalRotation%360;
-                            totalRotation += r.getRotation(); // add rotation to total
-                        } catch(Exception e) {
-                            System.out.println(e);
-                        }
-                    } else {
-                        // flip an image and rotate if required
-                        try {
-                            FlipImage f = (FlipImage) op;
-                            FlipImage flip = new FlipImage(f.getDirection(), true);
-                            totalRotation += ((90-totalRotation%360))*2;
-                            result = flip.apply(result);
-                        } catch(Exception e) {
-                            System.out.println(e);
-                        }
+                        RotateImage r = (RotateImage) op;
+                        this.rotation += r.getRotation();
+                        BufferedImage orig = deepCopy(original);
+                        RotateImage rorig = new RotateImage(this.rotation);
+                        orig = rorig.apply(orig);
+                        int width = orig.getWidth();
+                        int height = orig.getHeight();
+
+                        width *= this.resizedScale;
+                        height *= this.resizedScale;
+            
+                        int x1 = (result.getWidth() - width)/2;
+                        int y1 = (result.getHeight() - height)/2;
+            
+                        int x2 = x1 + width;
+                        int y2 = y1 + height;
+            
+                        CropImage crop = new CropImage(new Point(x1, y1),
+                                                        new Point(x2, y2));
+                        result = crop.apply(result);
                     }
                 }
             }
@@ -875,12 +913,34 @@ public class EditableImage {
             // apply total rotation
             RotateImage rotate = new RotateImage(totalRotation);
             result = rotate.apply(result);
+
+            RotateImage manscape = new RotateImage(-this.rotation);
+            result = manscape.apply(result);
+
+            BufferedImage orig = deepCopy(original);
+            int width = orig.getWidth();
+            int height = orig.getHeight();
+
+            int x1 = (result.getWidth() - width)/2;
+            int y1 = (result.getHeight() - height)/2;
+
+            int x2 = x1 + width;
+            int y2 = y1 + height;
+
+            CropImage crop = new CropImage(new Point(x1, y1),
+                                            new Point(x2, y2));
+            result = crop.apply(result);
+
+            manscape = new RotateImage(this.rotation);
+            result = manscape.apply(result);
+
+            ResizeImage resize = new ResizeImage((int) (resizeByAtEnd*100));
+            result = resize.apply(result);
     
             if (result != null) { //Only store the result on the 'current' data field if it returns successfully.
                 current = result;
             }
-    
-    
+            
         } catch (Exception ex) { //There could be no operations in the file, so using refresh would throw an error. Don't want to alert the user since this isn't a problem.
             return;
         }
