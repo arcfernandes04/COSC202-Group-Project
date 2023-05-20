@@ -2,6 +2,7 @@ package cosc202.andie;
 
 import java.util.*;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -100,7 +101,11 @@ public class ColourActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            target.getImage().apply(new ConvertToGrey());
+            if(target.getSelection().isEmpty()) target.getImage().apply(new ConvertToGrey());
+            else {
+                Point[] corners = target.getSelection().getCorners();
+                target.getImage().apply(new ConvertToGrey(corners[0], corners[1]));
+            }
             target.repaint();
             target.getParent().revalidate();
         }
@@ -181,7 +186,11 @@ public class ColourActions {
                         // set brightness and contrast spinner to slider values
                         brightnessSpinner.setValue((int)brightnessSlider.getValue());
                         contrastSpinner.setValue((int)contrastSlider.getValue());
-                        target.getImage().previewApply(new BrightnessContrastAdjustment((int)brightnessSlider.getValue(), (int)contrastSlider.getValue()));
+                        if(target.getSelection().isEmpty()) target.getImage().previewApply(new BrightnessContrastAdjustment((int)brightnessSlider.getValue(), (int)contrastSlider.getValue()));
+                        else {
+                            Point[] corners = target.getSelection().getCorners();
+                            target.getImage().previewApply(new BrightnessContrastAdjustment((int)brightnessSlider.getValue(), (int)contrastSlider.getValue(), corners[0], corners[1]));
+                        }
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -211,16 +220,21 @@ public class ColourActions {
             // Check return value from the dialog box
             if(option != JOptionPane.OK_OPTION) {
                 target.getImage().previewApply(new BrightnessContrastAdjustment(0, 0));
-                target.repaint();
-                target.getParent();
-                return;
+                Andie.getImagePanel().getSelection().reset();
+
             }else {
                 brightness = brightnessModel.getNumber().intValue();
                 contrast = contrastModel.getNumber().intValue();
+
+                // Create and apply filter
+                if(target.getSelection().isEmpty()) target.getImage().apply(new BrightnessContrastAdjustment(brightness, contrast));
+                else {
+                    Point[] corners = target.getSelection().getCorners();
+                    target.getImage().apply(new BrightnessContrastAdjustment(brightness, contrast, corners[0], corners[1]));
+                }
             }
 
-            // Create and apply filter
-            target.getImage().apply(new BrightnessContrastAdjustment(brightness, contrast));
+
             target.repaint();
             target.getParent().revalidate();
 

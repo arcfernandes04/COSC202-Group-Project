@@ -28,6 +28,12 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
      */
     private int brightness;
     private int contrast;
+
+    /**
+     * <p>
+     * The coordinates of the corners of the selected area. If there is no selected area, these will be equal to -1.
+     * </p>
+     */
     private int x1, x2, y1, y2 = -1;
     
     /**
@@ -41,6 +47,14 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
         this.contrast = contrast;
     }
 
+    /**
+     * Construct BrightnessContrastAdjustment with given values to be applied from p1 to p2.
+     * 
+     * @param brightness The percentage of brightness change (0 - 100 inclusive)
+     * @param contrast The percentage of contrast change (0 - 100 inclusive)
+     * @param p1 The point at the top corner of the selection
+     * @param p2 The point at the bottom corner of the selection
+     */
     public BrightnessContrastAdjustment(int brightness, int contrast, Point p1, Point p2) {
         this.brightness = brightness;
         this.contrast = contrast;
@@ -88,21 +102,14 @@ public class BrightnessContrastAdjustment implements ImageOperation, java.io.Ser
                     int r = (argb & 0x00FF0000) >> 16;
                     int g = (argb & 0x0000FF00) >> 8;
                     int b = (argb & 0x000000FF);
-                    if (x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1) {
+                    if (x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1) { // i.e. there is a selected area
                         if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
                             r = (calculateAdjustment(r));
                             g = (calculateAdjustment(g));
                             b = (calculateAdjustment(b));
                         }
-                        else {
-                            this.brightness = 0-(this.brightness);
-                            r = (calculateAdjustment(r));
-                            g = (calculateAdjustment(g));
-                            b = (calculateAdjustment(b));
-                            this.brightness = 0-(this.brightness);
-                        }
                     }
-                    else {
+                    else { // i.e. there is no selected area
                         r = (calculateAdjustment(r));
                         g = (calculateAdjustment(g));
                         b = (calculateAdjustment(b));

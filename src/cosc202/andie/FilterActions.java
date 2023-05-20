@@ -3,6 +3,7 @@ package cosc202.andie;
 import java.util.*;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -93,7 +94,11 @@ public class FilterActions {
 
         @Override
         Object mutateImage(int input) {
-            return new MeanFilter(input);
+            if(target.getSelection().isEmpty()) return new MeanFilter(input);
+            else {
+                Point[] corners = target.getSelection().getCorners();
+                return new MeanFilter(input, corners[0], corners[1]);
+            }
         }
 
         
@@ -136,7 +141,11 @@ public class FilterActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
-            target.getImage().apply(new SharpenFilter());
+            if(target.getSelection().isEmpty()) target.getImage().apply(new SharpenFilter());
+            else{
+                Point[] corners = target.getSelection().getCorners();
+                target.getImage().apply(new SharpenFilter(corners[0], corners[1]));
+            }
             target.repaint();
             target.getParent().revalidate();
         }
@@ -168,7 +177,11 @@ public class FilterActions {
 
         @Override
         Object mutateImage(int input) {
-            return new GaussianBlurFilter(input);
+            if(target.getSelection().isEmpty()) return new GaussianBlurFilter(input);
+            else {
+                Point[] corners = target.getSelection().getCorners();
+                return new GaussianBlurFilter(input, corners[0], corners[1]);
+            } 
         }
     }
 
@@ -197,7 +210,7 @@ public class FilterActions {
 
         /**
          * <p>
-         * Callback for when the convert-to-grey action is triggered.
+         * Callback for when the median filter action is triggered.
          * </p>
          * 
          * <p>
@@ -224,6 +237,7 @@ public class FilterActions {
 
             // Check the return value from the dialog box.
             if (option != JOptionPane.OK_OPTION) {
+                Andie.getImagePanel().getSelection().reset();
                 return;
             } else {
                 radius = radiusModel.getNumber().intValue();
@@ -245,6 +259,7 @@ public class FilterActions {
      * @see EmbossFilter
      */
     public class EmbossFilterAction extends ImageAction{
+        private int choice;
 
         /**
          * <p>
@@ -308,16 +323,21 @@ public class FilterActions {
                     String embossChoice = (String) cb.getSelectedItem();
 
                     try{
-                        if(embossChoice.equals(embossOptions[0])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.NONE));
-                        else if(embossChoice.equals(embossOptions[1])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.EAST));
-                        else if(embossChoice.equals(embossOptions[2])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.NORTH_EAST));
-                        else if(embossChoice.equals(embossOptions[3])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.NORTH));
-                        else if(embossChoice.equals(embossOptions[4])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.NORTH_WEST));
-                        else if(embossChoice.equals(embossOptions[5])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.WEST));
-                        else if(embossChoice.equals(embossOptions[6])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.SOUTH_WEST));
-                        else if(embossChoice.equals(embossOptions[7])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.SOUTH));
-                        else if(embossChoice.equals(embossOptions[8])) target.getImage().previewApply(new EmbossFilter(EmbossFilter.SOUTH_EAST));
+                        if(embossChoice.equals(embossOptions[0])) choice = EmbossFilter.NONE;
+                        else if(embossChoice.equals(embossOptions[1])) choice = EmbossFilter.EAST;
+                        else if(embossChoice.equals(embossOptions[2])) choice = EmbossFilter.NORTH_EAST;
+                        else if(embossChoice.equals(embossOptions[3])) choice = EmbossFilter.NORTH;
+                        else if(embossChoice.equals(embossOptions[4])) choice = EmbossFilter.NORTH_WEST;
+                        else if(embossChoice.equals(embossOptions[5])) choice = EmbossFilter.WEST;
+                        else if(embossChoice.equals(embossOptions[6])) choice = EmbossFilter.SOUTH_WEST;
+                        else if(embossChoice.equals(embossOptions[7])) choice = EmbossFilter.SOUTH;
+                        else if(embossChoice.equals(embossOptions[8])) choice = EmbossFilter.SOUTH_EAST;
 
+                        if(target.getSelection().isEmpty()) target.getImage().previewApply(new EmbossFilter(choice));
+                        else{
+                            Point[] corners = target.getSelection().getCorners();
+                            target.getImage().previewApply(new EmbossFilter(choice, corners[0], corners[1]));
+                        }
                     }catch(Exception ex){
                         ex.printStackTrace();
                     }
@@ -334,20 +354,20 @@ public class FilterActions {
             // Check return value from the dialog box
             if(option != JOptionPane.OK_OPTION){
                 target.getImage().previewApply(new EmbossFilter(EmbossFilter.NONE));
+                Andie.getImagePanel().getSelection().reset();
+
             }else{
                 // Determining which direction to emboss
                 String embossChoice = (String) cbEmboss.getSelectedItem();
 
                 if(embossChoice.equals(embossOptions[0])) return;
-                else if(embossChoice.equals(embossOptions[1])) target.getImage().apply(new EmbossFilter(EmbossFilter.EAST));
-                else if(embossChoice.equals(embossOptions[2])) target.getImage().apply(new EmbossFilter(EmbossFilter.NORTH_EAST));
-                else if(embossChoice.equals(embossOptions[3])) target.getImage().apply(new EmbossFilter(EmbossFilter.NORTH));
-                else if(embossChoice.equals(embossOptions[4])) target.getImage().apply(new EmbossFilter(EmbossFilter.NORTH_WEST));
-                else if(embossChoice.equals(embossOptions[5])) target.getImage().apply(new EmbossFilter(EmbossFilter.WEST));
-                else if(embossChoice.equals(embossOptions[6])) target.getImage().apply(new EmbossFilter(EmbossFilter.SOUTH_WEST));
-                else if(embossChoice.equals(embossOptions[7])) target.getImage().apply(new EmbossFilter(EmbossFilter.SOUTH));
-                else if(embossChoice.equals(embossOptions[8])) target.getImage().apply(new EmbossFilter(EmbossFilter.SOUTH_EAST));
-
+                else{
+                    if(target.getSelection().isEmpty()) target.getImage().apply(new EmbossFilter(choice));
+                    else{
+                        Point[] corners = target.getSelection().getCorners();
+                        target.getImage().apply(new EmbossFilter(choice, corners[0], corners[1]));
+                    }
+                }
             }
             
             target.repaint();
@@ -363,6 +383,8 @@ public class FilterActions {
      * @see SobelFilter
      */
     public class SobelFilterAction extends ImageAction {
+        int choice;
+        
          /**
          * <p>
          * Creates a new Sobel filter action.
@@ -419,9 +441,15 @@ public class FilterActions {
                     String sobelChoice = (String) cb.getSelectedItem();
 
                     try{
-                        if(sobelChoice.equals(sobelOptions[0])) target.getImage().previewApply(new SobelFilter(SobelFilter.NONE));
-                        else if(sobelChoice.equals(sobelOptions[1])) target.getImage().previewApply(new SobelFilter(SobelFilter.HORIZONTAL));
-                        else if(sobelChoice.equals(sobelOptions[2])) target.getImage().previewApply(new SobelFilter(SobelFilter.VERTICAL));
+                        if(sobelChoice.equals(sobelOptions[0])) choice = SobelFilter.NONE;
+                        else if(sobelChoice.equals(sobelOptions[1])) choice = SobelFilter.HORIZONTAL;
+                        else if(sobelChoice.equals(sobelOptions[2])) choice = SobelFilter.VERTICAL;
+
+                        if(target.getSelection().isEmpty()) target.getImage().previewApply(new SobelFilter(choice));
+                        else{
+                            Point[] corners = target.getSelection().getCorners();
+                            target.getImage().previewApply(new SobelFilter(choice, corners[0], corners[1]));
+                        }
                     }catch(Exception ex){
                         ex.printStackTrace();
                     }
@@ -437,14 +465,20 @@ public class FilterActions {
 
             // Check return value from the dialog box
             if(option != JOptionPane.OK_OPTION){
-                target.getImage().previewApply(new EmbossFilter(SobelFilter.NONE));
+                target.getImage().previewApply(new SobelFilter(SobelFilter.NONE));
+                Andie.getImagePanel().getSelection().reset();
             }else{
                 // Determining which direction to emboss
                 String sobelChoice = (String) cbSobel.getSelectedItem();
 
                 if(sobelChoice.equals(sobelOptions[0])) return;
-                else if(sobelChoice.equals(sobelOptions[1])) target.getImage().apply(new SobelFilter(SobelFilter.HORIZONTAL));
-                else if(sobelChoice.equals(sobelOptions[2])) target.getImage().apply(new SobelFilter(SobelFilter.VERTICAL));
+                else{
+                    if(target.getSelection().isEmpty()) target.getImage().apply(new SobelFilter(choice));
+                    else{
+                        Point[] corners = target.getSelection().getCorners();
+                        target.getImage().apply(new SobelFilter(choice, corners[0], corners[1]));
+                    }
+                }  
             }
             
             target.repaint();
