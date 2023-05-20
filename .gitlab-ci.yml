@@ -21,12 +21,13 @@ build-javadoc:      # create javadocs
  artifacts:
   paths:
   - docs
+ only:
+ - main
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
   script:
     - echo "Attempting to run unit tests..."
-    #- find src/cosc202/andie/ -type f -name "*.java" | xargs javac -d bin -classpath bin:lib/*
     - javac -d bin -classpath bin:lib/* src/test/cosc202/andie/*.java
     - java -jar lib/junit-platform-console-standalone-1.9.3.jar -cp bin --select-package test.cosc202.andie
 
@@ -53,6 +54,8 @@ create-jar:     # Create the JAR file
   artifacts:
     paths:
       - ANDIE.jar
+  only:
+  - main
 
 pages: # publish website
  stage: deploy
