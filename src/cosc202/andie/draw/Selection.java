@@ -187,7 +187,7 @@ public class Selection {
         if (DrawPanel.getTool().equals(DrawPanel.BRUSH)) return new DrawBrush(DrawPanel.getStrokeSize(), points, DrawPanel.getPrimary());
 
         //Lines are a special case of "shape"; their corners need to be p1 and p2, not the top-left and bottom-right corners.
-        if (DrawPanel.getShapeType().equals(DrawPanel.LINE)) corners = new Point[] {p1, p2};
+        if (DrawPanel.getShapeType().equals(DrawPanel.LINE)) return new DrawShape(DrawPanel.getShapeType(), DrawPanel.getFillType(), DrawPanel.getStrokeSize(), p1, p2, DrawPanel.getPrimary(), DrawPanel.getSecondary());
         
         if(isPreview) return new DrawShape(DrawPanel.getShapeType(), DrawPanel.getFillType(), DrawPanel.getStrokeSize(), topLeftCorner, bottomRightCorner, DrawPanel.getPrimary(), DrawPanel.getSecondary());
         return new DrawShape(DrawPanel.getShapeType(), DrawPanel.getFillType(), DrawPanel.getStrokeSize(), corners[0], corners[1], DrawPanel.getPrimary(), DrawPanel.getSecondary());
