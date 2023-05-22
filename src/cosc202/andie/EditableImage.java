@@ -868,18 +868,8 @@ public class EditableImage {
                     this.resizeTesting *= r.getResizeScale();
                 } 
                 else if (op instanceof FlipImage) {
-
-                    int d = 90*(Math.round((this.rotation%360+45)/90));
-                    d = this.rotation + d;
-
-
-                    RotateImage manscape = new RotateImage(-d);
-                    result = manscape.apply(result);
-
                     result = op.apply(result);
-
-                    manscape = new RotateImage(d);
-                    result = manscape.apply(result);
+                    this.rotation += ((90-this.rotation%360))*2;
                 } else {
                     result = op.apply(result);
                     if (op instanceof RotateImage) {
