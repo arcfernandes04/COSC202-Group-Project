@@ -45,7 +45,7 @@ public class FilterActions {
         actions.add(new MeanFilterAction(Language.getWord("Mean"), null, Language.getWord("Mean_desc"), Integer.valueOf(KeyEvent.VK_M), true, 1, 10, 1, 0));
         actions.add(new SharpenFilterAction(Language.getWord("Sharpen"), null, Language.getWord("Sharpen_desc"), Integer.valueOf(KeyEvent.VK_N)));
         actions.add(new GaussianBlurFilterAction(Language.getWord("Gaussian"), null, Language.getWord("Gaussian_desc"), Integer.valueOf(KeyEvent.VK_I), true, 1, 10, 1, 0));
-        actions.add(new MedianFilterAction(Language.getWord("Median"), null, Language.getWord("Median_desc"), Integer.valueOf(KeyEvent.VK_L)));
+        actions.add(new MedianFilterAction(Language.getWord("Median"), null, Language.getWord("Median_desc"), Integer.valueOf(KeyEvent.VK_L), true, 1, 5, 1, 0));
         actions.add(new EmbossFilterAction(Language.getWord("Emboss"), null, Language.getWord("Emboss_desc"), Integer.valueOf(KeyEvent.VK_O)));
         actions.add(new SobelFilterAction(Language.getWord("Sobel"), null, Language.getWord("Sobel_desc"), Integer.valueOf(KeyEvent.VK_S)));
     }
@@ -191,11 +191,11 @@ public class FilterActions {
      * 
      * @see MedianFilter
      */
-    public class MedianFilterAction extends ImageAction {
-        
+    public class MedianFilterAction extends UserInput {
+
         /**
          * <p>
-         * Create a new median-filter action.
+         * Create a new mean-filter action.
          * </p>
          * 
          * @param name The name of the action (ignored if null).
@@ -203,49 +203,26 @@ public class FilterActions {
          * @param desc A brief description of the action  (ignored if null).
          * @param mnemonic A mnemonic key to use as a shortcut  (ignored if null).
          */
-        MedianFilterAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
-            super(name , icon, desc, mnemonic);
+        MedianFilterAction(String name, ImageIcon icon, String desc, Integer mnemonic, boolean slider, int min, int max, int val, int zeroVal) {
+            super(name, icon, desc, mnemonic, slider, min, max, val, zeroVal);
         }
 
         /**
          * <p>
-         * Callback for when the median filter action is triggered.
+         * Callback for when the median filter action is triggered, after having received
+         * input from the user ({@code UserInput}).
          * </p>
-         * 
-         * <p>
-         * This method is called whenever the MedianFilterAction is triggered.
-         * It prompts the user for a filter radius, then applies an appropriately sized {@link MedianFilter}.
-         * </p>
-         * 
-         * @param e The event triggering this callback.
+         *
+         * @param input The image to mutate.
          */
-        public void actionPerformed(ActionEvent e) {
-
-            if (target.getImage().hasImage() == false) {
-                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
-                return;
+        @Override
+        Object mutateImage(int input) {
+            if (target.getSelection().isEmpty())
+                return new MedianFilter(input);
+            else {
+                Point[] corners = target.getSelection().getCorners();
+                return new MedianFilter(input, corners[0], corners[1]);
             }
-
-            // Determine the radius - ask the user.
-            int radius = 1;
-
-            // Pop-up dialog box to ask for the radius value.
-            SpinnerNumberModel radiusModel = new SpinnerNumberModel(1, 1, 10, 1);
-            JSpinner radiusSpinner = new JSpinner(radiusModel);
-            int option = JOptionPane.showOptionDialog(Andie.getFrame(), radiusSpinner, Language.getWord("EnterValue"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, Andie.getIcon(), null, null);
-
-            // Check the return value from the dialog box.
-            if (option != JOptionPane.OK_OPTION) {
-                Andie.getImagePanel().getSelection().reset();
-                return;
-            } else {
-                radius = radiusModel.getNumber().intValue();
-            }
-
-            //Create and apply the filter
-            target.getImage().apply(new MedianFilter(radius));
-            target.repaint();
-            target.getParent().revalidate();
         }
     
     }
