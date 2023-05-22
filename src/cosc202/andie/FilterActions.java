@@ -2,7 +2,6 @@ package cosc202.andie;
 
 import java.util.*;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.*;
 import javax.swing.*;

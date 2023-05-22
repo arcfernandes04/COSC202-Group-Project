@@ -2,7 +2,6 @@ package cosc202.andie;
 
 import java.util.*;
 import java.io.*;
-import java.lang.annotation.Target;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
