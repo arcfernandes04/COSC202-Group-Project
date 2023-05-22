@@ -96,20 +96,22 @@ public class Selection {
      * found on the current image.
      * </p>
      * 
-     * @param x The x oordinate to validate
-     * @param y The y oordinate to validate
+     * @param x The x coordinate to validate
+     * @param y The y coordinate to validate
      * @return A valid point on the image of the inputted values
      */
     private Point validPoint(int x, int y, double scale){
-        x = (int) (x / scale);
-        y = (int) (y / scale);
+        int xOffset = (int) target.getCenteredImageLocation().getWidth();
+        int yOffset = (int) target.getCenteredImageLocation().getHeight();
+        x = (int) ((x/scale - xOffset));
+        y = (int) ((y/scale - yOffset));
         if(scale < 1) scale = 1 / scale; //Need to find inverse of 'scale' if it's less than one.
         Dimension size = target.getImage().getDimensions();
         if (x < 0) x = 0;
         else if (x >= size.width*scale) x = (int) (size.width*scale - 1);
         if (y < 0) y = 0;
         else if (y >= size.height*scale) y = (int) (size.height*scale - 1);
-        // return new Point((int) (x/(target.getImage().getResizeScale()*1)), (int) (y/(target.getImage().getResizeScale()*1)));
+
         return new Point((int) (x/(target.getImage().getResizeScaleTesting()*1)), (int) (y/(target.getImage().getResizeScaleTesting()*1)));
     }
 

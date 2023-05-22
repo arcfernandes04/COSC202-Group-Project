@@ -136,6 +136,20 @@ public class ImagePanel extends JPanel {
         scale = zoomPercent / 100;
     }
 
+    /**
+     * <p>
+     * Get the location of the top left corner of an image to be centered
+     * </p>
+     * 
+     * <p>
+     * Returns the location of where the top left corner of an image should be for it to be centered
+     * on the image panel.
+     * </p>
+     */
+    public Dimension getCenteredImageLocation() {
+        return new Dimension((int) ((this.getWidth()/(2*scale))-(image.getDimensions().getWidth()/2)),
+                            (int) ((this.getHeight()/(2*scale))-(image.getDimensions().getHeight()/2)));
+    }
 
     /**
      * <p>
@@ -150,8 +164,7 @@ public class ImagePanel extends JPanel {
      */
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(600, 600);
-    }
+        return new Dimension(0, 0);    }
 
     /**
      * <p>
@@ -166,7 +179,8 @@ public class ImagePanel extends JPanel {
         if (image.hasImage()) {
             Graphics2D g2  = (Graphics2D) g.create();
             g2.scale(scale, scale);
-            g2.drawImage(image.getCurrentImage(), null, 0, 0);
+            g2.drawImage(image.getCurrentImage(), null, (int) (this.getCenteredImageLocation().getWidth()),
+                                                        (int) (this.getCenteredImageLocation().getHeight()));
             g2.dispose();
         }
         repaint();
