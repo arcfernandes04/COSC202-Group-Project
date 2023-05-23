@@ -30,21 +30,21 @@ public class TransformActions {
     public TransformActions() {
         actions = new ArrayList<Action>();
         actions.add(new FlipImageAction(Language.getWord("FlipHorizontal"), null, Language.getWord("FlipHorizontal_desc"),
-                Integer.valueOf(KeyEvent.VK_F1), "horizontal"));
+                Integer.valueOf(KeyEvent.VK_H), "horizontal"));
         actions.add(new FlipImageAction(Language.getWord("FlipVertical"), null, Language.getWord("FlipVertical_desc"),
-                Integer.valueOf(KeyEvent.VK_F2), "vertical"));
+                Integer.valueOf(KeyEvent.VK_V), "vertical"));
         actions.add(new RotateImageAction(Language.getWord("Rotate180"), null, Language.getWord("Rotate180_desc"),
-                Integer.valueOf(KeyEvent.VK_F5), 180));
+        null, 180));
         actions.add(new RotateImageAction(Language.getWord("Rotate90Right"), null, Language.getWord("Rotate90Right_desc"),
-                Integer.valueOf(KeyEvent.VK_F5), 90));
+        null, 90));
         actions.add(new RotateImageAction(Language.getWord("Rotate90Left"), null, Language.getWord("Rotate90Left_desc"),
-                Integer.valueOf(KeyEvent.VK_F5), 270));
+                null, 270));
         actions.add(new RotateImageActionInput(Language.getWord("CustomRotation"), null, Language.getWord("Rotate_desc"),
-                Integer.valueOf(KeyEvent.VK_F5), true,-180, 180, 0, 0));
+                Integer.valueOf(KeyEvent.VK_T), true,-180, 180, 0, 0));
         actions.add(new ResizeImageAction(Language.getWord("Resize"), null, Language.getWord("Resize_desc"),
-                Integer.valueOf(KeyEvent.VK_F3), true, 50, 200, 100, 100));
+                Integer.valueOf(KeyEvent.VK_T), true, 50, 200, 100, 100));
         actions.add(new CropImageAction(Language.getWord("Crop"), null, Language.getWord(Language.getWord("Crop_desc")),
-                Integer.valueOf(KeyEvent.VK_F4)));
+                Integer.valueOf(KeyEvent.VK_C)));
     }
 
     /**
@@ -57,11 +57,21 @@ public class TransformActions {
     public JMenu createMenu() {
         JMenu transformMenu = new JMenu(Language.getWord("Transform"));
         JMenu rotateMenu = new JMenu(Language.getWord("Rotate"));
+        
 
         for (Action action : actions) {
-            if (action instanceof RotateImageAction || action instanceof RotateImageActionInput) {
-                rotateMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK));
-            } else {
+            if(action instanceof FlipImageAction){
+                transformMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK+InputEvent.ALT_DOWN_MASK));
+            } else if (action instanceof RotateImageAction || action instanceof RotateImageActionInput) {
+                if(action.getValue("MnemonicKey") == null){
+                    rotateMenu.add(new JMenuItem(action));
+                }else{
+                    rotateMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK+InputEvent.ALT_DOWN_MASK));
+
+                }
+            } else if(action instanceof CropImageAction) {
+                transformMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK+InputEvent.ALT_DOWN_MASK));
+            }else {
                 transformMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK));
             }
         }

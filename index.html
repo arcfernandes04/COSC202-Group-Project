@@ -4,16 +4,73 @@
 <head>
     <meta charset='utf-8'>
     <title>ANDIE (Big Fish) Release Page</title>
+    <link rel="icon" type="image\png" href="src\resources\icons\logo\theme_light_rounded.png">
+
+    <Style>
+        body{
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            margin: 0px;
+        }
+
+        header {
+            background-color: #ececec;
+            min-height: 70px;
+            width: 100%;
+            overflow: auto;
+        }
+
+        #logo {
+            height: 50px;
+            padding: 10px 17px 10px 15px;
+            float: left;
+        }
+
+        header h1 {
+            display: inline;
+            float: left;
+            line-height: 25px;
+            font-size: 25px;
+            text-align: center;
+            padding: 22px 0 23px 0;
+            margin: 0;
+        }
+
+        #info{
+            margin: 25px;
+        }
+
+    </Style>
 </head>
 
 <body>
-    <h1>ANDIE (Big Fish) Release Page</h1>
-    <p>Run the ANDIE code with an invocation
-        such as <kbd>java -jar ANDIE.jar</kbd>.</p>
-    <ul>
-        <li><a href="ANDIE.jar">Download JAR release</a></li>
-        <li><a href="docs/">Online Javadoc</a></li>
-    </ul>
+    <header>
+        <img onclick="changeTheme()" alt="" id="logo" src="src/resources/icons/logo/theme_light_rounded.png" title="Click me">
+        <h1>ANDIE (Big Fish) Release Page</h1>
+    </header>
+
+    <div id="info">
+        <p>Run the ANDIE code with an invocation
+            such as <kbd>java -jar ANDIE.jar</kbd>.</p>
+        <ul>
+            <li><a href="ANDIE.jar" target="_blank">Download JAR release</a></li>
+            <li><a href="docs/" target="_blank">Online Javadoc</a></li>
+        </ul>
+    </div>
+
+
+
+    <script>
+        const paths = ["theme_light_rounded", "theme_light_basic", "theme_light_orange", "theme_light_cyan", "theme_dark_rounded", "theme_light_basic", "theme_dark_purple", "theme_dark_contrast"];
+        var i = 1;
+
+        function changeTheme(){
+            var img = document.getElementById("logo");
+            if(i == paths.length) {i = 0;}
+
+            img.src = "src/resources/icons/logo/" + paths[i] + ".png";
+            i++;
+        }
+    </script>
 </body>
 
 </html>
