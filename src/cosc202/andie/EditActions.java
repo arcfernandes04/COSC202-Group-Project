@@ -35,11 +35,11 @@ public class EditActions {
     public EditActions() {
         actions = new ArrayList<Action>();
         actions.add(new UndoAction(Language.getWord("Undo"), null, Language.getWord("Undo_desc"), Integer.valueOf(KeyEvent.VK_Z)));
-        actions.add(new UndoAllAction(Language.getWord("Undo_all"), null, Language.getWord("Undo_all_desc"), Integer.valueOf(KeyEvent.VK_U)));
+        actions.add(new UndoAllAction(Language.getWord("Undo_all"), null, Language.getWord("Undo_all_desc"), Integer.valueOf(KeyEvent.VK_Z)));
         actions.add(new RedoAction(Language.getWord("Redo"), null, Language.getWord("Redo_desc"), Integer.valueOf(KeyEvent.VK_Y)));
-        actions.add(new RedoAllAction(Language.getWord("Redo_all"), null, Language.getWord("Redo_all_desc"), Integer.valueOf(KeyEvent.VK_R)));
-        actions.add(new PasteAction(Language.getWord("Paste"), null, Language.getWord("Paste_desc"), Integer.valueOf(KeyEvent.VK_V)));
+        actions.add(new RedoAllAction(Language.getWord("Redo_all"), null, Language.getWord("Redo_all_desc"), Integer.valueOf(KeyEvent.VK_Y)));
         actions.add(new CopyAction(Language.getWord("Copy"), null, Language.getWord("Copy_desc"), Integer.valueOf(KeyEvent.VK_C)));
+        actions.add(new PasteAction(Language.getWord("Paste"), null, Language.getWord("Paste_desc"), Integer.valueOf(KeyEvent.VK_V)));
     }
 
     /**
@@ -53,7 +53,11 @@ public class EditActions {
         JMenu editMenu = new JMenu(Language.getWord("Edit"));
 
         for (Action action: actions) {
-            editMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK));
+            if(action instanceof UndoAllAction || action instanceof RedoAllAction){
+                editMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK+InputEvent.SHIFT_DOWN_MASK));
+            }else{
+                editMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK));
+            }
         }
         
         return editMenu;
@@ -309,6 +313,11 @@ public class EditActions {
          * @param e The event triggering this callback.
          */
         public void actionPerformed(ActionEvent e) {
+            if (target.getImage().hasImage() == false) {
+                UserMessage.showWarning(UserMessage.NULL_FILE_WARN);
+                return;
+            }
+
             target.getImage().copyToClipboard();
         }
     }

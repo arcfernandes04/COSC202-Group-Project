@@ -33,7 +33,7 @@ import cosc202.andie.settings.ThemeActions;
  * 
  * @author Abby Fernandes
  */
-public abstract class MacroDialog extends JDialog{
+public abstract class MacroDialog{
     private static String[] opsFileNames;
     private static ArrayList<String> opsFilePaths;
 
@@ -349,7 +349,7 @@ public abstract class MacroDialog extends JDialog{
             getOpsList();
     
             // Set the correct closing operation
-            dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             dialog.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e){

@@ -59,7 +59,7 @@ public class ColourActions {
         JMenu fileMenu = new JMenu(Language.getWord("Colour"));
 
         for(Action action: actions) {
-            fileMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK));
+            fileMenu.add(new JMenuItem(action)).setAccelerator(KeyStroke.getKeyStroke((Integer) action.getValue("MnemonicKey"), InputEvent.CTRL_DOWN_MASK+InputEvent.ALT_DOWN_MASK));
         }
 
         return fileMenu;

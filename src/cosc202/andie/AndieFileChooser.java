@@ -47,6 +47,7 @@ public class AndieFileChooser extends JFileChooser{
      */
     private boolean forOps;
 
+    /** The directory in which to open the file chooser if it is operation file specific. */
     private static String macroDirectory = Preferences.getPreference("macroDirectory");
 
 
@@ -62,7 +63,11 @@ public class AndieFileChooser extends JFileChooser{
     }
 
     /**
-     * Creates a new file chooser that is for ops files rather than image files.
+     * <p>
+     * If {@code forOps} is true, then a new file chooser is created starting from the saved-macro directory within the ANDIE folder. Otherwise, a regular file chooser is constructed
+     * </p>
+     * 
+     * @param forOps Whether this the file chooser should approve ops files (as opposed to image files).
      */
     public AndieFileChooser(boolean forOps){
         super(lastDirectory);
@@ -227,11 +232,18 @@ public class AndieFileChooser extends JFileChooser{
 
     /**
      * <p>
-     * Adapted from {@code approveSelection} to be specific to ops files. 
-     * This version also does not update the {@code lastDirectory} field.
+     * This is a safer version of the JFileChooser approveSelection() that asks before overwriting files. 
+     * </p>
+     * 
+     * <p>
+     * Adapted from {@code approveSelection} to approve operation files (rather than image files).
+     * </p>
+     * 
+     * <p>
+     * This version also does not update the {@code lastDirectory} field, or deal with unsaved changes (it has no need to).
      * </p>
      */
-    public void approveOpsSelection(){
+    private void approveOpsSelection(){
         // Get the image and desired fileName
         String fileName;
 
