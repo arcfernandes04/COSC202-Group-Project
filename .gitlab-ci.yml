@@ -62,6 +62,7 @@ pages: # publish website
  script:
     - mkdir public
     - cp -r docs public/
+    - cp -r src/resources/icons/logo public/
     - cp ANDIE.jar public/
     - cp index.html public/
     - ls -R public | head
