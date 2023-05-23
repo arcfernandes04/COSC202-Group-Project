@@ -3,12 +3,10 @@ package cosc202.andie.draw;
 import cosc202.andie.*;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 /**
  * <p>
@@ -25,8 +23,6 @@ public class DrawPanel extends JPanel {
 
     /** The default colour of items inside of this DrawPanel such that they blend in with the rest of the GUI */
     private static final Color TRANSPARENT = new Color(0, 0, 0, 0);
-    /** The colour to set GUI elements after being hovered over. */
-    private static final Color HOVER = new Color(0, 0, 0, 25);
     /** Whether or not the current image has an alpha channel or not. */
     private static boolean isTransparencyEnabled = true;
 
@@ -292,13 +288,16 @@ public class DrawPanel extends JPanel {
 
         /** The size of the square colour preview buttons. */
         private static final Dimension COLOUR_LABEL_DIMENSION = new Dimension(25, 25);
-
+        /** The JMenuBar holding primary colour information. */
+        private JMenuBar primaryBar;
+        /** The JMenuBar holding secondary colour information. */
+        private JMenuBar secondaryBar;
         /** The button with text to indicate that this for selecting the primary colour. */
-        private JButton primaryButton;
+        private JMenu primaryButton;
         /** The button which shows a preview of the current primary colour. */
         private JButton primaryPreview;
         /** The button with text to indicate that this for selecting the secondary colour. */
-        private JButton secondaryButton;
+        private JMenu secondaryButton;
         /** The button which shows a preview of the current secondary colour. */
         private JButton secondaryPreview;
 
@@ -309,55 +308,83 @@ public class DrawPanel extends JPanel {
          */
         public ColourPanel(){
             this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            //Initialise buttons
-            primaryButton = new JButton(Language.getWord("Colour_primary"));
+
+            primaryBar = new JMenuBar();
+            primaryBar.setBackground(TRANSPARENT);
+            primaryBar.setBorderPainted(false);
+            this.add(primaryBar);
+            primaryButton = new JMenu(Language.getWord("Colour_primary"));
             primaryPreview = new JButton();
-            secondaryButton = new JButton(Language.getWord("Colour_secondary"));
+
+            secondaryBar = new JMenuBar();
+            secondaryBar.setBackground(TRANSPARENT);
+            secondaryBar.setBorderPainted(false);
+            this.add(secondaryBar);
+            secondaryButton = new JMenu(Language.getWord("Colour_secondary"));
             secondaryPreview = new JButton();
 
-            //Make sure the text buttons have the same background color as the rest of the GUI, and do not have a border
-            primaryButton.setBorderPainted(false); primaryButton.setBackground(TRANSPARENT);
-            secondaryButton.setBorderPainted(false); secondaryButton.setBackground(TRANSPARENT);
+            primaryButton.addMenuListener(new MenuListener() {
+                public void menuSelected(MenuEvent e) { changePrimary(); }
+                public void menuDeselected(MenuEvent e) {}
+                public void menuCanceled(MenuEvent e) {}
+            });
 
-            ChangeListener hoverListener = new ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    JButton b = (JButton) e.getSource();
-                    if (b.getModel().isRollover()) b.setBackground(HOVER);
-                    else b.setBackground(TRANSPARENT);
-                }
-            };
-            primaryButton.addChangeListener(hoverListener); secondaryButton.addChangeListener(hoverListener);
+            secondaryButton.addMenuListener(new MenuListener() {
+                public void menuSelected(MenuEvent e) { changeSecondary(); }
+                public void menuDeselected(MenuEvent e) {}
+                public void menuCanceled(MenuEvent e) {}
+            });
 
-            //Add a listener for changing the primary colour
-            ActionListener primaryListener = new ActionListener() {
-                public void actionPerformed(ActionEvent e){
-                    primaryColour = UserMessage.showColourChooser(primaryColour, isTransparencyEnabled);
-                    primaryPreview.setBackground(primaryColour);
-                }
-            };
-            primaryButton.addActionListener(primaryListener); primaryPreview.addActionListener(primaryListener);
+            //Add a listeners to the preview buttons and set dimensions for preview buttons
+            primaryPreview.addActionListener((e) -> changePrimary());
+            secondaryPreview.addActionListener((e) -> changeSecondary());
+            setDimensions(primaryPreview, COLOUR_LABEL_DIMENSION);
+            setDimensions(secondaryPreview, COLOUR_LABEL_DIMENSION);
+            primaryPreview.setBackground(primaryColour);
+            primaryPreview.setBorderPainted(false);
+            secondaryPreview.setBackground(secondaryColour);
+            secondaryPreview.setBorderPainted(false);
 
-            //Listener for changing the secondary colour
-            ActionListener secondaryListener = new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    secondaryColour = UserMessage.showColourChooser(secondaryColour, isTransparencyEnabled);
-                    secondaryPreview.setBackground(secondaryColour);
-                }
-            };
-            secondaryButton.addActionListener(secondaryListener); secondaryPreview.addActionListener(secondaryListener);
-
-            //Set the dimensions, background colour, and border for the 'preview' buttons
-            primaryPreview.setMinimumSize(COLOUR_LABEL_DIMENSION); primaryPreview.setSize(COLOUR_LABEL_DIMENSION);
-            primaryPreview.setMaximumSize(COLOUR_LABEL_DIMENSION); primaryPreview.setPreferredSize(COLOUR_LABEL_DIMENSION);
-            primaryPreview.setBackground(primaryColour); primaryPreview.setBorderPainted(false);
-
-            secondaryPreview.setMinimumSize(COLOUR_LABEL_DIMENSION); secondaryPreview.setSize(COLOUR_LABEL_DIMENSION);
-            secondaryPreview.setMaximumSize(COLOUR_LABEL_DIMENSION); secondaryPreview.setPreferredSize(COLOUR_LABEL_DIMENSION);
-            secondaryPreview.setBackground(secondaryColour); secondaryPreview.setBorderPainted(false);
-
-            add(primaryPreview); add(primaryButton); add(secondaryPreview); add(secondaryButton);
+            primaryBar.add(primaryPreview); 
+            primaryBar.add(primaryButton); 
+            secondaryBar.add(secondaryPreview); 
+            secondaryBar.add(secondaryButton);
         }
 
+        /**
+         * <p>
+         * Set the dimensions of a component
+         * </p>
+         * 
+         * @param b The component to mutate
+         * @param d The dimensions to give this component
+         */
+        private void setDimensions(Component b, Dimension d){
+            b.setMinimumSize(d);
+            b.setSize(d);
+            b.setMaximumSize(d);
+            b.setPreferredSize(d);
+        }
+
+        /**
+         * Update the primary colour by calling the showColorChooser() method,
+         * then store this on the primaryPreview button.
+         */
+        private void changePrimary(){
+            primaryColour = UserMessage.showColourChooser(primaryColour, isTransparencyEnabled);
+            primaryPreview.setBackground(primaryColour);
+            primaryButton.setSelected(false);
+        }
+
+        /**
+         * Update the secondary colour by calling the showColorChooser() method,
+         * then store this on the secondaryPreview button.
+         */
+        private void changeSecondary(){
+            secondaryColour = UserMessage.showColourChooser(secondaryColour, isTransparencyEnabled);
+            secondaryPreview.setBackground(secondaryColour);
+            secondaryButton.setSelected(false);
+        }
     }
 
 }
