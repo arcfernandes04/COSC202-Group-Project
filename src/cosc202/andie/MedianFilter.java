@@ -184,10 +184,15 @@ public class MedianFilter implements ImageOperation, java.io.Serializable {
             int[] g = new int[size];
             int[] b = new int[size];
             int median = size/2;
+            int height = input.getHeight();
+            int width = input.getWidth();
             boolean hasAlpha = input.getColorModel().hasAlpha();
             //Go to every pixel in the selection
             for (int x = this.x1; x < this.x2; x++) {
                 for (int y = this.y1; y < this.y2; y++) {
+                    //Make sure the current pixel exists...
+                    if(x < 0 || x >= width) continue;
+                    if(y < 0 || y >= height) continue;
                     //Go to every pixel within the radius of the current pixel
                     int index = 0;
                     for (int i = x - radius; i <= x + radius; i++) {
@@ -195,9 +200,9 @@ public class MedianFilter implements ImageOperation, java.io.Serializable {
                             //Make sure this is a valid point (i.e. it is within the image bounds)
                             int validX = i, validY = j;
                             if(i < 0) validX = 0;
-                            else if(i >= input.getWidth()) validX = input.getWidth()-1;
+                            else if(i >= width) validX = width-1;
                             if(j < 0) validY = 0;
-                            else if(j >= input.getHeight()) validY = input.getHeight()-1;
+                            else if(j >= height) validY = height-1;
                             //Put this pixel into the arrays
                             int pixel = input.getRGB(validX, validY);
                             if(hasAlpha)  a[index] = (pixel & 0xFF000000) >> 24;
