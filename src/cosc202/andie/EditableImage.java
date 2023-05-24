@@ -17,6 +17,7 @@ import javax.imageio.*;
 
 import cosc202.andie.draw.DrawBrush;
 import cosc202.andie.draw.DrawPanel;
+import cosc202.andie.draw.DrawShape;
 
 
 /**
@@ -539,7 +540,7 @@ public class EditableImage {
             }
             
             // If op is an instance of a filter using convolution, refresh filters differently
-            if (op instanceof EmbossFilter || op instanceof GaussianBlurFilter || op instanceof SobelFilter || op instanceof MeanFilter || op instanceof DrawBrush) {
+            if (op instanceof EmbossFilter || op instanceof GaussianBlurFilter || op instanceof SobelFilter || op instanceof MeanFilter || op instanceof DrawBrush || op instanceof DrawShape) {
                 refresh(0, op);
             }
             
