@@ -147,7 +147,7 @@ public class Selection {
         p2 = validPoint(e.getX(), e.getY(), scale);
         points.add(p2);
 
-        target.getImage().previewApply(getOperation(true));
+        target.getImage().previewApply(getOperation());
     }
 
     /**
@@ -166,7 +166,7 @@ public class Selection {
             img.previewApply(new BrightnessContrastAdjustment(0, 0));
         }
         else{
-            img.apply(getOperation(false));
+            img.apply(getOperation());
         }
         reset();
     }
@@ -180,18 +180,17 @@ public class Selection {
      * @return The next appropriate operation for the image, based on the tools
      * and other attributes the user has selected.
      */
-    private ImageOperation getOperation(boolean isPreview){
+    private ImageOperation getOperation(){
         Point[] corners = getCorners();
         Point topLeftCorner = new Point((int) (corners[0].x*(target.getImage().getResizeScaleTesting()*1)), (int) (corners[0].y*(target.getImage().getResizeScaleTesting()*1)));
         Point bottomRightCorner = new Point((int) (corners[1].x*(target.getImage().getResizeScaleTesting()*1)), (int) (corners[1].y*(target.getImage().getResizeScaleTesting()*1)));
         if (DrawPanel.getTool().equals(DrawPanel.SELECTION)) return new BrightnessContrastAdjustment(25, 0, topLeftCorner, bottomRightCorner);
-
-        if (DrawPanel.getTool().equals(DrawPanel.BRUSH)) return new DrawBrush(DrawPanel.getStrokeSize(), points, DrawPanel.getPrimary());
-
-        //Lines are a special case of "shape"; their corners need to be p1 and p2, not the top-left and bottom-right corners.
-        if (DrawPanel.getShapeType().equals(DrawPanel.LINE)) return new DrawShape(DrawPanel.getShapeType(), DrawPanel.getFillType(), DrawPanel.getStrokeSize(), p1, p2, DrawPanel.getPrimary(), DrawPanel.getSecondary());
         
-        if(isPreview) return new DrawShape(DrawPanel.getShapeType(), DrawPanel.getFillType(), DrawPanel.getStrokeSize(), topLeftCorner, bottomRightCorner, DrawPanel.getPrimary(), DrawPanel.getSecondary());
+        if (DrawPanel.getTool().equals(DrawPanel.BRUSH)) return new DrawBrush(DrawPanel.getStrokeSize(), points, DrawPanel.getPrimary());
+        
+        //Lines are a special case of "shape"; their corners need to be p1 and p2, not the top-left and bottom-right corners.
+        if (DrawPanel.getShapeType().equals(DrawPanel.LINE)) return new DrawShape(DrawPanel.getShapeType(), DrawPanel.getFillType(), DrawPanel.getStrokeSize(), p1, p2, DrawPanel.getPrimary(), DrawPanel.getSecondary());        
+        
         return new DrawShape(DrawPanel.getShapeType(), DrawPanel.getFillType(), DrawPanel.getStrokeSize(), corners[0], corners[1], DrawPanel.getPrimary(), DrawPanel.getSecondary());
     }
 
