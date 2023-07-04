@@ -55,14 +55,23 @@ public abstract class Preferences{
             prop = new Properties();
             prop.load(inputStream); //open the properties file
             inputStream.close();
-            if(prop.isEmpty()) prop.setProperty("language", "en");
-            
-            prop.setProperty("macroDirectory", getAppDataPath() + "/saved-macros/");
+            if(prop.isEmpty()){
+                prop.setProperty("language", "en");
+                prop.setProperty("macroDirectory", getAppDataPath() + "/saved-macros/");
+                prop.setProperty("initial_x", "10");
+                prop.setProperty("initial_y", "10");
+                prop.setProperty("Frame_width", "600");
+                prop.setProperty("Frame_height", "600");                
+            }
         } catch (NullPointerException | IOException ex) {
             //There is an issue with the config file, so we need to just make a blank version.
             prop = new Properties();
             prop.setProperty("language", "en");
             prop.setProperty("macroDirectory", getAppDataPath() + "/saved-macros/");
+            prop.setProperty("initial_x", "10");
+            prop.setProperty("initial_y", "10");
+            prop.setProperty("Frame_width", "600");
+            prop.setProperty("Frame_height", "600");
         }
     }
 
