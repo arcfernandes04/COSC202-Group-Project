@@ -1,5 +1,8 @@
-# Big Fish ANDIE information
+# ANDIE information
 
+<p align="centre">
+  <img src="ANDIE-prev.png" alt="ANDIE Preview">
+</p>
 
 ## Brief user guide
 
